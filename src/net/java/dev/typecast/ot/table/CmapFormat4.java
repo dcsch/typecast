@@ -54,7 +54,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: CmapFormat4.java,v 1.2 2004-12-21 10:22:55 davidsch Exp $
+ * @version $Id: CmapFormat4.java,v 1.3 2004-12-21 16:57:23 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CmapFormat4 extends CmapFormat {
@@ -115,7 +115,7 @@ public class CmapFormat4 extends CmapFormat {
     }
     
     public Range getRange(int index) throws ArrayIndexOutOfBoundsException {
-        if (index < 0 && index >= _segCount) {
+        if (index < 0 || index >= _segCount) {
             throw new ArrayIndexOutOfBoundsException();
         }
         return new Range(_startCode[index], _endCode[index]);

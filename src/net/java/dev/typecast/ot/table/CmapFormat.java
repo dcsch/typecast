@@ -54,7 +54,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: CmapFormat.java,v 1.2 2004-12-21 10:22:55 davidsch Exp $
+ * @version $Id: CmapFormat.java,v 1.3 2004-12-21 16:56:35 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public abstract class CmapFormat {
@@ -80,11 +80,11 @@ public abstract class CmapFormat {
 
     protected int _format;
     protected int _length;
-    protected int _version;
+    protected int _language;
 
     protected CmapFormat(DataInput di) throws IOException {
         _length = di.readUnsignedShort();
-        _version = di.readUnsignedShort();
+        _language = di.readUnsignedShort();
     }
 
     protected static CmapFormat create(int format, DataInput di)
@@ -111,8 +111,8 @@ public abstract class CmapFormat {
         return _length;
     }
 
-    public int getVersion() {
-        return _version;
+    public int getLanguage() {
+        return _language;
     }
 
     public abstract int getRangeCount();
@@ -128,7 +128,7 @@ public abstract class CmapFormat {
         .append(_format)
         .append(", length: ")
         .append(_length)
-        .append(", version: ")
-        .append(_version).toString();
+        .append(", language: ")
+        .append(_language).toString();
     }
 }
