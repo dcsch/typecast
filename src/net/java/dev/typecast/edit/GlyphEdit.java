@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphEdit.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
+ * $Id: GlyphEdit.java,v 1.3 2004-12-15 14:08:56 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -44,7 +44,7 @@ import net.java.dev.typecast.ot.Glyph;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphEdit.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
+ * @version $Id: GlyphEdit.java,v 1.3 2004-12-15 14:08:56 davidsch Exp $
  */
 public class GlyphEdit extends JPanel implements Scrollable {
 
@@ -60,7 +60,7 @@ public class GlyphEdit extends JPanel implements Scrollable {
     private float _scaleFactor = 0.25f;
 
     private boolean _drawControlPoints = true;
-    private boolean _preview = false;
+    private boolean _preview = true;
     private Set<Point> _selectedPoints = new HashSet<Point>();
 
     //private static final String PROP_SAMPLE_PROPERTY = "SampleProperty";
@@ -166,7 +166,7 @@ public class GlyphEdit extends JPanel implements Scrollable {
         int i;
 
         if (_glyphPath == null) {
-            _glyphPath = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+            _glyphPath = new GeneralPath(GeneralPath.WIND_NON_ZERO);
 
             // Iterate through all of the points in the glyph.  Each time we find a
             // contour end point, add the point range to the path.
