@@ -1,10 +1,52 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
+/*
+
+ ============================================================================
+                   The Apache Software License, Version 1.1
+ ============================================================================
+
+ Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modifica-
+ tion, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of  source code must  retain the above copyright  notice,
+    this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. The end-user documentation included with the redistribution, if any, must
+    include  the following  acknowledgment:  "This product includes  software
+    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
+    Alternately, this  acknowledgment may  appear in the software itself,  if
+    and wherever such third-party acknowledgments normally appear.
+
+ 4. The names "Batik" and  "Apache Software Foundation" must  not  be
+    used to  endorse or promote  products derived from  this software without
+    prior written permission. For written permission, please contact
+    apache@apache.org.
+
+ 5. Products  derived from this software may not  be called "Apache", nor may
+    "Apache" appear  in their name,  without prior written permission  of the
+    Apache Software Foundation.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
+ APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
+ DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
+ ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
+ (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ This software  consists of voluntary contributions made  by many individuals
+ on  behalf of the Apache Software  Foundation. For more  information on the
+ Apache Software Foundation, please see <http://www.apache.org/>.
+
+*/
 
 package net.java.dev.typecast.ot.table;
 
@@ -12,100 +54,54 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: CmapIndexEntry.java,v 1.1.1.1 2004-12-05 23:14:35 davidsch Exp $
+ * @version $Id: CmapIndexEntry.java,v 1.2 2004-12-21 10:22:56 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CmapIndexEntry implements Comparable {
 
-    private int platformId;
-    private int encodingId;
-    private int offset;
-    private CmapFormat format;
+    private int _platformId;
+    private int _encodingId;
+    private int _offset;
+    private CmapFormat _format;
 
     protected CmapIndexEntry(DataInput di) throws IOException {
-        platformId = di.readUnsignedShort();
-        encodingId = di.readUnsignedShort();
-        offset = di.readInt();
+        _platformId = di.readUnsignedShort();
+        _encodingId = di.readUnsignedShort();
+        _offset = di.readInt();
     }
 
     public int getPlatformId() {
-        return platformId;
+        return _platformId;
     }
 
     public int getEncodingId() {
-        return encodingId;
+        return _encodingId;
     }
 
     public int getOffset() {
-        return offset;
-    }
-
-    public String getPlatformName() {
-        switch (platformId) {
-            case 1: return "Macintosh";
-            case 3: return "Windows";
-            default: return "";
-        }
-    }
-
-    public String getEncodingName() {
-        if (platformId == 3) {
-            // Windows specific encodings
-            switch (encodingId) {
-                case 0: return "Symbol";
-                case 1: return "Unicode";
-                case 2: return "ShiftJIS";
-                case 3: return "Big5";
-                case 4: return "PRC";
-                case 5: return "Wansung";
-                case 6: return "Johab";
-                default: return "";
-            }
-        }
-        return "";
+        return _offset;
     }
 
     public CmapFormat getFormat() {
-        return format;
+        return _format;
     }
     
     public void setFormat(CmapFormat format) {
-        this.format = format;
+        _format = format;
     }
 
     public String toString() {
-        String platform;
-        String encoding = "";
-
-        switch (platformId) {
-            case 1: platform = " (Macintosh)"; break;
-            case 3: platform = " (Windows)"; break;
-            default: platform = "";
-        }
-        if (platformId == 3) {
-            // Windows specific encodings
-            switch (encodingId) {
-                case 0: encoding = " (Symbol)"; break;
-                case 1: encoding = " (Unicode)"; break;
-                case 2: encoding = " (ShiftJIS)"; break;
-                case 3: encoding = " (Big5)"; break;
-                case 4: encoding = " (PRC)"; break;
-                case 5: encoding = " (Wansung)"; break;
-                case 6: encoding = " (Johab)"; break;
-                default: encoding = "";
-            }
-        }
         return new StringBuffer()
-        .append( "platform id: " )
-        .append( platformId )
-//        .append( platform )
-        .append(ID.getPlatformName((short) platformId))
-        .append( ", encoding id: " )
-        .append( encodingId )
-//        .append( encoding )
-        .append(ID.getEncodingName((short) platformId, (short) encodingId))
-        .append( ", offset: " )
-        .append( offset ).toString();
+            .append("platform id: ")
+            .append(_platformId)
+            .append(" (")
+            .append(ID.getPlatformName((short) _platformId))
+            .append("), encoding id: ")
+            .append(_encodingId)
+            .append(" (")
+            .append(ID.getEncodingName((short) _platformId, (short) _encodingId))
+            .append("), offset: ")
+            .append(_offset).toString();
     }
 
     public int compareTo(java.lang.Object obj) {

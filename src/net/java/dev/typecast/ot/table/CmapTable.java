@@ -52,10 +52,11 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import java.util.Arrays;
 
 /**
- * @version $Id: CmapTable.java,v 1.2 2004-12-09 23:46:20 davidsch Exp $
+ * @version $Id: CmapTable.java,v 1.3 2004-12-21 10:22:56 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CmapTable implements Table {
@@ -64,10 +65,9 @@ public class CmapTable implements Table {
     private int _version;
     private int _numTables;
     private CmapIndexEntry[] _entries;
-//    private CmapFormat[] formats;
 
     protected CmapTable(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+        _de = (DirectoryEntry) de.clone();
         _version = di.readUnsignedShort();
         _numTables = di.readUnsignedShort();
         long bytesRead = 4;
@@ -78,13 +78,6 @@ public class CmapTable implements Table {
             _entries[i] = new CmapIndexEntry(di);
             bytesRead += 8;
         }
-
-        // Count the number of different encodings
-//        int numEncodings = 0;
-//        for (int i = 0; i < numTables; i++) {
-//            numEncodings++;
-//        }
-//        formats = new CmapFormat[numEncodings];
 
         // Sort into their order of offset
         Arrays.sort(_entries);
@@ -108,7 +101,6 @@ public class CmapTable implements Table {
             int formatType = di.readUnsignedShort();
             lastFormat = CmapFormat.create(formatType, di);
             lastOffset = _entries[i].getOffset();
-//            formats[i] = lastFormat;
             _entries[i].setFormat(lastFormat);
             bytesRead += lastFormat.getLength();
         }
@@ -126,17 +118,12 @@ public class CmapTable implements Table {
         return _entries[i];
     }
     
-//    public CmapFormat getCmapFormat(int i) {
-//        return formats[i];
-//    }
-
     public CmapFormat getCmapFormat(short platformId, short encodingId) {
 
         // Find the requested format
         for (int i = 0; i < _numTables; i++) {
             if (_entries[i].getPlatformId() == platformId
                     && _entries[i].getEncodingId() == encodingId) {
-//                return formats[i];
                 return _entries[i].getFormat();
             }
         }

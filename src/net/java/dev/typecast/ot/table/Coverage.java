@@ -13,7 +13,7 @@ import java.io.*;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Coverage.java,v 1.1.1.1 2004-12-05 23:14:36 davidsch Exp $
+ * @version $Id: Coverage.java,v 1.2 2004-12-21 10:22:56 davidsch Exp $
  */
 public abstract class Coverage {
 
@@ -21,7 +21,7 @@ public abstract class Coverage {
 
     /**
      * @param glyphId The ID of the glyph to find.
-     * @returns The index of the glyph within the coverage, or -1 if the glyph
+     * @return The index of the glyph within the coverage, or -1 if the glyph
      * can't be found.
      */
     public abstract int findGlyph(int glyphId);
