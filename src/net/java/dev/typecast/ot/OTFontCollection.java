@@ -1,5 +1,5 @@
 /*
- * $Id: OTFontCollection.java,v 1.1.1.1 2004-12-05 23:14:31 davidsch Exp $
+ * $Id: OTFontCollection.java,v 1.2 2004-12-09 23:45:02 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -37,7 +37,7 @@ import net.java.dev.typecast.ot.table.TTCHeader;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: OTFontCollection.java,v 1.1.1.1 2004-12-05 23:14:31 davidsch Exp $
+ * @version $Id: OTFontCollection.java,v 1.2 2004-12-09 23:45:02 davidsch Exp $
  */
 public class OTFontCollection {
 
@@ -128,9 +128,9 @@ public class OTFontCollection {
                 for (int i = 0; i < resourceType.getCount(); i++) {
                     ResourceReference resourceReference = resourceType.getReference(i);
                     _fonts[i] = new OTFont(this);
-                    _fonts[i].read(
-                        dis,
-                        resourceHeader.getDataOffset() + resourceReference.getDataOffset() + 4);
+                    int offset = resourceHeader.getDataOffset() +
+                            resourceReference.getDataOffset() + 4;
+                    _fonts[i].read(dis, offset, offset);
                 }
 
             } else if (TTCHeader.isTTC(dis)) {
@@ -141,14 +141,14 @@ public class OTFontCollection {
                 _fonts = new OTFont[_ttcHeader.getDirectoryCount()];
                 for (int i = 0; i < _ttcHeader.getDirectoryCount(); i++) {
                     _fonts[i] = new OTFont(this);
-                    _fonts[i].read(dis, _ttcHeader.getTableDirectory(i));
+                    _fonts[i].read(dis, _ttcHeader.getTableDirectory(i), 0);
                 }
             } else {
 
                 // This is a standalone font file
                 _fonts = new OTFont[1];
                 _fonts[0] = new OTFont(this);
-                _fonts[0].read(dis, 0);
+                _fonts[0].read(dis, 0, 0);
             }
             dis.close();
         } catch (IOException e) {
