@@ -1,5 +1,5 @@
 /*
- * $Id: Splash.java,v 1.1.1.1 2004-12-05 23:14:12 davidsch Exp $
+ * $Id: Splash.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import java.awt.Dimension;
 import java.awt.Image;
@@ -28,7 +28,7 @@ import java.net.URL;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Splash.java,v 1.1.1.1 2004-12-05 23:14:12 davidsch Exp $
+ * @version $Id: Splash.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  */
 public class Splash extends javax.swing.JWindow {
 

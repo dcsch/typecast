@@ -1,5 +1,5 @@
 /*
- * $Id: TableTreeCellRenderer.java,v 1.1.1.1 2004-12-05 23:14:14 davidsch Exp $
+ * $Id: TableTreeCellRenderer.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import java.awt.*;
 import javax.swing.*;
@@ -26,7 +26,7 @@ import javax.swing.tree.*;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TableTreeCellRenderer.java,v 1.1.1.1 2004-12-05 23:14:14 davidsch Exp $
+ * @version $Id: TableTreeCellRenderer.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  */
 public class TableTreeCellRenderer extends JLabel implements TreeCellRenderer {
     

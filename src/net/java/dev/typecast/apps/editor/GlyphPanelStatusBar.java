@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanelStatusBar.java,v 1.1.1.1 2004-12-05 23:14:11 davidsch Exp $
+ * $Id: GlyphPanelStatusBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import net.java.dev.typecast.edit.GlyphEdit;
 import java.awt.event.MouseEvent;
@@ -35,7 +35,7 @@ import net.java.dev.typecast.ot.Point;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanelStatusBar.java,v 1.1.1.1 2004-12-05 23:14:11 davidsch Exp $
+ * @version $Id: GlyphPanelStatusBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  */
 public class GlyphPanelStatusBar extends JPanel {
 

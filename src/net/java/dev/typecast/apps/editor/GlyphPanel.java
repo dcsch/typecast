@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanel.java,v 1.1.1.1 2004-12-05 23:14:11 davidsch Exp $
+ * $Id: GlyphPanel.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import net.java.dev.typecast.edit.GlyphEdit;
 import net.java.dev.typecast.ot.Glyph;
@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.1.1.1 2004-12-05 23:14:11 davidsch Exp $
+ * @version $Id: GlyphPanel.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  */
 public class GlyphPanel extends javax.swing.JPanel {
 

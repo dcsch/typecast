@@ -1,5 +1,5 @@
 /*
- * $Id: TypecastPrefs.java,v 1.1 2004-12-09 23:41:29 davidsch Exp $
+ * $Id: EditorPrefs.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import java.util.prefs.Preferences;
 import java.awt.Point;
@@ -27,9 +27,9 @@ import java.awt.Dimension;
 /**
  * A class to handle all the various application preferences
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TypecastPrefs.java,v 1.1 2004-12-09 23:41:29 davidsch Exp $
+ * @version $Id: EditorPrefs.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  */
-public class TypecastPrefs {
+public class EditorPrefs {
     
     // Key strings
     private static final String APP_WINDOW_POS = "app_position";
@@ -48,7 +48,7 @@ public class TypecastPrefs {
     private int _treeWidth;
 
     /** Creates a new instance of TypecastPrefs */
-    public TypecastPrefs() {
+    public EditorPrefs() {
     }
     
     public void load(Preferences prefs) {

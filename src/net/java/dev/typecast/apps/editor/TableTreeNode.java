@@ -1,5 +1,5 @@
 /*
- * $Id: TableTreeNode.java,v 1.1.1.1 2004-12-05 23:14:14 davidsch Exp $
+ * $Id: TableTreeNode.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,25 +18,25 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TableTreeNode.java,v 1.1.1.1 2004-12-05 23:14:14 davidsch Exp $
+ * @version $Id: TableTreeNode.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  */
 public class TableTreeNode extends javax.swing.tree.DefaultMutableTreeNode {
 
     private static final long serialVersionUID = 1L;
 
-    private String nodeName;
-    private int index;
+    private String _nodeName;
+    private int _index;
     
     /** Creates new TableTreeNode */
     public TableTreeNode(String nodeName, Object userObject, int index) {
         super(userObject);
-        this.nodeName = nodeName;
-        this.index = index;
+        _nodeName = nodeName;
+        _index = index;
     }
 
     public TableTreeNode(String nodeName, Object userObject) {
@@ -44,10 +44,10 @@ public class TableTreeNode extends javax.swing.tree.DefaultMutableTreeNode {
     }
 
     public int getIndex() {
-        return index;
+        return _index;
     }
     
     public String toString() {
-        return nodeName;
+        return _nodeName;
     }
 }

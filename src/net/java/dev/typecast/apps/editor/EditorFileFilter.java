@@ -27,7 +27,7 @@
  * facility. Licensee represents and warrants that it will not use or
  * redistribute the Software for such purposes.
  */
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import java.io.File;
 import java.util.Hashtable;
@@ -54,7 +54,7 @@ import javax.swing.filechooser.*;
  * @version 1.9 04/23/99
  * @author Jeff Dinkins
  */
-public class ExampleFileFilter extends FileFilter {
+public class EditorFileFilter extends FileFilter {
 
     private static String TYPE_UNKNOWN = "Type Unknown";
     private static String HIDDEN_FILE = "Hidden File";
@@ -70,7 +70,7 @@ public class ExampleFileFilter extends FileFilter {
      *
      * @see #addExtension
      */
-    public ExampleFileFilter() {
+    public EditorFileFilter() {
 	this.filters = new Hashtable<String, FileFilter>();
     }
 
@@ -80,7 +80,7 @@ public class ExampleFileFilter extends FileFilter {
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String extension) {
+    public EditorFileFilter(String extension) {
 	this(extension,null);
     }
 
@@ -93,7 +93,7 @@ public class ExampleFileFilter extends FileFilter {
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String extension, String description) {
+    public EditorFileFilter(String extension, String description) {
 	this();
 	if(extension!=null) addExtension(extension);
  	if(description!=null) setDescription(description);
@@ -108,7 +108,7 @@ public class ExampleFileFilter extends FileFilter {
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String[] filters) {
+    public EditorFileFilter(String[] filters) {
 	this(filters, null);
     }
 
@@ -120,7 +120,7 @@ public class ExampleFileFilter extends FileFilter {
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String[] filters, String description) {
+    public EditorFileFilter(String[] filters, String description) {
 	this();
 	for (int i = 0; i < filters.length; i++) {
 	    // add filters one by one

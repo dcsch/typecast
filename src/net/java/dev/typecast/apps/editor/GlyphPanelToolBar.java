@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanelToolBar.java,v 1.1.1.1 2004-12-05 23:14:12 davidsch Exp $
+ * $Id: GlyphPanelToolBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
 import java.net.URL;
 import javax.swing.ImageIcon;
@@ -28,7 +28,7 @@ import javax.swing.JToolBar;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanelToolBar.java,v 1.1.1.1 2004-12-05 23:14:12 davidsch Exp $
+ * @version $Id: GlyphPanelToolBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
  */
 public class GlyphPanelToolBar extends javax.swing.JToolBar {
 

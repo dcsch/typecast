@@ -1,5 +1,5 @@
 /*
- * $Id: TableTreeBuilder.java,v 1.1.1.1 2004-12-05 23:14:13 davidsch Exp $
+ * $Id: TableTreeBuilder.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -18,9 +18,11 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.apps;
+package net.java.dev.typecast.apps.editor;
 
-import javax.swing.tree.*;
+import java.util.Enumeration;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.DefaultTreeModel;
 import net.java.dev.typecast.ot.OTFont;
 import net.java.dev.typecast.ot.OTFontCollection;
 import net.java.dev.typecast.ot.table.CmapIndexEntry;
@@ -44,7 +46,7 @@ import net.java.dev.typecast.ot.table.Table;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TableTreeBuilder.java,v 1.1.1.1 2004-12-05 23:14:13 davidsch Exp $
+ * @version $Id: TableTreeBuilder.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
  */
 public class TableTreeBuilder {
 
@@ -231,7 +233,7 @@ public class TableTreeBuilder {
 
     public static void addFontTree(TreeModel treeModel, OTFontCollection fc) {
         
-        TableTreeNode fcNode = createNode(fc.getFileName(), fc);
+        TableTreeNode fcNode = createNode(fc.getPathName(), fc);
         ((TableTreeNode) treeModel.getRoot()).add(fcNode);
 
         // Add each font in this collection
