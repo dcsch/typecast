@@ -70,7 +70,7 @@ import net.java.dev.typecast.ot.table.TableFactory;
 
 /**
  * The TrueType font.
- * @version $Id: OTFont.java,v 1.2 2004-12-09 23:45:02 davidsch Exp $
+ * @version $Id: OTFont.java,v 1.3 2004-12-21 10:20:06 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class OTFont {
@@ -198,23 +198,28 @@ public class OTFont {
 
         // Get references to commonly used tables (these happen to be all the
         // required tables)
-        _os2 = (Os2Table) getTable(Table.OS_2);
         _cmap = (CmapTable) getTable(Table.cmap);
-        _glyf = (GlyfTable) getTable(Table.glyf);
         _head = (HeadTable) getTable(Table.head);
         _hhea = (HheaTable) getTable(Table.hhea);
         _hmtx = (HmtxTable) getTable(Table.hmtx);
-        _loca = (LocaTable) getTable(Table.loca);
         _maxp = (MaxpTable) getTable(Table.maxp);
         _name = (NameTable) getTable(Table.name);
+        _os2 = (Os2Table) getTable(Table.OS_2);
         _post = (PostTable) getTable(Table.post);
+
+        // If this is a TrueType outline, then we'll have at least the
+        // following tables
+        _glyf = (GlyfTable) getTable(Table.glyf);
+        _loca = (LocaTable) getTable(Table.loca);
 
         // Initialize the tables that require it
         _hmtx.init(
                 _hhea.getNumberOfHMetrics(),
                 _maxp.getNumGlyphs() - _hhea.getNumberOfHMetrics());
-        _loca.init(_maxp.getNumGlyphs(), _head.getIndexToLocFormat() == 0);
-        _glyf.init(_maxp.getNumGlyphs(), _loca);
+        if (_glyf != null) {
+            _loca.init(_maxp.getNumGlyphs(), _head.getIndexToLocFormat() == 0);
+            _glyf.init(_maxp.getNumGlyphs(), _loca);
+        }
     }
 
     public String toString() {
