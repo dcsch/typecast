@@ -1,5 +1,5 @@
 /*
- * $Id: PointTool.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * $Id: PointTool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -30,7 +30,7 @@ import net.java.dev.typecast.ot.Glyph;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: PointTool.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * @version $Id: PointTool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  */
 public class PointTool extends Tool {
 
@@ -39,11 +39,18 @@ public class PointTool extends Tool {
     
     /** Creates new PointTool */
     public PointTool(GlyphEdit glyphEdit) {
-        this._glyphEdit = glyphEdit;
-        glyphEdit.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        _glyphEdit = glyphEdit;
+        
+        // BUG: The crosshair cursor keeps coming up as a text cursor on my
+        // Windows XP system :-(
+        //_glyphEdit.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        _glyphEdit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
-    void pressed(Point p) {
+    /**
+     * Selects a point
+     */
+    public void pressed(Point p) {
         _glyphEdit.getSelectedPoints().clear();
         Glyph glyph = _glyphEdit.getGlyph();
         for (int i = 0; i < glyph.getPointCount(); i++) {
@@ -55,10 +62,14 @@ public class PointTool extends Tool {
                 _glyphEdit.getSelectedPoints().add(gp);
             }
         }
+        _glyphEdit.modified();
         _glyphEdit.repaint();
     }
     
-    void pressedControl(Point p) {
+    /**
+     * Toggles the selected point between on-curve and off-curve
+     */
+    public void pressedControl(Point p) {
         Glyph glyph = _glyphEdit.getGlyph();
         for (int i = 0; i < glyph.getPointCount(); i++) {
             net.java.dev.typecast.ot.Point gp = glyph.getPoint(i);
@@ -69,10 +80,14 @@ public class PointTool extends Tool {
                 gp.onCurve = !gp.onCurve;
             }
         }
+        _glyphEdit.modified();
         _glyphEdit.repaint();
     }
     
-    void dragged(Point p) {
+    /**
+     * Moves the selected points
+     */
+    public void dragged(Point p) {
         int x = (int)(p.x / _glyphEdit.getScaleFactor() - _glyphEdit.getTranslateX());
         int y = -(int)(p.y / _glyphEdit.getScaleFactor() - _glyphEdit.getTranslateY());
         Iterator iter = _glyphEdit.getSelectedPoints().iterator();
@@ -81,14 +96,13 @@ public class PointTool extends Tool {
             gp.x = x;
             gp.y = y;
         }
+        _glyphEdit.modified();
         _glyphEdit.repaint();
     }
-    
-    void released(Point p) {
+
+    /**
+     * nop
+     */
+    public void released(Point p) {
     }
-    
-//    void setCursor(Window window) {
-//        window.setCursor(Cursor.CROSSHAIR_CURSOR);
-//    }
-    
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: Tool.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * $Id: Tool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -26,17 +26,15 @@ import java.awt.Window;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Tool.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * @version $Id: Tool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  */
 public abstract class Tool {
 
-    /** Creates new Tool */
-//    public Tool() {
-//    }
+    public abstract void pressed(Point p);
 
-//    abstract void setCursor(Window window);
-    abstract void pressed(Point p);
-    abstract void pressedControl(Point p);
-    abstract void released(Point p);
-    abstract void dragged(Point p);
+    public abstract void pressedControl(Point p);
+    
+    public abstract void released(Point p);
+    
+    public abstract void dragged(Point p);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphEdit.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * $Id: GlyphEdit.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -44,7 +44,7 @@ import net.java.dev.typecast.ot.Glyph;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphEdit.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
+ * @version $Id: GlyphEdit.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  */
 public class GlyphEdit extends JPanel implements Scrollable {
 
@@ -53,13 +53,14 @@ public class GlyphEdit extends JPanel implements Scrollable {
     private Glyph _glyph = null;
     private OTFont _font = null;
     private Tool _tool = null;
+    private GeneralPath _glyphPath;
 
     private int _translateX = 0;
     private int _translateY = 0;
     private float _scaleFactor = 0.25f;
 
     private boolean _drawControlPoints = true;
-    private boolean _preview = true;
+    private boolean _preview = false;
     private Set<Point> _selectedPoints = new HashSet<Point>();
 
     //private static final String PROP_SAMPLE_PROPERTY = "SampleProperty";
@@ -164,20 +165,26 @@ public class GlyphEdit extends JPanel implements Scrollable {
         int count = 0;
         int i;
 
-        GeneralPath gp = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-        for (i = 0; i < _glyph.getPointCount(); i++) {
-            count++;
-            if (_glyph.getPoint(i).endOfContour) {
-//                drawContour(g2d, firstIndex, count);
-                addContourToPath(gp, firstIndex, count);
-                firstIndex = i + 1;
-                count = 0;
+        if (_glyphPath == null) {
+            _glyphPath = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+
+            // Iterate through all of the points in the glyph.  Each time we find a
+            // contour end point, add the point range to the path.
+            for (i = 0; i < _glyph.getPointCount(); i++) {
+                count++;
+                if (_glyph.getPoint(i).endOfContour) {
+                    addContourToPath(_glyphPath, firstIndex, count);
+                    firstIndex = i + 1;
+                    count = 0;
+                }
             }
         }
+        
+        // Render the glyph path
         if (_preview) {
-            g2d.fill(gp);
+            g2d.fill(_glyphPath);
         } else {
-            g2d.draw(gp);
+            g2d.draw(_glyphPath);
         }
 
         if (_drawControlPoints) {
@@ -264,95 +271,6 @@ public class GlyphEdit extends JPanel implements Scrollable {
         }
     }
 
-    private void drawContour(Graphics2D g2d, int startIndex, int count) {
-        int offset = 0;
-//        while (offset < (startIndex + count)) {
-        while (offset < count) {
-            Point point_minus1 = _glyph.getPoint((offset==0) ? startIndex+count-1 : startIndex+(offset-1)%count);
-            Point point = _glyph.getPoint(startIndex + offset%count);
-            Point point_plus1 = _glyph.getPoint(startIndex + (offset+1)%count);
-            Point point_plus2 = _glyph.getPoint(startIndex + (offset+2)%count);
-            if (point.onCurve && point_plus1.onCurve) {
-                Line2D.Float line = new Line2D.Float(point.x, -point.y, point_plus1.x, -point_plus1.y);
-                if (_preview) {
-                    g2d.fill(line);
-                } else {
-                    g2d.draw(line);
-                }
-                offset++;
-            } else if (point.onCurve && !point_plus1.onCurve && point_plus2.onCurve) {
-                QuadCurve2D.Float curve = new QuadCurve2D.Float(
-                    point.x,
-                    -point.y,
-                    point_plus1.x,
-                    -point_plus1.y,
-                    point_plus2.x,
-                    -point_plus2.y);
-                if (_preview) {
-                    g2d.fill(curve);
-                } else {
-                    g2d.draw(curve);
-                }
-                offset+=2;
-            } else if (point.onCurve && !point_plus1.onCurve && !point_plus2.onCurve) {
-                QuadCurve2D.Float curve = new QuadCurve2D.Float(
-                    point.x,
-                    -point.y,
-                    point_plus1.x,
-                    -point_plus1.y,
-                    midValue(point_plus1.x, point_plus2.x),
-                    -midValue(point_plus1.y, point_plus2.y));
-                if (_preview) {
-                    g2d.fill(curve);
-                } else {
-                    g2d.draw(curve);
-                }
-                offset+=2;
-            } else if (!point.onCurve && !point_plus1.onCurve) {
-                QuadCurve2D.Float curve = new QuadCurve2D.Float(
-                    midValue(point_minus1.x, point.x),
-                    -midValue(point_minus1.y, point.y),
-                    point.x,
-                    -point.y,
-                    midValue(point.x, point_plus1.x),
-                    -midValue(point.y, point_plus1.y));
-                if (_preview) {
-                    g2d.fill(curve);
-                } else {
-                    g2d.draw(curve);
-                }
-                offset++;
-            } else if (!point.onCurve && point_plus1.onCurve) {
-                QuadCurve2D.Float curve = new QuadCurve2D.Float(
-                    midValue(point_minus1.x, point.x),
-                    -midValue(point_minus1.y, point.y),
-                    point.x,
-                    -point.y,
-                    point_plus1.x,
-                    -point_plus1.y);
-                if (_preview) {
-                    g2d.fill(curve);
-                } else {
-                    g2d.draw(curve);
-                }
-                offset++;
-            } else {
-                System.out.println("drawGlyph case not catered for!!");
-                break;
-            }
-        }
-    }
-/*  
-    private static int getCurveValue(long t, long p0, long p1, long p2) {
-        return (int)((((0x40-t)*(0x40-t)*p0)>>12)
-            + ((0x80*t*(0x40-t)*p1)>>18)
-            + ((t*t*p2)>>12));
-    }
-*/
-//    public int getGlyphIndex() {
-//        return glyphIndex;
-//    }
-
     private static int midValue(int a, int b) {
         return a + (b - a)/2;
     }
@@ -362,7 +280,13 @@ public class GlyphEdit extends JPanel implements Scrollable {
     }
     
     public void setGlyph(Glyph glyph) {
-        this._glyph = glyph;
+        
+        // Check if we actually have any work to do
+        //if (_glyph == glyph) {
+        //    return;
+        //}
+        
+        _glyph = glyph;
         
         // How much space does this glyph need?
 //        xOrigin = 0x5000;
@@ -370,8 +294,15 @@ public class GlyphEdit extends JPanel implements Scrollable {
 
         setPreferredSize(new Dimension(1024, 1024));
         setSize(new Dimension(1024, 1024));
+        
+        // We have a new glyph, so repaint
+        _glyphPath = null;
         invalidate();
         repaint();
+    }
+    
+    public void modified() {
+        _glyphPath = null;
     }
 
     public int getTranslateX() {
@@ -427,7 +358,7 @@ public class GlyphEdit extends JPanel implements Scrollable {
 //    }
     
     public void setFont(OTFont font) {
-        this._font = font;
+        _font = font;
 //        glyph = font.getGlyph(glyphIndex);
         _glyph = null;
 //        repaint();
