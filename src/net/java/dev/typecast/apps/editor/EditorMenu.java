@@ -1,5 +1,5 @@
 /*
- * $Id: EditorMenu.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * $Id: EditorMenu.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -33,6 +33,7 @@ import java.util.Properties;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
@@ -41,7 +42,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /**
  * The application menu bar
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorMenu.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * @version $Id: EditorMenu.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  */
 public class EditorMenu {
 
@@ -51,6 +52,8 @@ public class EditorMenu {
     private OTFontCollection _selectedFontCollection;
     private JMenuItem _closeMenuItem;
     private String _closeMenuString;
+    private JCheckBoxMenuItem _previewMenuItem;
+    private JCheckBoxMenuItem _showPointsMenuItem;
     
     /** Creates a new instance of TypecastMenu */
     public EditorMenu(Main app, ResourceBundle rb, Properties props) {
@@ -77,7 +80,15 @@ public class EditorMenu {
             _closeMenuItem.setEnabled(false);
         }
     }
-
+    
+    public boolean isPreview() {
+        return _previewMenuItem.getState();
+    }
+    
+    public boolean isShowPoints() {
+        return _showPointsMenuItem.getState();
+    }
+    
     private static void parseMenuString(String menuString, String[] tokens) {
         try {
             StreamTokenizer st = new StreamTokenizer(new StringReader(menuString));
@@ -131,7 +142,30 @@ public class EditorMenu {
             ActionListener al) {
         String[] tokens = new String[3];
         parseMenuString(menuText, tokens);
-        return createMenuItem(JMenuItem.class, tokens[0], tokens[1], tokens[2], accelerator, enabled, al);
+        return createMenuItem(
+                JMenuItem.class,
+                tokens[0],
+                tokens[1],
+                tokens[2],
+                accelerator,
+                enabled,
+                al);
+    }
+
+    private static JCheckBoxMenuItem createCheckBoxMenuItem(
+            String menuText,
+            KeyStroke accelerator,
+            ActionListener al) {
+        String[] tokens = new String[3];
+        parseMenuString(menuText, tokens);
+        return (JCheckBoxMenuItem) createMenuItem(
+                JCheckBoxMenuItem.class,
+                tokens[0],
+                tokens[1],
+                tokens[2],
+                accelerator,
+                true,
+                al);
     }
 
     private static JMenu createMenu(String menuText) {
@@ -361,23 +395,23 @@ public class EditorMenu {
     
     private JMenu createViewMenu() {
         JMenu menu = createMenu(_rb.getString("Typecast.menu.view"));
-        menu.add(createMenuItem(
+        menu.add(_previewMenuItem = createCheckBoxMenuItem(
                 _rb.getString("Typecast.menu.view.preview"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK),
-                true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        //setPreview(!getPreview());
+                        _app.changeGlyphView();
                     }
                 }));
-        menu.add(createMenuItem(
+        menu.add(_showPointsMenuItem = createCheckBoxMenuItem(
                 _rb.getString("Typecast.menu.view.showPoints"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK),
-                true,
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK),
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        _app.changeGlyphView();
                     }
                 }));
+        _showPointsMenuItem.setState(true);
         JMenu subMenu = createMenu(_rb.getString("Typecast.menu.view.magnification"));
         menu.add(subMenu);
         subMenu.add(createMenuItem(

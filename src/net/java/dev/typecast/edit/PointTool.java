@@ -1,5 +1,5 @@
 /*
- * $Id: PointTool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
+ * $Id: PointTool.java,v 1.3 2004-12-21 10:24:57 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -22,15 +22,20 @@ package net.java.dev.typecast.edit;
 
 import java.awt.Cursor;
 import java.awt.Point;
+
 import java.util.Iterator;
 import java.util.Set;
+
 import net.java.dev.typecast.edit.GlyphEdit;
+
 import net.java.dev.typecast.ot.Glyph;
 
 /**
- *
+ * A simple point selection and manipulation tool.  Allows the user to select a
+ * point with the cursor, to move that point by dragging, and to move the point
+ * on- and off-curve by selecting the point with the control key pressed.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: PointTool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
+ * @version $Id: PointTool.java,v 1.3 2004-12-21 10:24:57 davidsch Exp $
  */
 public class PointTool extends Tool {
 
@@ -55,8 +60,8 @@ public class PointTool extends Tool {
         Glyph glyph = _glyphEdit.getGlyph();
         for (int i = 0; i < glyph.getPointCount(); i++) {
             net.java.dev.typecast.ot.Point gp = glyph.getPoint(i);
-            float gpx = _glyphEdit.getScaleFactor() * (gp.x + _glyphEdit.getTranslateX());
-            float gpy = _glyphEdit.getScaleFactor() * (-gp.y + _glyphEdit.getTranslateY());
+            double gpx = _glyphEdit.getScaleFactor() * (gp.x + _glyphEdit.getTranslateX());
+            double gpy = _glyphEdit.getScaleFactor() * (-gp.y + _glyphEdit.getTranslateY());
             if (((gpx >= p.x - 2) && (gpx <= p.x + 2)) &&
                 ((gpy >= p.y - 2) && (gpy <= p.y + 2))) {
                 _glyphEdit.getSelectedPoints().add(gp);
@@ -73,8 +78,8 @@ public class PointTool extends Tool {
         Glyph glyph = _glyphEdit.getGlyph();
         for (int i = 0; i < glyph.getPointCount(); i++) {
             net.java.dev.typecast.ot.Point gp = glyph.getPoint(i);
-            float gpx = _glyphEdit.getScaleFactor() * (gp.x + _glyphEdit.getTranslateX());
-            float gpy = _glyphEdit.getScaleFactor() * (-gp.y + _glyphEdit.getTranslateY());
+            double gpx = _glyphEdit.getScaleFactor() * (gp.x + _glyphEdit.getTranslateX());
+            double gpy = _glyphEdit.getScaleFactor() * (-gp.y + _glyphEdit.getTranslateY());
             if (((gpx >= p.x - 2) && (gpx <= p.x + 2)) &&
                 ((gpy >= p.y - 2) && (gpy <= p.y + 2))) {
                 gp.onCurve = !gp.onCurve;

@@ -78,7 +78,7 @@ import org.apache.batik.util.XMLConstants;
 /**
  * Converts a TrueType font to an SVG embedded font.
  *
- * @version $Id: SVGExporter.java,v 1.1.1.1 2004-12-05 23:14:24 davidsch Exp $
+ * @version $Id: SVGExporter.java,v 1.2 2004-12-21 10:23:47 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class SVGExporter
@@ -608,7 +608,7 @@ public class SVGExporter
 
     /**
      * Does the deed
-     * @param pathName the path name of the SVG file to create
+     * @param os the stream to put the SVG data to
      */
     public void export(OutputStream os) throws TableException {
         PrintStream ps = new PrintStream(os);

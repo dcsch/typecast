@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanelStatusBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * $Id: GlyphPanelStatusBar.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -20,50 +20,69 @@
 
 package net.java.dev.typecast.apps.editor;
 
-import net.java.dev.typecast.edit.GlyphEdit;
-import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
+
+import java.awt.event.MouseEvent;
+
 import java.net.URL;
+
 import java.util.Set;
-import javax.swing.event.MouseInputListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+
+import javax.swing.event.MouseInputListener;
+
+import net.java.dev.typecast.edit.GlyphEdit;
+
 import net.java.dev.typecast.ot.Point;
 
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanelStatusBar.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * @version $Id: GlyphPanelStatusBar.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  */
 public class GlyphPanelStatusBar extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private GlyphEdit glyphEdit;
-    private JLabel cursorPos;
-    private JLabel selPos;
-    private JLabel selDelta;
+    private GlyphEdit _glyphEdit;
+    private JLabel _cursorPos;
+    private JLabel _selPos;
+    private JLabel _selDelta;
     
     /** Creates new GlyphEditStatusBar */
     public GlyphPanelStatusBar() {
         setLayout(new GridLayout(1, 5));
         URL iconURL = ClassLoader.getSystemResource("images/cursor_16x16.gif");
-        add(cursorPos = new JLabel("0, 0", new ImageIcon(iconURL), SwingConstants.LEFT));
+        add(_cursorPos = new JLabel(
+                "0, 0",
+                new ImageIcon(iconURL),
+                SwingConstants.LEFT));
         iconURL = ClassLoader.getSystemResource("images/point_selected_16.gif");
-        add(selPos = new JLabel("---, ---", new ImageIcon(iconURL), SwingConstants.LEFT));
-        iconURL = ClassLoader.getSystemResource("images/point_and_cursor_16.gif");
-        add(selDelta = new JLabel("---, ---", new ImageIcon(iconURL), SwingConstants.LEFT));
+        add(_selPos = new JLabel(
+                "---, ---",
+                new ImageIcon(iconURL),
+                SwingConstants.LEFT));
+        iconURL = ClassLoader.getSystemResource(
+                "images/point_and_cursor_16.gif");
+        add(_selDelta = new JLabel(
+                "---, ---",
+                new ImageIcon(iconURL),
+                SwingConstants.LEFT));
     }
 
     public GlyphEdit getGlyphEdit() {
-        return glyphEdit;
+        return _glyphEdit;
     }
     
     public void setGlyphEdit(GlyphEdit glyphEdit) {
-        this.glyphEdit = glyphEdit;
+        _glyphEdit = glyphEdit;
 
+        // Create a MouseInputListener to track the location of the cursor
+        // within the GlyphEdit window
         MouseInputListener mil = new MouseInputListener() {
             public void mouseClicked(MouseEvent e) { }
             public void mouseEntered(MouseEvent e) { }
@@ -86,30 +105,30 @@ public class GlyphPanelStatusBar extends JPanel {
     }
     
     private void setCursorStatus(int x, int y) {
-        float f = glyphEdit.getScaleFactor();
-        int x1 = (int)((float) x / f - (float) glyphEdit.getTranslateX());
-        int y1 = -(int)((float) y / f - (float) glyphEdit.getTranslateY());
+        double f = _glyphEdit.getScaleFactor();
+        int x1 = (int)((double) x / f - (double) _glyphEdit.getTranslateX());
+        int y1 = -(int)((double) y / f - (double) _glyphEdit.getTranslateY());
         
         // Cursor position
-        cursorPos.setText(x1 + ", " + y1);
+        _cursorPos.setText(x1 + ", " + y1);
         
         // Difference between cursor and selected point
-        Set s = glyphEdit.getSelectedPoints();
+        Set s = _glyphEdit.getSelectedPoints();
         if (s.size() == 1) {
             Point p = (Point) s.iterator().next();
-            selDelta.setText((x1 - p.x) + ", " + (y1 - p.y));
+            _selDelta.setText((x1 - p.x) + ", " + (y1 - p.y));
         } else {
-            selDelta.setText("---, ---");
+            _selDelta.setText("---, ---");
         }
     }
     
     private void setSelectedStatus() {
-        Set s = glyphEdit.getSelectedPoints();
+        Set s = _glyphEdit.getSelectedPoints();
         if (s.size() == 1) {
             Point p = (Point) s.iterator().next();
-            selPos.setText(p.x + ", " + p.y);
+            _selPos.setText(p.x + ", " + p.y);
         } else {
-            selPos.setText("---, ---");
+            _selPos.setText("---, ---");
         }
     }
 }

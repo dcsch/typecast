@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanel.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * $Id: GlyphPanel.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -20,54 +20,56 @@
 
 package net.java.dev.typecast.apps.editor;
 
-import net.java.dev.typecast.edit.GlyphEdit;
-import net.java.dev.typecast.ot.Glyph;
 import java.awt.BorderLayout;
 import java.awt.Color;
+
 import java.util.Properties;
+
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import net.java.dev.typecast.edit.GlyphEdit;
+import net.java.dev.typecast.ot.Glyph;
 
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * @version $Id: GlyphPanel.java,v 1.2 2004-12-21 10:26:10 davidsch Exp $
  */
-public class GlyphPanel extends javax.swing.JPanel {
+public class GlyphPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private Properties properties;
-    private GlyphEdit glyphEdit = new GlyphEdit();
-    private GlyphPanelToolBar toolBar = new GlyphPanelToolBar();
-    private GlyphPanelStatusBar glyphPanelStatusBar = new GlyphPanelStatusBar();
+    private Properties _properties;
+    private GlyphEdit _glyphEdit = new GlyphEdit();
+    private GlyphPanelToolBar _toolBar = new GlyphPanelToolBar();
+    private GlyphPanelStatusBar _glyphPanelStatusBar =
+            new GlyphPanelStatusBar();
 
     /** Creates new GlyphPanel */
     public GlyphPanel(Properties properties) {
-        this.properties = properties;
+        _properties = properties;
         setLayout(new BorderLayout());
 
         // Toolbar
-        add(toolBar, BorderLayout.NORTH);
+        add(_toolBar, BorderLayout.NORTH);
 
         // Editor
-        glyphEdit.setBackground(Color.white);
-        glyphEdit.setScaleFactor(Float.valueOf(properties.getProperty("Zoom", "0.25")).floatValue());
-        add(new JScrollPane(glyphEdit), BorderLayout.CENTER);
+        _glyphEdit.setBackground(Color.white);
+        _glyphEdit.setScaleFactor(
+                Float.valueOf(properties.getProperty("Zoom", "0.25")).floatValue());
+        add(new JScrollPane(_glyphEdit), BorderLayout.CENTER);
 
         // Status bar
-        glyphPanelStatusBar.setGlyphEdit(glyphEdit);
-        add(glyphPanelStatusBar, BorderLayout.SOUTH);
+        _glyphPanelStatusBar.setGlyphEdit(_glyphEdit);
+        add(_glyphPanelStatusBar, BorderLayout.SOUTH);
     }
     
-    public void setFont(net.java.dev.typecast.ot.OTFont font) {
-        glyphEdit.setFont(font);
-    }
-    
-    public void setGlyph(Glyph glyph) {
-        glyphEdit.setGlyph(glyph);
+    public GlyphEdit getGlyphEdit() {
+        return _glyphEdit;
     }
     
     public void setProperties() {
-        properties.setProperty("Zoom", String.valueOf(glyphEdit.getScaleFactor()));
+        _properties.setProperty("Zoom", String.valueOf(_glyphEdit.getScaleFactor()));
     }
 }
