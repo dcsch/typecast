@@ -1,10 +1,52 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
+/*
+
+ ============================================================================
+                   The Apache Software License, Version 1.1
+ ============================================================================
+
+ Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modifica-
+ tion, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of  source code must  retain the above copyright  notice,
+    this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. The end-user documentation included with the redistribution, if any, must
+    include  the following  acknowledgment:  "This product includes  software
+    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
+    Alternately, this  acknowledgment may  appear in the software itself,  if
+    and wherever such third-party acknowledgments normally appear.
+
+ 4. The names "Batik" and  "Apache Software Foundation" must  not  be
+    used to  endorse or promote  products derived from  this software without
+    prior written permission. For written permission, please contact
+    apache@apache.org.
+
+ 5. Products  derived from this software may not  be called "Apache", nor may
+    "Apache" appear  in their name,  without prior written permission  of the
+    Apache Software Foundation.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
+ APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
+ DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
+ ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
+ (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ This software  consists of voluntary contributions made  by many individuals
+ on  behalf of the Apache Software  Foundation. For more  information on the
+ Apache Software Foundation, please see <http://www.apache.org/>.
+
+*/
 
 package net.java.dev.typecast.ot.table;
 
@@ -12,7 +54,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfCompositeComp.java,v 1.1.1.1 2004-12-05 23:14:39 davidsch Exp $
+ * @version $Id: GlyfCompositeComp.java,v 1.2 2004-12-15 14:10:25 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfCompositeComp {
@@ -27,113 +69,113 @@ public class GlyfCompositeComp {
     public static final short WE_HAVE_INSTRUCTIONS = 0x0100;
     public static final short USE_MY_METRICS = 0x0200;
 
-    private int firstIndex;
-    private int firstContour;
-    private short argument1;
-    private short argument2;
-    private short flags;
-    private short glyphIndex;
-    private double xscale = 1.0;
-    private double yscale = 1.0;
-    private double scale01 = 0.0;
-    private double scale10 = 0.0;
-    private int xtranslate = 0;
-    private int ytranslate = 0;
-    private int point1 = 0;
-    private int point2 = 0;
+    private int _firstIndex;
+    private int _firstContour;
+    private short _argument1;
+    private short _argument2;
+    private short _flags;
+    private short _glyphIndex;
+    private double _xscale = 1.0;
+    private double _yscale = 1.0;
+    private double _scale01 = 0.0;
+    private double _scale10 = 0.0;
+    private int _xtranslate = 0;
+    private int _ytranslate = 0;
+    private int _point1 = 0;
+    private int _point2 = 0;
 
     protected GlyfCompositeComp(int firstIndex, int firstContour, DataInput di)
     throws IOException {
-        this.firstIndex = firstIndex;
-        this.firstContour = firstContour;
-        flags = di.readShort();
-        glyphIndex = di.readShort();
+        _firstIndex = firstIndex;
+        _firstContour = firstContour;
+        _flags = di.readShort();
+        _glyphIndex = di.readShort();
 
         // Get the arguments as just their raw values
-        if ((flags & ARG_1_AND_2_ARE_WORDS) != 0) {
-            argument1 = di.readShort();
-            argument2 = di.readShort();
+        if ((_flags & ARG_1_AND_2_ARE_WORDS) != 0) {
+            _argument1 = di.readShort();
+            _argument2 = di.readShort();
         } else {
-            argument1 = (short) di.readByte();
-            argument2 = (short) di.readByte();
+            _argument1 = (short) di.readByte();
+            _argument2 = (short) di.readByte();
         }
 
         // Assign the arguments according to the flags
-        if ((flags & ARGS_ARE_XY_VALUES) != 0) {
-            xtranslate = argument1;
-            ytranslate = argument2;
+        if ((_flags & ARGS_ARE_XY_VALUES) != 0) {
+            _xtranslate = _argument1;
+            _ytranslate = _argument2;
         } else {
-            point1 = argument1;
-            point2 = argument2;
+            _point1 = _argument1;
+            _point2 = _argument2;
         }
 
         // Get the scale values (if any)
-        if ((flags & WE_HAVE_A_SCALE) != 0) {
+        if ((_flags & WE_HAVE_A_SCALE) != 0) {
             int i = di.readShort();
-            xscale = yscale = (double) i / (double) 0x4000;
-        } else if ((flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0) {
+            _xscale = _yscale = (double) i / (double) 0x4000;
+        } else if ((_flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0) {
             short i = di.readShort();
-            xscale = (double) i / (double) 0x4000;
+            _xscale = (double) i / (double) 0x4000;
             i = di.readShort();
-            yscale = (double) i / (double) 0x4000;
-        } else if ((flags & WE_HAVE_A_TWO_BY_TWO) != 0) {
+            _yscale = (double) i / (double) 0x4000;
+        } else if ((_flags & WE_HAVE_A_TWO_BY_TWO) != 0) {
             int i = di.readShort();
-            xscale = (double) i / (double) 0x4000;
+            _xscale = (double) i / (double) 0x4000;
             i = di.readShort();
-            scale01 = (double) i / (double) 0x4000;
+            _scale01 = (double) i / (double) 0x4000;
             i = di.readShort();
-            scale10 = (double) i / (double) 0x4000;
+            _scale10 = (double) i / (double) 0x4000;
             i = di.readShort();
-            yscale = (double) i / (double) 0x4000;
+            _yscale = (double) i / (double) 0x4000;
         }
     }
 
     public int getFirstIndex() {
-        return firstIndex;
+        return _firstIndex;
     }
 
     public int getFirstContour() {
-        return firstContour;
+        return _firstContour;
     }
 
     public short getArgument1() {
-        return argument1;
+        return _argument1;
     }
 
     public short getArgument2() {
-        return argument2;
+        return _argument2;
     }
 
     public short getFlags() {
-        return flags;
+        return _flags;
     }
 
     public short getGlyphIndex() {
-        return glyphIndex;
+        return _glyphIndex;
     }
 
     public double getScale01() {
-        return scale01;
+        return _scale01;
     }
 
     public double getScale10() {
-        return scale10;
+        return _scale10;
     }
 
     public double getXScale() {
-        return xscale;
+        return _xscale;
     }
 
     public double getYScale() {
-        return yscale;
+        return _yscale;
     }
 
     public int getXTranslate() {
-        return xtranslate;
+        return _xtranslate;
     }
 
     public int getYTranslate() {
-        return ytranslate;
+        return _ytranslate;
     }
 
     /**
@@ -143,7 +185,7 @@ public class GlyfCompositeComp {
      * @return The transformed x-coordinate
      */
     public int scaleX(int x, int y) {
-        return (int)((double) x * xscale + (double) y * scale10);
+        return (int)((double) x * _xscale + (double) y * _scale10);
     }
 
     /**
@@ -153,6 +195,6 @@ public class GlyfCompositeComp {
      * @return The transformed y-coordinate
      */
     public int scaleY(int x, int y) {
-        return (int)((double) x * scale01 + (double) y * yscale);
+        return (int)((double) x * _scale01 + (double) y * _yscale);
     }
 }

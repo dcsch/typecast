@@ -1,10 +1,52 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
+/*
+
+ ============================================================================
+                   The Apache Software License, Version 1.1
+ ============================================================================
+
+ Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modifica-
+ tion, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of  source code must  retain the above copyright  notice,
+    this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. The end-user documentation included with the redistribution, if any, must
+    include  the following  acknowledgment:  "This product includes  software
+    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
+    Alternately, this  acknowledgment may  appear in the software itself,  if
+    and wherever such third-party acknowledgments normally appear.
+
+ 4. The names "Batik" and  "Apache Software Foundation" must  not  be
+    used to  endorse or promote  products derived from  this software without
+    prior written permission. For written permission, please contact
+    apache@apache.org.
+
+ 5. Products  derived from this software may not  be called "Apache", nor may
+    "Apache" appear  in their name,  without prior written permission  of the
+    Apache Software Foundation.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
+ APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
+ DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
+ ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
+ (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ This software  consists of voluntary contributions made  by many individuals
+ on  behalf of the Apache Software  Foundation. For more  information on the
+ Apache Software Foundation, please see <http://www.apache.org/>.
+
+*/
 
 package net.java.dev.typecast.ot.table;
 
@@ -13,16 +55,16 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * @version $Id: GlyfSimpleDescript.java,v 1.1.1.1 2004-12-05 23:14:41 davidsch Exp $
+ * @version $Id: GlyfSimpleDescript.java,v 1.2 2004-12-15 14:10:27 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfSimpleDescript extends GlyfDescript {
 
-    private int[] endPtsOfContours;
-    private byte[] flags;
-    private short[] xCoordinates;
-    private short[] yCoordinates;
-    private int count;
+    private int[] _endPtsOfContours;
+    private byte[] _flags;
+    private short[] _xCoordinates;
+    private short[] _yCoordinates;
+    private int _count;
 
     public GlyfSimpleDescript(GlyfTable parentTable, short numberOfContours, DataInput di)
     throws IOException {
@@ -30,39 +72,37 @@ public class GlyfSimpleDescript extends GlyfDescript {
         super(parentTable, numberOfContours, di);
         
         // Simple glyph description
-        endPtsOfContours = new int[numberOfContours];
+        _endPtsOfContours = new int[numberOfContours];
         for (int i = 0; i < numberOfContours; i++) {
-//            endPtsOfContours[i] = (int)(bais.read()<<8 | bais.read());
-            endPtsOfContours[i] = di.readShort();
+            _endPtsOfContours[i] = di.readShort();
         }
 
         // The last end point index reveals the total number of points
-        count = endPtsOfContours[numberOfContours-1] + 1;
-        flags = new byte[count];
-        xCoordinates = new short[count];
-        yCoordinates = new short[count];
+        _count = _endPtsOfContours[numberOfContours-1] + 1;
+        _flags = new byte[_count];
+        _xCoordinates = new short[_count];
+        _yCoordinates = new short[_count];
 
-//        int instructionCount = (int)(bais.read()<<8 | bais.read());
         int instructionCount = di.readShort();
         readInstructions(di, instructionCount);
-        readFlags(count, di);
-        readCoords(count, di);
+        readFlags(_count, di);
+        readCoords(_count, di);
     }
 
     public int getEndPtOfContours(int i) {
-        return endPtsOfContours[i];
+        return _endPtsOfContours[i];
     }
 
     public byte getFlags(int i) {
-        return flags[i];
+        return _flags[i];
     }
 
     public short getXCoordinate(int i) {
-        return xCoordinates[i];
+        return _xCoordinates[i];
     }
 
     public short getYCoordinate(int i) {
-        return yCoordinates[i];
+        return _yCoordinates[i];
     }
 
     public boolean isComposite() {
@@ -70,7 +110,7 @@ public class GlyfSimpleDescript extends GlyfDescript {
     }
 
     public int getPointCount() {
-        return count;
+        return _count;
     }
 
     public int getContourCount() {
@@ -92,33 +132,33 @@ public class GlyfSimpleDescript extends GlyfDescript {
         short x = 0;
         short y = 0;
         for (int i = 0; i < count; i++) {
-            if ((flags[i] & xDual) != 0) {
-                if ((flags[i] & xShortVector) != 0) {
+            if ((_flags[i] & xDual) != 0) {
+                if ((_flags[i] & xShortVector) != 0) {
                     x += (short) di.readUnsignedByte();
                 }
             } else {
-                if ((flags[i] & xShortVector) != 0) {
+                if ((_flags[i] & xShortVector) != 0) {
                     x += (short) -((short) di.readUnsignedByte());
                 } else {
                     x += di.readShort();
                 }
             }
-            xCoordinates[i] = x;
+            _xCoordinates[i] = x;
         }
 
         for (int i = 0; i < count; i++) {
-            if ((flags[i] & yDual) != 0) {
-                if ((flags[i] & yShortVector) != 0) {
+            if ((_flags[i] & yDual) != 0) {
+                if ((_flags[i] & yShortVector) != 0) {
                     y += (short) di.readUnsignedByte();
                 }
             } else {
-                if ((flags[i] & yShortVector) != 0) {
+                if ((_flags[i] & yShortVector) != 0) {
                     y += (short) -((short) di.readUnsignedByte());
                 } else {
                     y += di.readShort();
                 }
             }
-            yCoordinates[i] = y;
+            _yCoordinates[i] = y;
         }
     }
 
@@ -128,11 +168,11 @@ public class GlyfSimpleDescript extends GlyfDescript {
     private void readFlags(int flagCount, DataInput di) throws IOException {
         try {
             for (int index = 0; index < flagCount; index++) {
-                flags[index] = di.readByte();
-                if ((flags[index] & repeat) != 0) {
+                _flags[index] = di.readByte();
+                if ((_flags[index] & repeat) != 0) {
                     int repeats = di.readByte();
                     for (int i = 1; i <= repeats; i++) {
-                        flags[index + i] = flags[index];
+                        _flags[index + i] = _flags[index];
                     }
                     index += repeats;
                 }
@@ -146,41 +186,41 @@ public class GlyfSimpleDescript extends GlyfDescript {
         StringBuffer sb = new StringBuffer();
         sb.append(super.toString());
         sb.append("\n\n        EndPoints\n        ---------");
-        for (int i = 0; i < endPtsOfContours.length; i++) {
-            sb.append("\n          ").append(i).append(": ").append(endPtsOfContours[i]);
+        for (int i = 0; i < _endPtsOfContours.length; i++) {
+            sb.append("\n          ").append(i).append(": ").append(_endPtsOfContours[i]);
         }
         sb.append("\n\n          Length of Instructions: ");
         sb.append(getInstructions().length).append("\n");
         sb.append(Disassembler.disassemble(getInstructions(), 8));
         sb.append("\n        Flags\n        -----");
-        for (int i = 0; i < flags.length; i++) {
+        for (int i = 0; i < _flags.length; i++) {
             sb.append("\n          ").append(i).append(":  ");
-            if ((flags[i] & 0x20) != 0) {
+            if ((_flags[i] & 0x20) != 0) {
                 sb.append("YDual ");
             } else {
                 sb.append("      ");
             }
-            if ((flags[i] & 0x10) != 0) {
+            if ((_flags[i] & 0x10) != 0) {
                 sb.append("XDual ");
             } else {
                 sb.append("      ");
             }
-            if ((flags[i] & 0x08) != 0) {
+            if ((_flags[i] & 0x08) != 0) {
                 sb.append("Repeat ");
             } else {
                 sb.append("       ");
             }
-            if ((flags[i] & 0x04) != 0) {
+            if ((_flags[i] & 0x04) != 0) {
                 sb.append("Y-Short ");
             } else {
                 sb.append("        ");
             }
-            if ((flags[i] & 0x02) != 0) {
+            if ((_flags[i] & 0x02) != 0) {
                 sb.append("X-Short ");
             } else {
                 sb.append("        ");
             }
-            if ((flags[i] & 0x01) != 0) {
+            if ((_flags[i] & 0x01) != 0) {
                 sb.append("On");
             } else {
                 sb.append("  ");
@@ -189,14 +229,14 @@ public class GlyfSimpleDescript extends GlyfDescript {
         sb.append("\n\n        Coordinates\n        -----------");
         short oldX = 0;
         short oldY = 0;
-        for (int i = 0; i < xCoordinates.length; i++) {
+        for (int i = 0; i < _xCoordinates.length; i++) {
             sb.append("\n          ").append(i)
-                .append(": Rel (").append(xCoordinates[i] - oldX)
-                .append(", ").append(yCoordinates[i] - oldY)
-                .append(")  ->  Abs (").append(xCoordinates[i])
-                .append(", ").append(yCoordinates[i]).append(")");
-            oldX = xCoordinates[i];
-            oldY = yCoordinates[i];
+                .append(": Rel (").append(_xCoordinates[i] - oldX)
+                .append(", ").append(_yCoordinates[i] - oldY)
+                .append(")  ->  Abs (").append(_xCoordinates[i])
+                .append(", ").append(_yCoordinates[i]).append(")");
+            oldX = _xCoordinates[i];
+            oldY = _yCoordinates[i];
         }
         return sb.toString();
     }
