@@ -66,4 +66,28 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+    <!-- This is a quick hack to build a compressed distribution file -->
+    <target name="dist-bin" depends="compile">
+        <property file="src/net/java/dev/typecast/apps/editor/Main.properties"/>
+        <property name="zip.dir" value="typecast-${Typecast.version}"/>
+        <property name="zip.filename" value="typecast-bin-${Typecast.version}"/>
+
+        <copy todir="${zip.dir}">
+            <fileset dir="${dist.dir}">
+                <include name="typecast.jar"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="typecast.bat"/>
+                <include name="README.txt"/>
+                <include name="LICENSE.txt"/>
+            </fileset>
+        </copy>
+        <copy todir="${zip.dir}/lib">
+            <fileset dir="lib">
+                <include name="jlfgr-1_0.jar"/>
+            </fileset>
+        </copy>
+        <zip destfile="${zip.filename}.zip" basedir="${zip.dir}" includes="**"/>
+    </target>
 </project>
