@@ -1,5 +1,5 @@
 /*
- * $Id: Typecast.java,v 1.1.1.1 2004-12-05 23:14:17 davidsch Exp $
+ * $Id: Typecast.java,v 1.2 2004-12-09 23:41:29 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.StreamTokenizer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.swing.*;
@@ -46,18 +47,20 @@ import net.java.dev.typecast.exchange.SVGExporter;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Typecast.java,v 1.1.1.1 2004-12-05 23:14:17 davidsch Exp $
+ * @version $Id: Typecast.java,v 1.2 2004-12-09 23:41:29 davidsch Exp $
  */
 public class Typecast {
-
+    
     private JMenuBar _menuBar = null;
     private JFrame _frame;
     private JTree _tree;
+    private JSplitPane _splitPane;
     private DefaultTreeModel _treeModel;
     private JTextArea _dumpTextArea;
     private GlyphPanel _glyphPanel;
     private ArrayList<OTFontCollection> _fontCollections = new ArrayList<OTFontCollection>();
     private Properties _properties = new Properties();
+    private TypecastPrefs _appPrefs = new TypecastPrefs();
     private JTabbedPane _tabbedPane;
     private JComponent _glyphPane;
     private JComponent _textPane;
@@ -65,16 +68,21 @@ public class Typecast {
     private Object _treeSelection;
     private ResourceBundle _rb;
     private OTFont _selectedFont = null;
+    private boolean _preview = false;
     
     /**
-     * FontGeek constructor comment.
-     * @param title java.lang.String
+     * Typecast constructor.
      */
-    public Typecast(String title) {
+    public Typecast() {
 
+        // Show a splash screen whilst we load up
         Splash splash = new Splash();
         splash.setVisible(true);
 
+        // Load the user's application preferences
+        _appPrefs.load(Preferences.userNodeForPackage(getClass()));
+
+        // This is the old preferences store - to be removed
         try {
             _properties.load(new FileInputStream(
                 System.getProperty("user.home") +
@@ -87,6 +95,8 @@ public class Typecast {
         _rb = ResourceBundle.getBundle("net/java/dev/typecast/apps/Typecast");
 
         _frame = new JFrame(_rb.getString("Typecast.title"));
+        _frame.setLocation(_appPrefs.getAppWindowPos());
+        _frame.setPreferredSize(_appPrefs.getAppWindowSize());
 
         _treeModel = (DefaultTreeModel) TableTreeBuilder.createTypecastTreeModel();
         _tree = new JTree(_treeModel);
@@ -98,13 +108,12 @@ public class Typecast {
         // be picked up
         ToolTipManager.sharedInstance().registerComponent(_tree);
 
-        // Make the tree use an instance of DOMBrowserCellRenderer for
+        // Make the tree use an instance of TableTreeCellRenderer for
         // drawing
         _tree.setCellRenderer(new TableTreeCellRenderer());
 
         // Put the Tree in a scroller
         JScrollPane treePane = new JScrollPane();
-        treePane.setPreferredSize(new Dimension(500, 500));
         treePane.getViewport().add(_tree);
 
         // Listen for selection events from the tree
@@ -114,30 +123,35 @@ public class Typecast {
                 if(selPath != null) {
                     net.java.dev.typecast.ot.OTFont font = null;
                     if (selPath.getPathCount() >= 3) {
-                        TableTreeNode fontNode = (TableTreeNode) selPath.getPathComponent(2);
-                        font = (net.java.dev.typecast.ot.OTFont) fontNode.getUserObject();
+                        TableTreeNode fontNode =
+                                (TableTreeNode) selPath.getPathComponent(2);
+                        font = (OTFont) fontNode.getUserObject();
                     }
-                    TableTreeNode tn = (TableTreeNode) selPath.getLastPathComponent();
+                    TableTreeNode tn =
+                            (TableTreeNode) selPath.getLastPathComponent();
                     selectElement(font, tn);
                 }
             }
         };
         _tree.addTreeSelectionListener(tsl);
 
+        // Create a tabbed workspace
         _tabbedPane = new JTabbedPane();
         _glyphPane = createGlyphEditPane();
         _textPane = createTextPane();
         _propertyPane = createPropertyTable();
         configTabbedPane(null);
 
-        JSplitPane splitPane = new JSplitPane(
+        // Split the main frame
+        _splitPane = new JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
             treePane,
             _tabbedPane);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerLocation(200);
+        _splitPane.setOneTouchExpandable(true);
+        _splitPane.setDividerLocation(_appPrefs.getTreeWidth());
+        _frame.getContentPane().add("Center", _splitPane);
 
-        _frame.getContentPane().add("Center", splitPane);
+        // Create a menu bar
         _frame.setJMenuBar(createMenuBar());
 
         _frame.addWindowListener(
@@ -148,12 +162,20 @@ public class Typecast {
             }
         );
 
+        // We're built, so make the main frame visible and hide the splash
         _frame.pack();
         _frame.setVisible(true);
-        
         splash.setVisible(false);
     }
 
+    public boolean getPreview() {
+        return _preview;
+    }
+    
+    public void setPreview(boolean preview) {
+        _preview = preview;
+    }
+    
     private void parseMenuString(String menuString, String[] tokens) {
         try {
             StreamTokenizer st = new StreamTokenizer(new StringReader(menuString));
@@ -418,6 +440,7 @@ public class Typecast {
             KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK),
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    setPreview(!getPreview());
                 }
             }));
         menu.add(createMenuItem(
@@ -613,7 +636,7 @@ public class Typecast {
     }
 
     public static void main(String[] args) {
-        new Typecast("Typecast");
+        new Typecast();
     }
 
     private void addMru(String mru) {
@@ -690,6 +713,12 @@ public class Typecast {
     
     private void close() {
         
+        // Save the user's application preferences
+        _appPrefs.setAppWindowPos(_frame.getLocation());
+        _appPrefs.setAppWindowSize(_frame.getSize());
+        _appPrefs.setTreeWidth(_splitPane.getDividerLocation());
+        _appPrefs.save(Preferences.userNodeForPackage(getClass()));
+
         // Save properties
         try {
             _glyphPanel.setProperties();
