@@ -1,5 +1,5 @@
 /*
- * $Id: TableTreeBuilder.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
+ * $Id: TableTreeBuilder.java,v 1.2 2004-12-21 10:25:54 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -21,10 +21,13 @@
 package net.java.dev.typecast.apps.editor;
 
 import java.util.Enumeration;
-import javax.swing.tree.TreeModel;
+
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+
 import net.java.dev.typecast.ot.OTFont;
 import net.java.dev.typecast.ot.OTFontCollection;
+
 import net.java.dev.typecast.ot.table.CmapIndexEntry;
 import net.java.dev.typecast.ot.table.CmapTable;
 import net.java.dev.typecast.ot.table.DirectoryEntry;
@@ -46,7 +49,7 @@ import net.java.dev.typecast.ot.table.Table;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TableTreeBuilder.java,v 1.1 2004-12-15 14:07:41 davidsch Exp $
+ * @version $Id: TableTreeBuilder.java,v 1.2 2004-12-21 10:25:54 davidsch Exp $
  */
 public class TableTreeBuilder {
 
@@ -64,7 +67,6 @@ public class TableTreeBuilder {
             if (lastPlatformId != cie.getPlatformId()) {
                 lastPlatformId = cie.getPlatformId();
                 lastEncodingId = -1;
-//                String s = "Platform ID: " + lastPlatformId + " (" + cie.getPlatformName() + ")";
                 String s = "Platform ID: " + cie.getPlatformId() + " (" +
                     ID.getPlatformName((short) cie.getPlatformId()) + ")";
                 platformNode = createNode(s, null);
@@ -72,14 +74,13 @@ public class TableTreeBuilder {
             }
             if (lastEncodingId != cie.getEncodingId()) {
                 lastEncodingId = cie.getEncodingId();
-//                String s = "Encoding ID: " + lastEncodingId + " (" + cie.getEncodingName() + ")";
                 String s = "Encoding ID: " + cie.getEncodingId() + " (" +
-                    ID.getEncodingName((short) cie.getPlatformId(), (short) cie.getEncodingId()) + ")";
-                encodingNode = createNode(s, null);
+                    ID.getEncodingName(
+                        (short) cie.getPlatformId(),
+                        (short) cie.getEncodingId()) + ")";
+                encodingNode = createNode(s, cie.getFormat());
                 platformNode.add(encodingNode);
             }
-//            TypecastTreeNode node = createNode(Integer.toString(nr.getNameId()), nr);
-//            encodingNode.add(node);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * $Id: Main.java,v 1.2 2004-12-21 10:25:55 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -57,6 +57,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import net.java.dev.typecast.edit.CharacterMap;
+
 import net.java.dev.typecast.ot.table.DirectoryEntry;
 import net.java.dev.typecast.ot.table.GlyfDescript;
 import net.java.dev.typecast.ot.table.Table;
@@ -69,7 +71,7 @@ import net.java.dev.typecast.exchange.SVGExporter;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.1 2004-12-15 14:07:40 davidsch Exp $
+ * @version $Id: Main.java,v 1.2 2004-12-21 10:25:55 davidsch Exp $
  */
 public class Main {
 
@@ -80,7 +82,8 @@ public class Main {
     private DefaultTreeModel _treeModel;
     private JTextArea _dumpTextArea;
     private GlyphPanel _glyphPanel;
-    private ArrayList<OTFontCollection> _fontCollections = new ArrayList<OTFontCollection>();
+    private ArrayList<OTFontCollection> _fontCollections =
+            new ArrayList<OTFontCollection>();
     private Properties _properties = new Properties();
     private EditorPrefs _appPrefs = new EditorPrefs();
     private JTabbedPane _tabbedPane;
@@ -91,7 +94,6 @@ public class Main {
     private ResourceBundle _rb;
     private OTFont _selectedFont = null;
     private TableTreeNode _selectedCollectionNode;
-    private boolean _preview = false;
     
     /**
      * Typecast constructor.
@@ -153,7 +155,8 @@ public class Main {
                             _selectedCollectionNode =
                                     (TableTreeNode) selPath.getPathComponent(1);
                             _menu.setSelectedFontCollection(
-                                    (OTFontCollection) _selectedCollectionNode.getUserObject());
+                                    (OTFontCollection)
+                                    _selectedCollectionNode.getUserObject());
                         }
 
                         // Pick the selected font out of the path
@@ -216,14 +219,6 @@ public class Main {
         }
     }
 
-    public boolean getPreview() {
-        return _preview;
-    }
-    
-    public void setPreview(boolean preview) {
-        _preview = preview;
-    }
-        
     private JComponent createTextPane() {
         _dumpTextArea = new JTextArea();
         _dumpTextArea.setEditable(false);
@@ -272,9 +267,18 @@ public class Main {
             _tabbedPane.removeAll();
         } else if (_treeSelection == null || _treeSelection.getClass() != selection.getClass()) {
             _tabbedPane.removeAll();
+
+            // Glyph outlines get the glyph pane
             if (selection instanceof GlyfDescript) {
-                _tabbedPane.addTab("Countours", _glyphPane);
+                _tabbedPane.addTab("Outline", _glyphPane);
             }
+            
+            // Character maps
+            if (selection instanceof net.java.dev.typecast.ot.table.CmapFormat) {
+                _tabbedPane.addTab("Character Map", new CharacterMap(_selectedFont, (net.java.dev.typecast.ot.table.CmapFormat) selection));
+            }
+            
+            // All selections get a "dump" pane
             if (selection != null) {
                 _tabbedPane.add("Dump", _textPane);
 //                tabbedPane.addTab("Properties", null, propertyPane, "Does little");
@@ -417,6 +421,12 @@ public class Main {
         System.exit(0);
     }
     
+    protected void changeGlyphView() {
+        _glyphPanel.getGlyphEdit().setPreview(_menu.isPreview());
+        _glyphPanel.getGlyphEdit().setDrawControlPoints(_menu.isShowPoints());
+        _glyphPanel.getGlyphEdit().repaint();
+    }
+    
     private void selectElement(OTFont font, TableTreeNode tn) {
         
         // Note that this font is currently selected
@@ -440,8 +450,8 @@ public class Main {
             _dumpTextArea.setText(obj.toString());
 
             if (obj instanceof GlyfDescript) {
-                _glyphPanel.setFont(font);
-                _glyphPanel.setGlyph(font.getGlyph(tn.getIndex()));
+                _glyphPanel.getGlyphEdit().setFont(font);
+                _glyphPanel.getGlyphEdit().setGlyph(font.getGlyph(tn.getIndex()));
             }
         }
         configTabbedPane(obj);
