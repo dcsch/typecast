@@ -55,12 +55,10 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import java.io.RandomAccessFile;
-
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GsubTable.java,v 1.2 2004-12-09 23:46:21 davidsch Exp $
+ * @version $Id: GsubTable.java,v 1.3 2007-01-24 09:47:46 davidsch Exp $
  */
 public class GsubTable implements Table, LookupSubtableFactory {
 
@@ -75,7 +73,7 @@ public class GsubTable implements Table, LookupSubtableFactory {
         // Load into a temporary buffer, and create another input stream
         byte[] buf = new byte[de.getLength()];
         di.readFully(buf);
-        DataInput dis = new DataInputStream(new ByteArrayInputStream(buf));
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(buf));
 
         // GSUB Header
         int version = dis.readInt();
@@ -84,13 +82,13 @@ public class GsubTable implements Table, LookupSubtableFactory {
         int lookupListOffset = dis.readUnsignedShort();
 
         // Script List
-//        scriptList = new ScriptList(raf, de.getOffset() + scriptListOffset);
+        _scriptList = new ScriptList(dis, scriptListOffset);
 
         // Feature List
-//        featureList = new FeatureList(raf, de.getOffset() + featureListOffset);
+        _featureList = new FeatureList(dis, featureListOffset);
         
         // Lookup List
-//        lookupList = new LookupList(raf, de.getOffset() + lookupListOffset, this);
+        _lookupList = new LookupList(dis, lookupListOffset, this);
     }
 
     /**
@@ -103,27 +101,27 @@ public class GsubTable implements Table, LookupSubtableFactory {
      */
     public LookupSubtable read(
             int type,
-            RandomAccessFile raf,
+            DataInputStream dis,
             int offset) throws IOException {
         LookupSubtable s = null;
         switch (type) {
         case 1:
-            s = SingleSubst.read(raf, offset);
+            s = SingleSubst.read(dis, offset);
             break;
         case 2:
-//            s = MultipleSubst.read(raf, offset);
+//            s = MultipleSubst.read(dis, offset);
             break;
         case 3:
-//            s = AlternateSubst.read(raf, offset);
+//            s = AlternateSubst.read(dis, offset);
             break;
         case 4:
-            s = LigatureSubst.read(raf, offset);
+            s = LigatureSubst.read(dis, offset);
             break;
         case 5:
-//            s = ContextSubst.read(raf, offset);
+//            s = ContextSubst.read(dis, offset);
             break;
         case 6:
-//            s = ChainingSubst.read(raf, offset);
+//            s = ChainingSubst.read(dis, offset);
             break;
         }
         return s;

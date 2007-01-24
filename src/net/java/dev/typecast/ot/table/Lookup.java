@@ -1,20 +1,62 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
+/*
+
+ ============================================================================
+                   The Apache Software License, Version 1.1
+ ============================================================================
+
+ Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modifica-
+ tion, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of  source code must  retain the above copyright  notice,
+    this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. The end-user documentation included with the redistribution, if any, must
+    include  the following  acknowledgment:  "This product includes  software
+    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
+    Alternately, this  acknowledgment may  appear in the software itself,  if
+    and wherever such third-party acknowledgments normally appear.
+
+ 4. The names "Batik" and  "Apache Software Foundation" must  not  be
+    used to  endorse or promote  products derived from  this software without
+    prior written permission. For written permission, please contact
+    apache@apache.org.
+
+ 5. Products  derived from this software may not  be called "Apache", nor may
+    "Apache" appear  in their name,  without prior written permission  of the
+    Apache Software Foundation.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
+ APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
+ DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
+ ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
+ (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ This software  consists of voluntary contributions made  by many individuals
+ on  behalf of the Apache Software  Foundation. For more  information on the
+ Apache Software Foundation, please see <http://www.apache.org/>.
+
+*/
 
 package net.java.dev.typecast.ot.table;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Lookup.java,v 1.1.1.1 2004-12-05 23:14:50 davidsch Exp $
+ * @version $Id: Lookup.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
  */
 public class Lookup {
 
@@ -24,39 +66,44 @@ public class Lookup {
     public static final int IGNORE_BASE_MARKS = 0x0008;
     public static final int MARK_ATTACHMENT_TYPE = 0xFF00;
 
-    private int type;
-    private int flag;
-    private int subTableCount;
-    private int[] subTableOffsets;
-    private LookupSubtable[] subTables;
+    private int _type;
+    private int _flag;
+    private int _subTableCount;
+    private int[] _subTableOffsets;
+    private LookupSubtable[] _subTables;
 
     /** Creates new Lookup */
-    public Lookup(LookupSubtableFactory factory, RandomAccessFile raf, int offset)
+    public Lookup(LookupSubtableFactory factory, DataInputStream dis, int offset)
     throws IOException {
-        raf.seek(offset);
-        type = raf.readUnsignedShort();
-        flag = raf.readUnsignedShort();
-        subTableCount = raf.readUnsignedShort();
-        subTableOffsets = new int[subTableCount];
-        subTables = new LookupSubtable[subTableCount];
-        for (int i = 0; i < subTableCount; i++) {
-            subTableOffsets[i] = raf.readUnsignedShort();
+
+        // Ensure we're in the right place
+        dis.reset();
+        dis.skipBytes(offset);
+        
+        // Start reading
+        _type = dis.readUnsignedShort();
+        _flag = dis.readUnsignedShort();
+        _subTableCount = dis.readUnsignedShort();
+        _subTableOffsets = new int[_subTableCount];
+        _subTables = new LookupSubtable[_subTableCount];
+        for (int i = 0; i < _subTableCount; i++) {
+            _subTableOffsets[i] = dis.readUnsignedShort();
         }
-        for (int i = 0; i < subTableCount; i++) {
-            subTables[i] = factory.read(type, raf, offset + subTableOffsets[i]);
+        for (int i = 0; i < _subTableCount; i++) {
+            _subTables[i] = factory.read(_type, dis, offset + _subTableOffsets[i]);
         }
     }
 
     public int getType() {
-        return type;
+        return _type;
     }
 
     public int getSubtableCount() {
-        return subTableCount;
+        return _subTableCount;
     }
 
     public LookupSubtable getSubtable(int i) {
-        return subTables[i];
+        return _subTables[i];
     }
 
 }

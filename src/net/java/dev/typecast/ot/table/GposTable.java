@@ -1,60 +1,45 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
+/*
+ * $Id: GposTable.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
+ *
+ * Typecast - The Font Development Environment
+ *
+ * Copyright (c) 2004 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.java.dev.typecast.ot.table;
 
-import java.io.IOException;
 import java.io.DataInput;
+import java.io.IOException;
 
 /**
- *
+ * TODO: To be implemented
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GposTable.java,v 1.1.1.1 2004-12-05 23:14:42 davidsch Exp $
+ * @version $Id: GposTable.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
  */
 public class GposTable implements Table {
 
-    private DirectoryEntry de;
+    private DirectoryEntry _de;
 
     protected GposTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+        _de = (DirectoryEntry) de.clone();
 
         // GPOS Header
         int version = di.readInt();
         int scriptList = di.readInt();
         int featureList = di.readInt();
         int lookupList = di.readInt();
-/*        
-        for (int i = 0; i < t_maxp.getNumGlyphs(); i++) {
-            raf.seek(tde.getOffset() + t_loca.getOffset(i));
-            int len = t_loca.getOffset((short)(i + 1)) - t_loca.getOffset(i);
-            if (len > 0) {
-                short numberOfContours = raf.readShort();
-                if (numberOfContours < 0) {
-                    //          descript[i] = new TableGlyfCompositeDescript(this, raf);
-                } else {
-                    descript[i] = new TableGlyfSimpleDescript(this, numberOfContours, raf);
-                }
-            } else {
-                descript[i] = null;
-            }
-        }
-
-        for (int i = 0; i < t_maxp.getNumGlyphs(); i++) {
-            raf.seek(tde.getOffset() + t_loca.getOffset(i));
-            int len = t_loca.getOffset((short)(i + 1)) - t_loca.getOffset(i);
-            if (len > 0) {
-                short numberOfContours = raf.readShort();
-                if (numberOfContours < 0) {
-                    descript[i] = new TableGlyfCompositeDescript(this, raf);
-                }
-            }
-        }
-*/
     }
 
     /** Get the table type, as a table directory value.
@@ -75,7 +60,7 @@ public class GposTable implements Table {
      * @return A directory entry
      */
     public DirectoryEntry getDirectoryEntry() {
-        return de;
+        return _de;
     }
     
 }

@@ -52,10 +52,12 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * Specifies access to glyph description classes, simple and composite.
- * @version $Id: GlyphDescription.java,v 1.2 2004-12-15 14:10:28 davidsch Exp $
+ * @version $Id: GlyphDescription.java,v 1.3 2007-01-24 09:47:45 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public interface GlyphDescription {
+    
+    public int getGlyphIndex();
     
     public int getEndPtOfContours(int i);
     

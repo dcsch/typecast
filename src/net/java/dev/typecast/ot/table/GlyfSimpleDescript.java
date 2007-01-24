@@ -55,7 +55,7 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * @version $Id: GlyfSimpleDescript.java,v 1.2 2004-12-15 14:10:27 davidsch Exp $
+ * @version $Id: GlyfSimpleDescript.java,v 1.3 2007-01-24 09:47:47 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfSimpleDescript extends GlyfDescript {
@@ -66,10 +66,12 @@ public class GlyfSimpleDescript extends GlyfDescript {
     private short[] _yCoordinates;
     private int _count;
 
-    public GlyfSimpleDescript(GlyfTable parentTable, short numberOfContours, DataInput di)
-    throws IOException {
-
-        super(parentTable, numberOfContours, di);
+    public GlyfSimpleDescript(
+            GlyfTable parentTable,
+            int glyphIndex,
+            short numberOfContours,
+            DataInput di) throws IOException {
+        super(parentTable, glyphIndex, numberOfContours, di);
         
         // Simple glyph description
         _endPtsOfContours = new int[numberOfContours];

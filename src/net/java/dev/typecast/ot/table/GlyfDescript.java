@@ -54,7 +54,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfDescript.java,v 1.2 2004-12-15 14:10:26 davidsch Exp $
+ * @version $Id: GlyfDescript.java,v 1.3 2007-01-24 09:47:48 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public abstract class GlyfDescript extends Program implements GlyphDescription {
@@ -68,14 +68,18 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
     public static final byte yDual = 0x20;
 
     protected GlyfTable _parentTable;
+    private int _glyphIndex;
     private int _numberOfContours;
     private short _xMin;
     private short _yMin;
     private short _xMax;
     private short _yMax;
 
-    protected GlyfDescript(GlyfTable parentTable, short numberOfContours, DataInput di)
-    throws IOException {
+    protected GlyfDescript(
+            GlyfTable parentTable,
+            int glyphIndex,
+            short numberOfContours,
+            DataInput di) throws IOException {
         _parentTable = parentTable;
         _numberOfContours = numberOfContours;
         _xMin = di.readShort();
@@ -86,6 +90,10 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
 
     public int getNumberOfContours() {
         return _numberOfContours;
+    }
+
+    public int getGlyphIndex() {
+        return _glyphIndex;
     }
 
     public short getXMaximum() {

@@ -56,7 +56,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfTable.java,v 1.2 2004-12-15 14:10:28 davidsch Exp $
+ * @version $Id: GlyfTable.java,v 1.3 2007-01-24 09:47:46 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfTable implements Table {
@@ -67,38 +67,11 @@ public class GlyfTable implements Table {
 
     protected GlyfTable(DirectoryEntry de, DataInput di) throws IOException {
         _de = (DirectoryEntry) de.clone();
+        
+        // We need to buffer this and then initialise once we have the
+        // "loca" table
         _buf = new byte[de.getLength()];
         di.readFully(_buf);
-/*
-        TableMaxp t_maxp = (TableMaxp) td.getEntryByTag(maxp).getTable();
-        TableLoca t_loca = (TableLoca) td.getEntryByTag(loca).getTable();
-        descript = new TableGlyfDescript[t_maxp.getNumGlyphs()];
-        for (int i = 0; i < t_maxp.getNumGlyphs(); i++) {
-            raf.seek(tde.getOffset() + t_loca.getOffset(i));
-            int len = t_loca.getOffset((short)(i + 1)) - t_loca.getOffset(i);
-            if (len > 0) {
-                short numberOfContours = raf.readShort();
-                if (numberOfContours < 0) {
-                    //          descript[i] = new TableGlyfCompositeDescript(this, raf);
-                } else {
-                    descript[i] = new TableGlyfSimpleDescript(this, numberOfContours, raf);
-                }
-            } else {
-                descript[i] = null;
-            }
-        }
-
-        for (int i = 0; i < t_maxp.getNumGlyphs(); i++) {
-            raf.seek(tde.getOffset() + t_loca.getOffset(i));
-            int len = t_loca.getOffset((short)(i + 1)) - t_loca.getOffset(i);
-            if (len > 0) {
-                short numberOfContours = raf.readShort();
-                if (numberOfContours < 0) {
-                    descript[i] = new TableGlyfCompositeDescript(this, raf);
-                }
-            }
-        }
-*/
     }
 
     public void init(int numGlyphs, LocaTable loca) throws IOException {
@@ -117,7 +90,7 @@ public class GlyfTable implements Table {
                 DataInputStream dis = new DataInputStream(bais);
                 short numberOfContours = dis.readShort();
                 if (numberOfContours >= 0) {
-                    _descript[i] = new GlyfSimpleDescript(this, numberOfContours, dis);
+                    _descript[i] = new GlyfSimpleDescript(this, i, numberOfContours, dis);
                 }
             } else {
                 _descript[i] = null;
@@ -133,7 +106,7 @@ public class GlyfTable implements Table {
                 DataInputStream dis = new DataInputStream(bais);
                 short numberOfContours = dis.readShort();
                 if (numberOfContours < 0) {
-                    _descript[i] = new GlyfCompositeDescript(this, dis);
+                    _descript[i] = new GlyfCompositeDescript(this, i, dis);
                 }
             }
         }
