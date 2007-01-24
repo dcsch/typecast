@@ -1,5 +1,5 @@
 /*
- * $Id: CharacterMap.java,v 1.2 2004-12-21 16:55:48 davidsch Exp $
+ * $Id: CharacterMap.java,v 1.3 2007-01-24 09:40:52 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -45,6 +45,8 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import net.java.dev.typecast.app.framework.EditorView;
+
 import net.java.dev.typecast.ot.OTFont;
 
 import net.java.dev.typecast.ot.table.CmapFormat;
@@ -54,9 +56,9 @@ import net.java.dev.typecast.render.GlyphImageFactory;
 /**
  * An editor for the character-to-glyph map, as represented in the CmapTable.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: CharacterMap.java,v 1.2 2004-12-21 16:55:48 davidsch Exp $
+ * @version $Id: CharacterMap.java,v 1.3 2007-01-24 09:40:52 davidsch Exp $
  */
-public class CharacterMap extends JScrollPane {
+public class CharacterMap extends JScrollPane implements EditorView {
 
     private static final long serialVersionUID = 1L;
     
@@ -64,6 +66,7 @@ public class CharacterMap extends JScrollPane {
     private static final int CELL_HEIGHT = 60;
     
     private AbstractListModel _listModel;
+    private CmapFormat _cmapFormat;
     private OTFont _font;
     private AffineTransform _tx;
     private Font _labelFont = new Font("SansSerif", Font.PLAIN, 10);
@@ -72,7 +75,6 @@ public class CharacterMap extends JScrollPane {
 
         private int _charCode;
         private int _glyphCode;
-        private Image _glyphImage;
         
         public Mapping(int charCode, int glyphCode) {
             _charCode = charCode;
@@ -88,14 +90,14 @@ public class CharacterMap extends JScrollPane {
         }
         
         public Image getGlyphImage() {
-            if (_glyphImage == null) {
-                _glyphImage = GlyphImageFactory.buildImage(
-                        _font.getGlyph(_glyphCode),
-                        _tx,
-                        CELL_WIDTH,
-                        CELL_HEIGHT - 10);
-            }
-            return _glyphImage;
+            
+            // NOTE: We're not caching the image as we can be dealing with
+            // quite a lot of them
+            return GlyphImageFactory.buildImage(
+                    _font.getGlyph(_glyphCode),
+                    _tx,
+                    CELL_WIDTH,
+                    CELL_HEIGHT - 10);
         }
     }
     
@@ -104,9 +106,10 @@ public class CharacterMap extends JScrollPane {
         private static final long serialVersionUID = 1L;
         
         private Mapping _mapping;
+        private int _index;
         private boolean _isSelected;
         private AffineTransform _imageTx =
-                new AffineTransform(1.0, 0.0, 0.0, 1.0, 0.0, 10.0);
+                new AffineTransform(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
         
         /**
          * Renders each individual cell
@@ -114,19 +117,25 @@ public class CharacterMap extends JScrollPane {
         protected void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
 
-            g2d.setColor(Color.BLACK);
-            
             if (_isSelected) {
-                g2d.fillRect(0, 0, CELL_WIDTH, 10);
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, CELL_HEIGHT - 10, CELL_WIDTH, 10);
                 g2d.setColor(Color.WHITE);
+            } else {
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, CELL_HEIGHT - 10, CELL_WIDTH, 10);
+                g2d.setColor(Color.BLACK);
             }
-            
-            // Label this cell with the character code
-            g2d.setFont(_labelFont);
-            g2d.drawString(String.format("%04X", _mapping.getCharCode()), 1, 9);
             
             // Draw the glyph
             g2d.drawImage(_mapping.getGlyphImage(), _imageTx, null);
+
+            // Label this cell with the character code
+            g2d.setFont(_labelFont);
+            g2d.drawString(
+                    String.format("%04X", _mapping.getCharCode()),
+                    1,
+                    CELL_HEIGHT - 1);
         }
         
         public Component getListCellRendererComponent(
@@ -136,69 +145,76 @@ public class CharacterMap extends JScrollPane {
                 boolean isSelected,
                 boolean cellHasFocus) {
             _mapping = (Mapping) value;
+            _index = index;
             _isSelected = isSelected;
-            setPreferredSize(new Dimension(CELL_WIDTH, CELL_HEIGHT));
+            setPreferredSize(new Dimension(CELL_WIDTH + 1, CELL_HEIGHT + 1));
             return this;
         }
     }
     
     /** Creates a new instance of CharacterMap */
-    public CharacterMap(OTFont font, final CmapFormat cmapFormat) {
+    public CharacterMap() {
+        setName("Character Map");
+    }
 
-        _font = font;
+    public void setModel(OTFont font, Object obj) {
+        if (obj instanceof CmapFormat) {
+            _font = font;
+            _cmapFormat = (CmapFormat) obj;
 
-        // Set up a list model to wrap the cmap
-        AbstractListModel _listModel = new AbstractListModel() {
-            
-            private static final long serialVersionUID = 1L;
-            private CmapFormat _cmapFormat  = cmapFormat;
-            private ArrayList<Mapping> _mappings = new ArrayList<Mapping>();
+            // Set up a list model to wrap the cmap
+            _listModel = new AbstractListModel() {
 
-            {
-                for (int i = 0; i < _cmapFormat.getRangeCount(); ++i) {
-                    CmapFormat.Range range = _cmapFormat.getRange(i);
-                    for (int j = range.getStartCode(); j <= range.getEndCode(); ++j) {
-                        _mappings.add(new Mapping(j, _cmapFormat.mapCharCode(j)));
+                private static final long serialVersionUID = 1L;
+                private ArrayList<Mapping> _mappings = new ArrayList<Mapping>();
+
+                {
+                    for (int i = 0; i < _cmapFormat.getRangeCount(); ++i) {
+                        CmapFormat.Range range = _cmapFormat.getRange(i);
+                        for (int j = range.getStartCode(); j <= range.getEndCode(); ++j) {
+                            _mappings.add(new Mapping(j, _cmapFormat.mapCharCode(j)));
+                        }
                     }
                 }
-            }
 
-            public Object getElementAt(int index) {
-                return _mappings.get(index);
-            }
-            
-            public int getSize() {
-                return _mappings.size();
-            }
-        };
-        
-        final JList list = new JList(_listModel);
-        list.setCellRenderer(new CharListCellRenderer());
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        list.setVisibleRowCount(
-                _listModel.getSize() / 16 +
-                (_listModel.getSize() % 16 > 0 ? 1 : 0));
-        setViewportView(list);
-
-        // Create a mouse listener so we can listen to double-clicks
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = list.locationToIndex(e.getPoint());
+                public Object getElementAt(int index) {
+                    return _mappings.get(index);
                 }
-            }
-        };
-        list.addMouseListener(mouseListener);
 
-//        int unitsPerEmBy2 = _font.getHeadTable().getUnitsPerEm() / 2;
-//        int translateX = 2 * unitsPerEmBy2;
-//        int translateY = 2 * unitsPerEmBy2;
-        
-        // How much should we scale the font to fit it into our tint bitmap?
-        double scaleFactor = 40.0 / _font.getHeadTable().getUnitsPerEm();
-        
-        _tx = new AffineTransform();
-        _tx.translate(2, CELL_HEIGHT - 20);
-        _tx.scale(scaleFactor, scaleFactor);
+                public int getSize() {
+                    return _mappings.size();
+                }
+            };
+
+            final JList list = new JList(_listModel);
+            list.setBackground(Color.LIGHT_GRAY);
+            list.setCellRenderer(new CharListCellRenderer());
+            list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+            list.setVisibleRowCount(
+                    _listModel.getSize() / 16 +
+                    (_listModel.getSize() % 16 > 0 ? 1 : 0));
+            setViewportView(list);
+
+            // Create a mouse listener so we can listen to double-clicks
+            MouseListener mouseListener = new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) {
+                        int index = list.locationToIndex(e.getPoint());
+                    }
+                }
+            };
+            list.addMouseListener(mouseListener);
+
+    //        int unitsPerEmBy2 = _font.getHeadTable().getUnitsPerEm() / 2;
+    //        int translateX = 2 * unitsPerEmBy2;
+    //        int translateY = 2 * unitsPerEmBy2;
+
+            // How much should we scale the font to fit it into our tint bitmap?
+            double scaleFactor = 40.0 / _font.getHeadTable().getUnitsPerEm();
+
+            _tx = new AffineTransform();
+            _tx.translate(2, CELL_HEIGHT - 20);
+            _tx.scale(scaleFactor, scaleFactor);
+        }
     }
 }
