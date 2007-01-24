@@ -56,7 +56,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfTable.java,v 1.3 2007-01-24 09:47:46 davidsch Exp $
+ * @version $Id: GlyfTable.java,v 1.4 2007-01-24 11:37:04 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfTable implements Table {
@@ -114,7 +114,11 @@ public class GlyfTable implements Table {
     }
 
     public GlyfDescript getDescription(int i) {
-        return _descript[i];
+        if (i < _descript.length) {
+            return _descript[i];
+        } else {
+            return null;
+        }
     }
 
     public int getType() {
