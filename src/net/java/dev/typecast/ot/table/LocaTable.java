@@ -13,7 +13,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: LocaTable.java,v 1.1.1.1 2004-12-05 23:14:50 davidsch Exp $
+ * @version $Id: LocaTable.java,v 1.2 2007-01-24 09:54:44 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class LocaTable implements Table {
@@ -38,12 +38,12 @@ public class LocaTable implements Table {
         if (shortEntries) {
             factor = 2;
             for (int i = 0; i <= numGlyphs; i++) {
-                offsets[i] = (int)(bais.read()<<8 | bais.read());
+                offsets[i] = bais.read()<<8 | bais.read();
             }
         } else {
             factor = 1;
             for (int i = 0; i <= numGlyphs; i++) {
-                offsets[i] = (int)(bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read());
+                offsets[i] = bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read();
             }
         }
         buf = null;

@@ -1,5 +1,5 @@
 /*
- * $Id: OTFontCollection.java,v 1.3 2004-12-15 14:09:44 davidsch Exp $
+ * $Id: OTFontCollection.java,v 1.4 2007-01-24 09:54:45 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -39,7 +39,7 @@ import net.java.dev.typecast.ot.table.TTCHeader;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: OTFontCollection.java,v 1.3 2004-12-15 14:09:44 davidsch Exp $
+ * @version $Id: OTFontCollection.java,v 1.4 2007-01-24 09:54:45 davidsch Exp $
  */
 public class OTFontCollection {
 
@@ -84,7 +84,7 @@ public class OTFontCollection {
 
     public Table getTable(DirectoryEntry de) {
         for (int i = 0; i < _tables.size(); i++) {
-            Table table = (Table) _tables.get(i);
+            Table table = _tables.get(i);
             if ((table.getDirectoryEntry().getTag() == de.getTag()) &&
                 (table.getDirectoryEntry().getOffset() == de.getOffset())) {
                 return table;

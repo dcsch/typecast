@@ -55,7 +55,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: HmtxTable.java,v 1.2 2004-12-21 10:23:20 davidsch Exp $
+ * @version $Id: HmtxTable.java,v 1.3 2007-01-24 09:54:44 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class HmtxTable implements Table {
@@ -78,7 +78,7 @@ public class HmtxTable implements Table {
         _hMetrics = new int[numberOfHMetrics];
         ByteArrayInputStream bais = new ByteArrayInputStream(_buf);
         for (int i = 0; i < numberOfHMetrics; ++i) {
-            _hMetrics[i] = (int)(bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read());
+            _hMetrics[i] = bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read();
         }
         _leftSideBearing = new short[lsbCount];
         for (int i = 0; i < lsbCount; ++i) {

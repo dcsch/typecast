@@ -56,7 +56,7 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: ScriptList.java,v 1.2 2007-01-24 09:47:46 davidsch Exp $
+ * @version $Id: ScriptList.java,v 1.3 2007-01-24 09:54:44 davidsch Exp $
  */
 public class ScriptList {
 
@@ -99,7 +99,7 @@ public class ScriptList {
         if (tag.length() != 4) {
             return null;
         }
-        int tagVal = (int)((tag.charAt(0)<<24)
+        int tagVal = ((tag.charAt(0)<<24)
             | (tag.charAt(1)<<16)
             | (tag.charAt(2)<<8)
             | tag.charAt(3));
