@@ -1,5 +1,5 @@
 /*
- * $Id: EditorMenu.java,v 1.2 2007-01-25 08:40:03 davidsch Exp $
+ * $Id: EditorMenu.java,v 1.3 2007-01-25 23:57:16 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -29,7 +29,6 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 
 import java.util.ResourceBundle;
-import java.util.Properties;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -43,13 +42,13 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /**
  * The application menu bar
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorMenu.java,v 1.2 2007-01-25 08:40:03 davidsch Exp $
+ * @version $Id: EditorMenu.java,v 1.3 2007-01-25 23:57:16 davidsch Exp $
  */
 public class EditorMenu {
 
     private Main _app;
     private ResourceBundle _rb;
-    private Properties _properties;
+    private EditorPrefs _prefs;
     private OTFontCollection _selectedFontCollection;
     private JMenuItem _closeMenuItem;
     private String _closeMenuString;
@@ -57,12 +56,13 @@ public class EditorMenu {
     private JCheckBoxMenuItem _showPointsMenuItem;
     private boolean _macPlatform;
     private int _primaryKeystrokeMask;
+    private JMenu _mruMenu;
     
-    /** Creates a new instance of TypecastMenu */
-    public EditorMenu(Main app, ResourceBundle rb, Properties props) {
+    /** Creates a new instance of EditorMenu */
+    public EditorMenu(Main app, ResourceBundle rb, EditorPrefs prefs) {
         _app = app;
         _rb = rb;
-        _properties = props;
+        _prefs = prefs;
         _primaryKeystrokeMask =
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         if (System.getProperty("os.name").equals("Mac OS X")) {
@@ -210,7 +210,6 @@ public class EditorMenu {
                     public void actionPerformed(ActionEvent e) {
                     }
                 }));
-        menu.add(new JSeparator());
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.open"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, _primaryKeystrokeMask),
@@ -220,6 +219,13 @@ public class EditorMenu {
                         _app.openFont();
                     }
                 }));
+        _mruMenu = createMenu(_rb.getString("Typecast.menu.file.openRecent"));
+        menu.add(_mruMenu);
+
+        // Generate a MRU list
+        buildMRU();
+
+        menu.add(new JSeparator());
         menu.add(_closeMenuItem = createMenuItem(
                 _rb.getString("Typecast.menu.file.close"),
                 null,
@@ -230,7 +236,6 @@ public class EditorMenu {
                     }
                 }));
         _closeMenuString = _closeMenuItem.getText();
-        menu.add(new JSeparator());
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.save"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, _primaryKeystrokeMask),
@@ -241,6 +246,24 @@ public class EditorMenu {
                 }));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.saveAs"),
+                KeyStroke.getKeyStroke(
+                    KeyEvent.VK_S,
+                    _primaryKeystrokeMask | KeyEvent.SHIFT_MASK),
+                true,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                }));
+        menu.add(createMenuItem(
+                _rb.getString("Typecast.menu.file.saveAll"),
+                null,
+                true,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                }));
+        menu.add(createMenuItem(
+                _rb.getString("Typecast.menu.file.revertToSaved"),
                 null,
                 true,
                 new ActionListener() {
@@ -267,39 +290,10 @@ public class EditorMenu {
                         }
                     }));
         }
-        menu.add(new JSeparator());
 
-        // Generate a MRU list
-        boolean foundMru = false;
-        for (int i = 0; i < 4; i++) {
-            String mru = _properties.getProperty("MRU" + i);
-            if (mru != null) {
-                foundMru = true;
-                JMenuItem menuItem = menu.add(new JMenuItem(
-//                    String.valueOf(i) + " " + mru,
-                    mru,
-                    KeyEvent.VK_0 + i));
-                menuItem.getAccessibleContext().setAccessibleDescription(
-                    "Recently used font");
-                menuItem.addActionListener(
-                    new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            _app.loadFont(e.getActionCommand());
-                        }
-                    }
-                );
-            }
-        }
-        if (!foundMru) {
-            
-            // Add a placeholder
-            JMenuItem menuItem = menu.add(new JMenuItem("Recently used files"));
-            menuItem.setEnabled(false);
-        }
-        
+        // Only add "Exit" to the menu if this isn't a Mac
         if (!_macPlatform) {
             menu.add(new JSeparator());
-
             menu.add(createMenuItem(
                     _rb.getString("Typecast.menu.file.exit"),
                     null,
@@ -546,7 +540,17 @@ public class EditorMenu {
 
     private JMenu createHelpMenu() {
         JMenu menu = createMenu(_rb.getString("Typecast.menu.help"));
+        menu.add(createMenuItem(
+                _rb.getString("Typecast.menu.help.typecast"),
+                KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, _primaryKeystrokeMask),
+                true,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        _app.showHelp();
+                    }
+                }));
         if (!_macPlatform) {
+            menu.add(new JSeparator());
             menu.add(createMenuItem(
                     _rb.getString("Typecast.menu.help.about"),
                     null,
@@ -557,28 +561,49 @@ public class EditorMenu {
                         }
                     }));
         }
-        menu.add(createMenuItem(
-                _rb.getString("Typecast.menu.help.typecast"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, _primaryKeystrokeMask),
+        return menu;
+    }
+    
+    private void buildMRU() {
+        _mruMenu.removeAll();
+        for (int i = 0; i < _prefs.getMRUCount(); ++i) {
+            String mru = _prefs.getMRU(i);
+            if (mru != null) {
+                JMenuItem menuItem = _mruMenu.add(new JMenuItem(
+                    mru,
+                    KeyEvent.VK_0 + i));
+                menuItem.getAccessibleContext().setAccessibleDescription(
+                    "Recently used font");
+                menuItem.addActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            _app.loadFont(e.getActionCommand());
+                        }
+                    }
+                );
+            }
+        }
+        if (_prefs.getMRUCount() == 0) {
+            
+            // Add a placeholder
+            JMenuItem menuItem = _mruMenu.add(new JMenuItem("Recently used files"));
+            menuItem.setEnabled(false);
+        }
+        _mruMenu.add(new JSeparator());
+        _mruMenu.add(createMenuItem(
+                _rb.getString("Typecast.menu.file.openRecent.clearMenu"),
+                null,
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        _app.showAbout();
+                        _prefs.clearMRU();
+                        buildMRU();
                     }
                 }));
-        return menu;
     }
 
     public void addMru(String mru) {
-        String oldMru;
-        for (int i = 0; i < 4; i++) {
-            oldMru = _properties.getProperty("MRU" + i);
-            if (mru != null) {
-                _properties.setProperty("MRU" + i, mru);
-                mru = oldMru;
-            } else {
-                break;
-            }
-        }
+        _prefs.addMRU(mru);
+        buildMRU();
     }
 }
