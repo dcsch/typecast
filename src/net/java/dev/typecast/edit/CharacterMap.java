@@ -1,5 +1,5 @@
 /*
- * $Id: CharacterMap.java,v 1.3 2007-01-24 09:40:52 davidsch Exp $
+ * $Id: CharacterMap.java,v 1.4 2007-01-25 08:41:56 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -56,7 +56,7 @@ import net.java.dev.typecast.render.GlyphImageFactory;
 /**
  * An editor for the character-to-glyph map, as represented in the CmapTable.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: CharacterMap.java,v 1.3 2007-01-24 09:40:52 davidsch Exp $
+ * @version $Id: CharacterMap.java,v 1.4 2007-01-25 08:41:56 davidsch Exp $
  */
 public class CharacterMap extends JScrollPane implements EditorView {
 
@@ -154,6 +154,9 @@ public class CharacterMap extends JScrollPane implements EditorView {
     
     /** Creates a new instance of CharacterMap */
     public CharacterMap() {
+        super(
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+            JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         setName("Character Map");
     }
 

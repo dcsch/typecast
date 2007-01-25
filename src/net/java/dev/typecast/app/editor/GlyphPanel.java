@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanel.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * $Id: GlyphPanel.java,v 1.2 2007-01-25 08:40:27 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -43,7 +43,7 @@ import net.java.dev.typecast.app.editor.GlyphPanelStatusBar;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * @version $Id: GlyphPanel.java,v 1.2 2007-01-25 08:40:27 davidsch Exp $
  */
 public class GlyphPanel extends JPanel implements EditorView {
 
@@ -68,7 +68,11 @@ public class GlyphPanel extends JPanel implements EditorView {
         _glyphEdit.setBackground(Color.white);
         _glyphEdit.setScaleFactor(
                 Float.valueOf(properties.getProperty("Zoom", "0.25")).floatValue());
-        add(new JScrollPane(_glyphEdit), BorderLayout.CENTER);
+        add(new JScrollPane(
+                    _glyphEdit,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
+                BorderLayout.CENTER);
 
         // Status bar
         _glyphPanelStatusBar.setGlyphEdit(_glyphEdit);

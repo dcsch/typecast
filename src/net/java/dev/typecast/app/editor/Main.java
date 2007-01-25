@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * $Id: Main.java,v 1.2 2007-01-25 08:41:29 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -24,6 +24,7 @@ import java.awt.Component;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.FileDialog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,7 +90,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * @version $Id: Main.java,v 1.2 2007-01-25 08:41:29 davidsch Exp $
  */
 public class Main {
 
@@ -175,7 +176,9 @@ public class Main {
             _tree.setCellRenderer(new TableTreeCellRenderer());
 
             // Put the Tree in a scroller
-            JScrollPane treePane = new JScrollPane();
+            JScrollPane treePane = new JScrollPane(
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             treePane.getViewport().add(_tree);
 
             // Listen for selection events from the tree
@@ -313,20 +316,31 @@ public class Main {
      * Display a file chooser and open the selected font file
      */
     protected void openFont() {
-        JFileChooser chooser = new JFileChooser();
+        
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            FileDialog fd = new FileDialog(_frame, "Open");
+            fd.setVisible(true);
+            if (fd.getFile() != null) {
+                String pathName = fd.getDirectory() + fd.getFile();
+                loadFont(pathName);
+                _menu.addMru(pathName);
+            }
+        } else {
+            JFileChooser chooser = new JFileChooser();
 
-        EditorFileFilter filter = new EditorFileFilter();
-        filter.addExtension("ttf");
-        filter.addExtension("ttc");
-        filter.addExtension("otf");
-        filter.addExtension("dfont");
-        filter.setDescription("OpenType Fonts");
+            EditorFileFilter filter = new EditorFileFilter();
+            filter.addExtension("ttf");
+            filter.addExtension("ttc");
+            filter.addExtension("otf");
+            filter.addExtension("dfont");
+            filter.setDescription("OpenType Fonts");
 
-        chooser.setFileFilter(filter);
+            chooser.setFileFilter(filter);
 
-        if (chooser.showOpenDialog(_frame) == JFileChooser.APPROVE_OPTION) {
-            loadFont(chooser.getSelectedFile().getPath());
-            _menu.addMru(chooser.getSelectedFile().getPath());
+            if (chooser.showOpenDialog(_frame) == JFileChooser.APPROVE_OPTION) {
+                loadFont(chooser.getSelectedFile().getPath());
+                _menu.addMru(chooser.getSelectedFile().getPath());
+            }
         }
     }
 

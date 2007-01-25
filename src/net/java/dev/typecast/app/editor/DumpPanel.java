@@ -1,5 +1,5 @@
 /*
- * $Id: DumpPanel.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
+ * $Id: DumpPanel.java,v 1.2 2007-01-25 08:39:24 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -34,7 +34,7 @@ import net.java.dev.typecast.ot.OTFont;
 /**
  * A simple view of an object's "toString()" output.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: DumpPanel.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
+ * @version $Id: DumpPanel.java,v 1.2 2007-01-25 08:39:24 davidsch Exp $
  */
 public class DumpPanel extends JPanel implements EditorView {
 
@@ -49,7 +49,11 @@ public class DumpPanel extends JPanel implements EditorView {
         _dumpTextArea = new JTextArea();
         _dumpTextArea.setEditable(false);
         _dumpTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        add(new JScrollPane(_dumpTextArea), BorderLayout.CENTER);
+        add(new JScrollPane(
+                    _dumpTextArea,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS),
+                BorderLayout.CENTER);
     }
     
     public void setModel(OTFont font, Object obj) {

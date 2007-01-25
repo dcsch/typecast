@@ -1,5 +1,5 @@
 /*
- * $Id: EditorMenu.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * $Id: EditorMenu.java,v 1.2 2007-01-25 08:40:03 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -23,6 +23,7 @@ package net.java.dev.typecast.app.editor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
 
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -42,7 +43,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /**
  * The application menu bar
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorMenu.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
+ * @version $Id: EditorMenu.java,v 1.2 2007-01-25 08:40:03 davidsch Exp $
  */
 public class EditorMenu {
 
@@ -54,12 +55,22 @@ public class EditorMenu {
     private String _closeMenuString;
     private JCheckBoxMenuItem _previewMenuItem;
     private JCheckBoxMenuItem _showPointsMenuItem;
+    private boolean _macPlatform;
+    private int _primaryKeystrokeMask;
     
     /** Creates a new instance of TypecastMenu */
     public EditorMenu(Main app, ResourceBundle rb, Properties props) {
         _app = app;
         _rb = rb;
         _properties = props;
+        _primaryKeystrokeMask =
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            _macPlatform = true;
+            new MacOSMenuHandler(_app);
+        } else {
+            _macPlatform = false;
+        }
     }
     
     public OTFontCollection getSelectedFontCollection() {
@@ -182,6 +193,9 @@ public class EditorMenu {
         //menuBar.add(createElementMenu());
         //menuBar.add(createPointsMenu());
         //menuBar.add(createMetricsMenu());
+        if (_macPlatform) {
+            menuBar.add(createWindowMenu());
+        }
         menuBar.add(createHelpMenu());
         return menuBar;
     }
@@ -190,7 +204,7 @@ public class EditorMenu {
         JMenu menu = createMenu(_rb.getString("Typecast.menu.file"));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.new"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -199,7 +213,7 @@ public class EditorMenu {
         menu.add(new JSeparator());
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.open"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -219,7 +233,7 @@ public class EditorMenu {
         menu.add(new JSeparator());
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.file.save"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -242,15 +256,17 @@ public class EditorMenu {
                         _app.exportFont();
                     }
                 }));
-        menu.add(new JSeparator());
-        menu.add(createMenuItem(
-                _rb.getString("Typecast.menu.file.preferences"),
-                null,
-                true,
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                    }
-                }));
+        if (!_macPlatform) {
+            menu.add(new JSeparator());
+            menu.add(createMenuItem(
+                    _rb.getString("Typecast.menu.file.preferences"),
+                    null,
+                    true,
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                        }
+                    }));
+        }
         menu.add(new JSeparator());
 
         // Generate a MRU list
@@ -280,19 +296,20 @@ public class EditorMenu {
             JMenuItem menuItem = menu.add(new JMenuItem("Recently used files"));
             menuItem.setEnabled(false);
         }
+        
+        if (!_macPlatform) {
+            menu.add(new JSeparator());
 
-        menu.add(new JSeparator());
-
-        menu.add(createMenuItem(
-                _rb.getString("Typecast.menu.file.exit"),
-                null,
-                true,
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        _app.close();
-                    }
-                }));
-
+            menu.add(createMenuItem(
+                    _rb.getString("Typecast.menu.file.exit"),
+                    null,
+                    true,
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            _app.close();
+                        }
+                    }));
+        }
         return menu;
     }
 
@@ -300,7 +317,7 @@ public class EditorMenu {
         JMenu menu = createMenu(_rb.getString("Typecast.menu.edit"));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.undo"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -308,7 +325,7 @@ public class EditorMenu {
                 }));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.redo"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -317,7 +334,7 @@ public class EditorMenu {
         menu.add(new JSeparator());
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.cut"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -325,7 +342,7 @@ public class EditorMenu {
                 }));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.copy"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -333,7 +350,7 @@ public class EditorMenu {
                 }));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.paste"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -370,7 +387,7 @@ public class EditorMenu {
         //    }));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.edit.selectAll"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_A, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -378,7 +395,7 @@ public class EditorMenu {
                 }));
         //menu.add(createMenuItem(
         //    _rb.getString("Typecast.menu.edit.duplicate"),
-        //    KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK),
+        //    KeyStroke.getKeyStroke(KeyEvent.VK_D, _primaryKeystrokeMask),
         //    new ActionListener() {
         //        public void actionPerformed(ActionEvent e) {
         //        }
@@ -397,7 +414,7 @@ public class EditorMenu {
         JMenu menu = createMenu(_rb.getString("Typecast.menu.view"));
         menu.add(_previewMenuItem = createCheckBoxMenuItem(
                 _rb.getString("Typecast.menu.view.preview"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_L, _primaryKeystrokeMask),
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         _app.changeGlyphView();
@@ -405,7 +422,7 @@ public class EditorMenu {
                 }));
         menu.add(_showPointsMenuItem = createCheckBoxMenuItem(
                 _rb.getString("Typecast.menu.view.showPoints"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, _primaryKeystrokeMask),
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         _app.changeGlyphView();
@@ -416,7 +433,7 @@ public class EditorMenu {
         menu.add(subMenu);
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.fitInWindow"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_T, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -425,7 +442,7 @@ public class EditorMenu {
         subMenu.add(new JSeparator());
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.00625"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_1, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -433,7 +450,7 @@ public class EditorMenu {
                 }));
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.01250"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_2, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -441,7 +458,7 @@ public class EditorMenu {
                 }));
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.02500"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_3, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -449,7 +466,7 @@ public class EditorMenu {
                 }));
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.05000"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_4, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_4, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -457,7 +474,7 @@ public class EditorMenu {
                 }));
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.10000"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_5, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_5, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -465,7 +482,7 @@ public class EditorMenu {
                 }));
         subMenu.add(createMenuItem(
                 _rb.getString("Typecast.menu.view.magnification.20000"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_6, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_6, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -513,11 +530,36 @@ public class EditorMenu {
         return menu;
     }
     
-    private JMenu createHelpMenu() {
-        JMenu menu = createMenu(_rb.getString("Typecast.menu.help"));
+    private JMenu createWindowMenu() {
+        JMenu menu = createMenu(_rb.getString("Typecast.menu.window"));
         menu.add(createMenuItem(
                 _rb.getString("Typecast.menu.help.about"),
                 null,
+                true,
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        _app.showAbout();
+                    }
+                }));
+        return menu;
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu menu = createMenu(_rb.getString("Typecast.menu.help"));
+        if (!_macPlatform) {
+            menu.add(createMenuItem(
+                    _rb.getString("Typecast.menu.help.about"),
+                    null,
+                    true,
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            _app.showAbout();
+                        }
+                    }));
+        }
+        menu.add(createMenuItem(
+                _rb.getString("Typecast.menu.help.typecast"),
+                KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, _primaryKeystrokeMask),
                 true,
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
