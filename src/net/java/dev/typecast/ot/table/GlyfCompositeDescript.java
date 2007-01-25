@@ -60,7 +60,7 @@ import java.util.ArrayList;
  * or more simple glyphs, usually with some sort of transformation applied to
  * each.
  *
- * @version $Id: GlyfCompositeDescript.java,v 1.4 2007-01-24 09:54:44 davidsch Exp $
+ * @version $Id: GlyfCompositeDescript.java,v 1.5 2007-01-25 08:43:18 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfCompositeDescript extends GlyfDescript {
@@ -81,8 +81,11 @@ public class GlyfCompositeDescript extends GlyfDescript {
         try {
             do {
                 _components.add(comp = new GlyfCompositeComp(firstIndex, firstContour, di));
-                firstIndex += parentTable.getDescription(comp.getGlyphIndex()).getPointCount();
-                firstContour += parentTable.getDescription(comp.getGlyphIndex()).getContourCount();
+                GlyfDescript desc = parentTable.getDescription(comp.getGlyphIndex());
+                if (desc != null) {
+                    firstIndex += desc.getPointCount();
+                    firstContour += desc.getContourCount();
+                }
             } while ((comp.getFlags() & GlyfCompositeComp.MORE_COMPONENTS) != 0);
 
             // Are there hinting intructions to read?
