@@ -1,5 +1,5 @@
 /*
- * $Id: EditorPrefs.java,v 1.1 2007-01-24 09:36:57 davidsch Exp $
+ * $Id: EditorPrefs.java,v 1.2 2007-01-25 23:58:25 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -20,21 +20,28 @@
 
 package net.java.dev.typecast.app.editor;
 
+import java.util.ArrayList;
+
 import java.util.prefs.Preferences;
+
 import java.awt.Point;
 import java.awt.Dimension;
 
 /**
  * A class to handle all the various application preferences
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorPrefs.java,v 1.1 2007-01-24 09:36:57 davidsch Exp $
+ * @version $Id: EditorPrefs.java,v 1.2 2007-01-25 23:58:25 davidsch Exp $
  */
 public class EditorPrefs {
+    
+    public static final int maxMRUCount = 10;
     
     // Key strings
     private static final String APP_WINDOW_POS = "app_position";
     private static final String APP_WINDOW_SIZE = "app_size";
     private static final String TREE_WIDTH = "tree_width";
+    private static final String MRU_COUNT = "mru_count";
+    private static final String MRU_PREFIX = "mru_";
     
     // Default values
     private static final int APP_WINDOW_POS_X_DEFAULT = 0;
@@ -42,10 +49,12 @@ public class EditorPrefs {
     private static final int APP_WINDOW_SIZE_WIDTH_DEFAULT = 640;
     private static final int APP_WINDOW_SIZE_HEIGHT_DEFAULT = 480;
     private static final int TREE_WIDTH_DEFAULT = 200;
+    private static final int MRU_COUNT_DEFAULT = 0;
     
     private Point _appWindowPos;
     private Dimension _appWindowSize;
     private int _treeWidth;
+    private ArrayList<String> _mru = new ArrayList<String>();
 
     /** Creates a new instance of TypecastPrefs */
     public EditorPrefs() {
@@ -63,12 +72,20 @@ public class EditorPrefs {
                     APP_WINDOW_SIZE_WIDTH_DEFAULT,
                     APP_WINDOW_SIZE_HEIGHT_DEFAULT));
         _treeWidth = prefs.getInt(TREE_WIDTH, TREE_WIDTH_DEFAULT);
+        int mruCount = prefs.getInt(MRU_COUNT, MRU_COUNT_DEFAULT);
+        for (int i = 0; i < mruCount; ++i) {
+            _mru.add(prefs.get(MRU_PREFIX + Integer.toString(i), null));
+        }
     }
 
     public void save(Preferences prefs) {
         putPosition(prefs, APP_WINDOW_POS, _appWindowPos);
         putSize(prefs, APP_WINDOW_SIZE, _appWindowSize);
         prefs.putInt(TREE_WIDTH, _treeWidth);
+        prefs.putInt(MRU_COUNT, getMRUCount());
+        for (int i = 0; i < getMRUCount(); ++i) {
+            prefs.put(MRU_PREFIX + Integer.toString(i), _mru.get(i));
+        }
     }
 
     public Point getAppWindowPos() {
@@ -93,6 +110,36 @@ public class EditorPrefs {
     
     public void setTreeWidth(int width) {
         _treeWidth = width;
+    }
+    
+    public int getMRUCount() {
+        return _mru.size();
+    }
+    
+    public String getMRU(int index) {
+        return _mru.get(index);
+    }
+    
+    public void addMRU(String mru) {
+        
+        // Insert this file at the beginning of the list and remove any that
+        // drop off the end of the list
+        _mru.add(0, mru);
+        if (_mru.size() > maxMRUCount) {
+            _mru.remove(maxMRUCount);
+        }
+    }
+    
+    public void clearMRU() {
+        _mru.clear();
+    }
+    
+    public float getZoom() {
+        return 0.25f;
+    }
+    
+    public void setZoom(float factor) {
+        
     }
 
     /**
