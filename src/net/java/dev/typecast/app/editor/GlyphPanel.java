@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphPanel.java,v 1.2 2007-01-25 08:40:27 davidsch Exp $
+ * $Id: GlyphPanel.java,v 1.3 2007-01-26 00:03:49 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -43,21 +43,21 @@ import net.java.dev.typecast.app.editor.GlyphPanelStatusBar;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.2 2007-01-25 08:40:27 davidsch Exp $
+ * @version $Id: GlyphPanel.java,v 1.3 2007-01-26 00:03:49 davidsch Exp $
  */
 public class GlyphPanel extends JPanel implements EditorView {
 
     private static final long serialVersionUID = 1L;
 
-    private Properties _properties;
+    private EditorPrefs _prefs;
     private GlyphEdit _glyphEdit = new GlyphEdit();
     private GlyphPanelToolBar _toolBar = new GlyphPanelToolBar();
     private GlyphPanelStatusBar _glyphPanelStatusBar =
             new GlyphPanelStatusBar();
 
     /** Creates new GlyphPanel */
-    public GlyphPanel(Properties properties) {
-        _properties = properties;
+    public GlyphPanel(EditorPrefs prefs) {
+        _prefs = prefs;
         setName("Outline");
         setLayout(new BorderLayout());
 
@@ -66,8 +66,7 @@ public class GlyphPanel extends JPanel implements EditorView {
 
         // Editor
         _glyphEdit.setBackground(Color.white);
-        _glyphEdit.setScaleFactor(
-                Float.valueOf(properties.getProperty("Zoom", "0.25")).floatValue());
+        _glyphEdit.setScaleFactor(_prefs.getZoom());
         add(new JScrollPane(
                     _glyphEdit,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -99,6 +98,6 @@ public class GlyphPanel extends JPanel implements EditorView {
     }
     
     public void setProperties() {
-        _properties.setProperty("Zoom", String.valueOf(_glyphEdit.getScaleFactor()));
+        _prefs.setZoom((float)_glyphEdit.getScaleFactor());
     }
 }
