@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.2 2007-01-25 08:41:29 davidsch Exp $
+ * $Id: Main.java,v 1.3 2007-01-26 00:06:19 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -90,7 +90,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.2 2007-01-25 08:41:29 davidsch Exp $
+ * @version $Id: Main.java,v 1.3 2007-01-26 00:06:19 davidsch Exp $
  */
 public class Main {
 
@@ -101,7 +101,6 @@ public class Main {
     private DefaultTreeModel _treeModel;
     private ArrayList<OTFontCollection> _fontCollections =
             new ArrayList<OTFontCollection>();
-    private Properties _properties = new Properties();
     private EditorPrefs _appPrefs = new EditorPrefs();
     private JTabbedPane _tabbedPane;
     private GlyphPanel _glyphPane;
@@ -142,15 +141,6 @@ public class Main {
         try {
             // Load the user's application preferences
             _appPrefs.load(Preferences.userNodeForPackage(getClass()));
-
-            // This is the old preferences store - to be removed
-            try {
-                _properties.load(new FileInputStream(
-                    System.getProperty("user.home") +
-                    System.getProperty("file.separator") +
-                    "typecast.properties"));
-            } catch (IOException e) {
-            }
 
             // Load the resource bundle
             _rb = ResourceBundle.getBundle("net/java/dev/typecast/app/editor/Main");
@@ -226,7 +216,7 @@ public class Main {
             _frame.getContentPane().add("Center", _splitPane);
 
             // Create a menu bar
-            _menu = new EditorMenu(this, _rb, _properties);
+            _menu = new EditorMenu(this, _rb, _appPrefs);
             _frame.setJMenuBar(_menu.createMenuBar());
 
             _frame.addWindowListener(
@@ -386,6 +376,14 @@ public class Main {
         }
     }
 
+    protected void showHelp() {
+        JOptionPane.showMessageDialog(
+            null,
+            "Typecast currently has no help.",
+            "Typecast Help",
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+
     protected void showAbout() {
         JOptionPane.showMessageDialog(
             null,
@@ -409,17 +407,6 @@ public class Main {
         _appPrefs.setAppWindowSize(_frame.getSize());
         _appPrefs.setTreeWidth(_splitPane.getDividerLocation());
         _appPrefs.save(Preferences.userNodeForPackage(getClass()));
-
-        // Save properties
-        try {
-            //_glyphPane.setProperties();
-
-            _properties.store(new FileOutputStream(
-                System.getProperty("user.home") +
-                System.getProperty("file.separator") +
-                "typecast.properties"), "Heading");
-        } catch (IOException e) {
-        }
 
         // End the application
         System.exit(0);
@@ -459,7 +446,7 @@ public class Main {
 
         // Then add the panes we're interested in
         if (obj instanceof GlyphDescription) {
-            _glyphPane = new GlyphPanel(_properties);
+            _glyphPane = new GlyphPanel(_appPrefs);
             _glyphPane.setModel(font, obj);
             _tabbedPane.add(_glyphPane);
         }
