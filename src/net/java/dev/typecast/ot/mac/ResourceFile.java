@@ -1,5 +1,5 @@
 /*
- * $Id: ResourceFile.java,v 1.1.1.1 2004-12-05 23:14:32 davidsch Exp $
+ * $Id: ResourceFile.java,v 1.2 2007-01-29 04:01:53 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -27,7 +27,7 @@ import java.io.RandomAccessFile;
  * Mac resource loading test.
  * TODO: incorporate this into the test suite.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: ResourceFile.java,v 1.1.1.1 2004-12-05 23:14:32 davidsch Exp $
+ * @version $Id: ResourceFile.java,v 1.2 2007-01-29 04:01:53 davidsch Exp $
  */
 public class ResourceFile {
 
@@ -52,7 +52,10 @@ public class ResourceFile {
 
     public static void main(String[] args) {
         try {
-            RandomAccessFile raf = new RandomAccessFile("D:\\personal\\typecast\\fonts\\GillSans.dfont", "r");
+            //RandomAccessFile raf = new RandomAccessFile("/Library/Fonts/GillSans.dfont", "r");
+            
+            // Tests loading a font from a resource fork on Mac OS X
+            RandomAccessFile raf = new RandomAccessFile("/Library/Fonts/Georgia/..namedfork/rsrc", "r");
             ResourceFile resource = new ResourceFile(raf);
             for (int i = 0; i < resource.getResourceMap().getResourceTypeCount(); i++) {
                 System.out.println(resource.getResourceMap().getResourceType(i).getTypeAsString());
