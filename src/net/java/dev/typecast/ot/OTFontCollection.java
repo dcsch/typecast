@@ -1,5 +1,5 @@
 /*
- * $Id: OTFontCollection.java,v 1.4 2007-01-24 09:54:45 davidsch Exp $
+ * $Id: OTFontCollection.java,v 1.5 2007-01-29 04:02:57 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -39,7 +39,7 @@ import net.java.dev.typecast.ot.table.TTCHeader;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: OTFontCollection.java,v 1.4 2007-01-24 09:54:45 davidsch Exp $
+ * @version $Id: OTFontCollection.java,v 1.5 2007-01-29 04:02:57 davidsch Exp $
  */
 public class OTFontCollection {
 
@@ -48,6 +48,7 @@ public class OTFontCollection {
     private TTCHeader _ttcHeader;
     private OTFont[] _fonts;
     private ArrayList<Table> _tables = new ArrayList<Table>();
+    private boolean _resourceFork = false;
 
     /** Creates new FontCollection */
     protected OTFontCollection() {
@@ -109,17 +110,25 @@ public class OTFontCollection {
             return;
         }
 
+        // Do we need to modify the path name to deal with font resources
+        // in a Mac resource fork?
+        if (file.length() == 0) {
+            file = new File(file, "..namedfork/rsrc");
+            if (!file.exists()) {
+                // TODO: Throw TTException
+                return;
+            }
+            _resourceFork = true;
+        }
+
         DataInputStream dis = new DataInputStream(
             new BufferedInputStream(
                 new FileInputStream(file), (int) file.length()));
         dis.mark((int) file.length());
 
-        if (_pathName.endsWith(".dfont")) {
+        if (_resourceFork || _pathName.endsWith(".dfont")) {
 
             // This is a Macintosh font suitcase resource
-            // Note that the resource fork must have been converted to a
-            // data fork, which appears to be the standard case for
-            // Mac OS X, thus the "dfont" extension.
             ResourceHeader resourceHeader = new ResourceHeader(dis);
 
             // Seek to the map offset and read the map
