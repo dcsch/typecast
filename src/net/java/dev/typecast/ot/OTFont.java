@@ -53,6 +53,7 @@ package net.java.dev.typecast.ot;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import net.java.dev.typecast.ot.table.DirectoryEntry;
 import net.java.dev.typecast.ot.table.TTCHeader;
 import net.java.dev.typecast.ot.table.TableDirectory;
 import net.java.dev.typecast.ot.table.Table;
@@ -70,7 +71,7 @@ import net.java.dev.typecast.ot.table.TableFactory;
 
 /**
  * The TrueType font.
- * @version $Id: OTFont.java,v 1.3 2004-12-21 10:20:06 davidsch Exp $
+ * @version $Id: OTFont.java,v 1.4 2007-01-30 03:51:40 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class OTFont {
@@ -165,6 +166,16 @@ public class OTFont {
     public TableDirectory getTableDirectory() {
         return _tableDirectory;
     }
+    
+    private Table readTable(
+            DataInputStream dis,
+            int tablesOrigin,
+            int tag) throws IOException {
+        dis.reset();
+        DirectoryEntry entry = _tableDirectory.getEntryByTag(tag);
+        dis.skip(tablesOrigin + entry.getOffset());
+        return TableFactory.create(_fc, this, entry, dis);
+    }
 
     /**
      * @param dis OpenType/TrueType font file data.
@@ -187,39 +198,47 @@ public class OTFont {
         dis.skip(directoryOffset);
         _tableDirectory = new TableDirectory(dis);
         _tables = new Table[_tableDirectory.getNumTables()];
+        
+        // Load some prerequisite tables
+        _head = (HeadTable) readTable(dis, tablesOrigin, Table.head);
+        _hhea = (HheaTable) readTable(dis, tablesOrigin, Table.hhea);
+        _maxp = (MaxpTable) readTable(dis, tablesOrigin, Table.maxp);
+        _loca = (LocaTable) readTable(dis, tablesOrigin, Table.loca);
 
-        // Load each of the tables
+        int index = 0;
+        _tables[index++] = _head;
+        _tables[index++] = _hhea;
+        _tables[index++] = _maxp;
+        if (_loca != null) {
+            _tables[index++] = _loca;
+        }
+        
+        // Load all other tables
         for (int i = 0; i < _tableDirectory.getNumTables(); i++) {
+            DirectoryEntry entry = _tableDirectory.getEntry(i);
+            if (entry.getTag() == Table.head
+                    || entry.getTag() == Table.hhea
+                    || entry.getTag() == Table.maxp
+                    || entry.getTag() == Table.loca) {
+                continue;
+            }
             dis.reset();
-            dis.skip(tablesOrigin + _tableDirectory.getEntry(i).getOffset());
-            _tables[i] =
-                    TableFactory.create(_fc, _tableDirectory.getEntry(i), dis);
+            dis.skip(tablesOrigin + entry.getOffset());
+            _tables[index] = TableFactory.create(_fc, this, entry, dis);
+            ++index;
         }
 
         // Get references to commonly used tables (these happen to be all the
         // required tables)
         _cmap = (CmapTable) getTable(Table.cmap);
-        _head = (HeadTable) getTable(Table.head);
-        _hhea = (HheaTable) getTable(Table.hhea);
         _hmtx = (HmtxTable) getTable(Table.hmtx);
-        _maxp = (MaxpTable) getTable(Table.maxp);
         _name = (NameTable) getTable(Table.name);
         _os2 = (Os2Table) getTable(Table.OS_2);
         _post = (PostTable) getTable(Table.post);
 
         // If this is a TrueType outline, then we'll have at least the
-        // following tables
+        // 'glyf' table (along with the 'loca' table)
         _glyf = (GlyfTable) getTable(Table.glyf);
-        _loca = (LocaTable) getTable(Table.loca);
-
-        // Initialize the tables that require it
-        _hmtx.init(
-                _hhea.getNumberOfHMetrics(),
-                _maxp.getNumGlyphs() - _hhea.getNumberOfHMetrics());
-        if (_glyf != null) {
-            _loca.init(_maxp.getNumGlyphs(), _head.getIndexToLocFormat() == 0);
-            _glyf.init(_maxp.getNumGlyphs(), _loca);
-        }
     }
 
     public String toString() {
