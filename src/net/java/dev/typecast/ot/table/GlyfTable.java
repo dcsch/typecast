@@ -56,33 +56,29 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfTable.java,v 1.4 2007-01-24 11:37:04 davidsch Exp $
+ * @version $Id: GlyfTable.java,v 1.5 2007-01-30 03:49:46 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfTable implements Table {
 
     private DirectoryEntry _de;
-    private byte[] _buf = null;
     private GlyfDescript[] _descript;
 
-    protected GlyfTable(DirectoryEntry de, DataInput di) throws IOException {
+    protected GlyfTable(
+            DirectoryEntry de,
+            DataInput di,
+            MaxpTable maxp,
+            LocaTable loca) throws IOException {
         _de = (DirectoryEntry) de.clone();
+        _descript = new GlyfDescript[maxp.getNumGlyphs()];
         
-        // We need to buffer this and then initialise once we have the
-        // "loca" table
-        _buf = new byte[de.getLength()];
-        di.readFully(_buf);
-    }
-
-    public void init(int numGlyphs, LocaTable loca) throws IOException {
-        if (_buf == null) {
-            return;
-        }
-        _descript = new GlyfDescript[numGlyphs];
-        ByteArrayInputStream bais = new ByteArrayInputStream(_buf);
+        // Buffer the whole table so we can randomly access it
+        byte[] buf = new byte[de.getLength()];
+        di.readFully(buf);
+        ByteArrayInputStream bais = new ByteArrayInputStream(buf);
         
         // Process all the simple glyphs
-        for (int i = 0; i < numGlyphs; i++) {
+        for (int i = 0; i < maxp.getNumGlyphs(); i++) {
             int len = loca.getOffset((short)(i + 1)) - loca.getOffset(i);
             if (len > 0) {
                 bais.reset();
@@ -98,7 +94,7 @@ public class GlyfTable implements Table {
         }
 
         // Now do all the composite glyphs
-        for (int i = 0; i < numGlyphs; i++) {
+        for (int i = 0; i < maxp.getNumGlyphs(); i++) {
             int len = loca.getOffset((short)(i + 1)) - loca.getOffset(i);
             if (len > 0) {
                 bais.reset();
@@ -110,7 +106,6 @@ public class GlyfTable implements Table {
                 }
             }
         }
-        _buf = null;
     }
 
     public GlyfDescript getDescription(int i) {

@@ -55,36 +55,34 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: HmtxTable.java,v 1.3 2007-01-24 09:54:44 davidsch Exp $
+ * @version $Id: HmtxTable.java,v 1.4 2007-01-30 03:49:34 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class HmtxTable implements Table {
 
     private DirectoryEntry _de;
-    private byte[] _buf = null;
     private int[] _hMetrics = null;
     private short[] _leftSideBearing = null;
 
-    protected HmtxTable(DirectoryEntry de, DataInput di) throws IOException {
+    protected HmtxTable(
+            DirectoryEntry de,
+            DataInput di,
+            HheaTable hhea,
+            MaxpTable maxp) throws IOException {
         _de = (DirectoryEntry) de.clone();
-        _buf = new byte[de.getLength()];
-        di.readFully(_buf);
-    }
-
-    public void init(int numberOfHMetrics, int lsbCount) {
-        if (_buf == null) {
-            return;
+        _hMetrics = new int[hhea.getNumberOfHMetrics()];
+        for (int i = 0; i < hhea.getNumberOfHMetrics(); ++i) {
+            _hMetrics[i] =
+                    di.readUnsignedByte()<<24
+                    | di.readUnsignedByte()<<16
+                    | di.readUnsignedByte()<<8
+                    | di.readUnsignedByte();
         }
-        _hMetrics = new int[numberOfHMetrics];
-        ByteArrayInputStream bais = new ByteArrayInputStream(_buf);
-        for (int i = 0; i < numberOfHMetrics; ++i) {
-            _hMetrics[i] = bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read();
-        }
+        int lsbCount = maxp.getNumGlyphs() - hhea.getNumberOfHMetrics();
         _leftSideBearing = new short[lsbCount];
         for (int i = 0; i < lsbCount; ++i) {
-            _leftSideBearing[i] = (short)(bais.read()<<8 | bais.read());
+            _leftSideBearing[i] = di.readShort();
         }
-        _buf = null;
     }
 
     public int getAdvanceWidth(int i) {
@@ -116,7 +114,8 @@ public class HmtxTable implements Table {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'hmtx' Table - Horizontal Metrics\n---------------------------------\n");
-        sb.append("Size = ").append(0).append(" bytes, ").append(_hMetrics.length).append(" entries\n");
+        sb.append("Size = ").append(_de.getLength()).append(" bytes, ")
+            .append(_hMetrics.length).append(" entries\n");
         for (int i = 0; i < _hMetrics.length; i++) {
             sb.append("        ").append(i)
                 .append(". advWid: ").append(getAdvanceWidth(i))

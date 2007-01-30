@@ -13,47 +13,41 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: LocaTable.java,v 1.2 2007-01-24 09:54:44 davidsch Exp $
+ * @version $Id: LocaTable.java,v 1.3 2007-01-30 03:49:17 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class LocaTable implements Table {
 
-    private DirectoryEntry de;
-    private byte[] buf = null;
-    private int[] offsets = null;
-    private short factor = 0;
+    private DirectoryEntry _de;
+    private int[] _offsets = null;
+    private short _factor = 0;
 
-    protected LocaTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
-        buf = new byte[de.getLength()];
-        di.readFully(buf);
-    }
-
-    public void init(int numGlyphs, boolean shortEntries) {
-        if (buf == null) {
-            return;
-        }
-        offsets = new int[numGlyphs + 1];
-        ByteArrayInputStream bais = new ByteArrayInputStream(buf);
+    protected LocaTable(
+            DirectoryEntry de,
+            DataInput di,
+            HeadTable head,
+            MaxpTable maxp) throws IOException {
+        _de = (DirectoryEntry) de.clone();
+        _offsets = new int[maxp.getNumGlyphs() + 1];
+        boolean shortEntries = head.getIndexToLocFormat() == 0;
         if (shortEntries) {
-            factor = 2;
-            for (int i = 0; i <= numGlyphs; i++) {
-                offsets[i] = bais.read()<<8 | bais.read();
+            _factor = 2;
+            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
+                _offsets[i] = di.readUnsignedShort();
             }
         } else {
-            factor = 1;
-            for (int i = 0; i <= numGlyphs; i++) {
-                offsets[i] = bais.read()<<24 | bais.read()<<16 | bais.read()<<8 | bais.read();
+            _factor = 1;
+            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
+                _offsets[i] = di.readInt();
             }
         }
-        buf = null;
     }
-    
+
     public int getOffset(int i) {
-        if (offsets == null) {
+        if (_offsets == null) {
             return 0;
         }
-        return offsets[i] * factor;
+        return _offsets[i] * _factor;
     }
 
     public int getType() {
@@ -63,9 +57,9 @@ public class LocaTable implements Table {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'loca' Table - Index To Location Table\n--------------------------------------\n")
-            .append("Size = ").append(0).append(" bytes, ")
-            .append(offsets.length).append(" entries\n");
-        for (int i = 0; i < offsets.length; i++) {
+            .append("Size = ").append(_de.getLength()).append(" bytes, ")
+            .append(_offsets.length).append(" entries\n");
+        for (int i = 0; i < _offsets.length; i++) {
             sb.append("        Idx ").append(i)
                 .append(" -> glyfOff 0x").append(getOffset(i)).append("\n");
         }
@@ -79,7 +73,6 @@ public class LocaTable implements Table {
      * @return A directory entry
      */
     public DirectoryEntry getDirectoryEntry() {
-        return de;
+        return _de;
     }
-    
 }
