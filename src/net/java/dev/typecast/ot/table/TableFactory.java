@@ -53,17 +53,19 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import net.java.dev.typecast.ot.OTFont;
 import net.java.dev.typecast.ot.OTFontCollection;
 
 /** 
  *
- * @version $Id: TableFactory.java,v 1.2 2004-12-09 23:46:21 davidsch Exp $
+ * @version $Id: TableFactory.java,v 1.3 2007-01-30 03:48:41 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class TableFactory {
 
     public static Table create(
             OTFontCollection fc,
+            OTFont font,
             DirectoryEntry de,
             DataInputStream dis) throws IOException {
         Table t = null;
@@ -131,9 +133,10 @@ public class TableFactory {
             t = new GaspTable(de, dis);
             break;
         case Table.glyf:
-            t = new GlyfTable(de, dis);
+            t = new GlyfTable(de, dis, font.getMaxpTable(), font.getLocaTable());
             break;
         case Table.hdmx:
+            t = new HdmxTable(de, dis, font.getMaxpTable());
             break;
         case Table.head:
             t = new HeadTable(de, dis);
@@ -142,13 +145,13 @@ public class TableFactory {
             t = new HheaTable(de, dis);
             break;
         case Table.hmtx:
-            t = new HmtxTable(de, dis);
+            t = new HmtxTable(de, dis, font.getHheaTable(), font.getMaxpTable());
             break;
         case Table.kern:
             t = new KernTable(de, dis);
             break;
         case Table.loca:
-            t = new LocaTable(de, dis);
+            t = new LocaTable(de, dis, font.getHeadTable(), font.getMaxpTable());
             break;
         case Table.maxp:
             t = new MaxpTable(de, dis);
