@@ -1,9 +1,9 @@
 /*
- * $Id: EditorPrefs.java,v 1.2 2007-01-25 23:58:25 davidsch Exp $
+ * $Id: EditorPrefs.java,v 1.3 2007-01-30 23:27:14 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2007 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package net.java.dev.typecast.app.editor;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import java.util.prefs.Preferences;
 
@@ -30,7 +31,7 @@ import java.awt.Dimension;
 /**
  * A class to handle all the various application preferences
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorPrefs.java,v 1.2 2007-01-25 23:58:25 davidsch Exp $
+ * @version $Id: EditorPrefs.java,v 1.3 2007-01-30 23:27:14 davidsch Exp $
  */
 public class EditorPrefs {
     
@@ -121,6 +122,14 @@ public class EditorPrefs {
     }
     
     public void addMRU(String mru) {
+        
+        // Is this string already in the list?
+        ListIterator<String> iter = _mru.listIterator();
+        while (iter.hasNext()) {
+            if (iter.next().equals(mru)) {
+                return;
+            }
+        }
         
         // Insert this file at the beginning of the list and remove any that
         // drop off the end of the list
