@@ -58,7 +58,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 
 /** 
  *
- * @version $Id: TableFactory.java,v 1.3 2007-01-30 03:48:41 davidsch Exp $
+ * @version $Id: TableFactory.java,v 1.4 2007-01-30 05:25:52 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class TableFactory {
@@ -117,6 +117,7 @@ public class TableFactory {
             t = new PcltTable(de, dis);
             break;
         case Table.VDMX:
+            t = new VdmxTable(de, dis);
             break;
         case Table.cmap:
             t = new CmapTable(de, dis);
