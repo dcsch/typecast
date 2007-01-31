@@ -72,7 +72,7 @@ import net.java.dev.typecast.ot.table.TableFactory;
 
 /**
  * The TrueType font.
- * @version $Id: OTFont.java,v 1.5 2007-01-31 01:19:22 davidsch Exp $
+ * @version $Id: OTFont.java,v 1.6 2007-01-31 01:49:18 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class OTFont {
@@ -179,6 +179,9 @@ public class OTFont {
             int tag) throws IOException {
         dis.reset();
         DirectoryEntry entry = _tableDirectory.getEntryByTag(tag);
+        if (entry == null) {
+            return null;
+        }
         dis.skip(tablesOrigin + entry.getOffset());
         return TableFactory.create(_fc, this, entry, dis);
     }
