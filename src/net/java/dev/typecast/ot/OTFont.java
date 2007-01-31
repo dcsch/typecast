@@ -67,11 +67,12 @@ import net.java.dev.typecast.ot.table.LocaTable;
 import net.java.dev.typecast.ot.table.MaxpTable;
 import net.java.dev.typecast.ot.table.NameTable;
 import net.java.dev.typecast.ot.table.PostTable;
+import net.java.dev.typecast.ot.table.VheaTable;
 import net.java.dev.typecast.ot.table.TableFactory;
 
 /**
  * The TrueType font.
- * @version $Id: OTFont.java,v 1.4 2007-01-30 03:51:40 davidsch Exp $
+ * @version $Id: OTFont.java,v 1.5 2007-01-31 01:19:22 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class OTFont {
@@ -89,6 +90,7 @@ public class OTFont {
     private MaxpTable _maxp;
     private NameTable _name;
     private PostTable _post;
+    private VheaTable _vhea;
 
     /**
      * Constructor
@@ -140,6 +142,10 @@ public class OTFont {
 
     public PostTable getPostTable() {
         return _post;
+    }
+
+    public VheaTable getVheaTable() {
+        return _vhea;
     }
 
     public int getAscent() {
@@ -204,6 +210,7 @@ public class OTFont {
         _hhea = (HheaTable) readTable(dis, tablesOrigin, Table.hhea);
         _maxp = (MaxpTable) readTable(dis, tablesOrigin, Table.maxp);
         _loca = (LocaTable) readTable(dis, tablesOrigin, Table.loca);
+        _vhea = (VheaTable) readTable(dis, tablesOrigin, Table.vhea);
 
         int index = 0;
         _tables[index++] = _head;
@@ -212,6 +219,9 @@ public class OTFont {
         if (_loca != null) {
             _tables[index++] = _loca;
         }
+        if (_vhea != null) {
+            _tables[index++] = _vhea;
+        }
         
         // Load all other tables
         for (int i = 0; i < _tableDirectory.getNumTables(); i++) {
@@ -219,7 +229,8 @@ public class OTFont {
             if (entry.getTag() == Table.head
                     || entry.getTag() == Table.hhea
                     || entry.getTag() == Table.maxp
-                    || entry.getTag() == Table.loca) {
+                    || entry.getTag() == Table.loca
+                    || entry.getTag() == Table.vhea) {
                 continue;
             }
             dis.reset();
