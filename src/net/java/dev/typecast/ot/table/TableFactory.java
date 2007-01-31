@@ -58,7 +58,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 
 /** 
  *
- * @version $Id: TableFactory.java,v 1.4 2007-01-30 05:25:52 davidsch Exp $
+ * @version $Id: TableFactory.java,v 1.5 2007-01-31 01:18:32 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class TableFactory {
@@ -167,8 +167,10 @@ public class TableFactory {
             t = new PostTable(de, dis);
             break;
         case Table.vhea:
+            t = new VheaTable(de, dis);
             break;
         case Table.vmtx:
+            t = new VmtxTable(de, dis, font.getVheaTable(), font.getMaxpTable());
             break;
         }
         
