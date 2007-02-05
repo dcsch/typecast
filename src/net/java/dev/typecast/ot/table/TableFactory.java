@@ -58,7 +58,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 
 /** 
  *
- * @version $Id: TableFactory.java,v 1.6 2007-02-02 03:00:33 davidsch Exp $
+ * @version $Id: TableFactory.java,v 1.7 2007-02-05 12:39:51 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class TableFactory {
@@ -84,6 +84,7 @@ public class TableFactory {
             t = new BaseTable(de, dis);
             break;
         case Table.CFF:
+            t = new CffTable(de, dis);
             break;
         case Table.DSIG:
             t = new DsigTable(de, dis);
