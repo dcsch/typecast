@@ -1,5 +1,5 @@
 /*
- * $Id: BaseTable.java,v 1.1 2007-02-02 02:59:54 davidsch Exp $
+ * $Id: BaseTable.java,v 1.2 2007-02-05 12:41:06 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -28,7 +28,7 @@ import net.java.dev.typecast.ot.Fixed;
 
 /**
  * Baseline Table
- * @version $Id: BaseTable.java,v 1.1 2007-02-02 02:59:54 davidsch Exp $
+ * @version $Id: BaseTable.java,v 1.2 2007-02-05 12:41:06 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class BaseTable implements Table {
@@ -376,6 +376,9 @@ public class BaseTable implements Table {
         if (_vertAxisOffset != 0) {
             _vertAxis = new Axis(_vertAxisOffset);
         }
+        
+        // Let go of the buffer
+        _buf = null;
     }
     
     private DataInput getDataInputForOffset(int offset) {
