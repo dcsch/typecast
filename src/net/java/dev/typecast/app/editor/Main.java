@@ -1,9 +1,9 @@
 /*
- * $Id: Main.java,v 1.3 2007-01-26 00:06:19 davidsch Exp $
+ * $Id: Main.java,v 1.4 2007-02-05 12:39:16 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2005 David Schweinsberg
+ * Copyright (c) 2004-2007 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -90,7 +91,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.3 2007-01-26 00:06:19 davidsch Exp $
+ * @version $Id: Main.java,v 1.4 2007-02-05 12:39:16 davidsch Exp $
  */
 public class Main {
 
@@ -139,6 +140,13 @@ public class Main {
 //                CharacterMap.class));
 
         try {
+            // Set the L&F appropriate for the OS
+            // (Mac automatically selects Aqua, but Windows goes for Metal)
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                UIManager.setLookAndFeel(
+                        "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            }
+
             // Load the user's application preferences
             _appPrefs.load(Preferences.userNodeForPackage(getClass()));
 
@@ -394,6 +402,8 @@ public class Main {
                 _rb.getString("Typecast.shortDesc") +
                 "\n" +
                 _rb.getString("Typecast.copyright") +
+                "\n" +
+                _rb.getString("Typecast.copyright2") +
                 "\n" +
                 _rb.getString("Typecast.webHome"),
             _rb.getString("Typecast.about.title"),
