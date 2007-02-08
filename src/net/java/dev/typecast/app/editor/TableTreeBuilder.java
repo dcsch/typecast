@@ -1,9 +1,9 @@
 /*
- * $Id: TableTreeBuilder.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
+ * $Id: TableTreeBuilder.java,v 1.2 2007-02-08 04:28:30 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2007 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import net.java.dev.typecast.ot.table.GlyfCompositeComp;
 import net.java.dev.typecast.ot.table.GlyfCompositeDescript;
 import net.java.dev.typecast.ot.table.GlyfDescript;
 import net.java.dev.typecast.ot.table.GlyfTable;
+import net.java.dev.typecast.ot.table.CffTable;
+import net.java.dev.typecast.ot.table.Charstring;
 import net.java.dev.typecast.ot.table.GsubTable;
 import net.java.dev.typecast.ot.table.ID;
 import net.java.dev.typecast.ot.table.LangSys;
@@ -49,7 +51,7 @@ import net.java.dev.typecast.ot.table.Table;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: TableTreeBuilder.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
+ * @version $Id: TableTreeBuilder.java,v 1.2 2007-02-08 04:28:30 davidsch Exp $
  */
 public class TableTreeBuilder {
 
@@ -149,10 +151,15 @@ public class TableTreeBuilder {
                 // Add lookup subtables
                 for (int k = 0; k < l.getSubtableCount(); k++) {
                     LookupSubtable lsub = l.getSubtable(k);
-                    TableTreeNode lsubNode = new TableTreeNode(
-                        lsub.getTypeAsString(),
-                        lsub);
-                    lookupNode.add(lsubNode);
+                    
+                    // For some reason, lsub can be null
+                    // TODO: find out why
+                    if (lsub != null) {
+                        TableTreeNode lsubNode = new TableTreeNode(
+                            lsub.getTypeAsString(),
+                            lsub);
+                        lookupNode.add(lsubNode);
+                    }
                 }
             }
         }
@@ -218,6 +225,33 @@ public class TableTreeBuilder {
         }
     }
     
+    private static void addCffFont(
+            OTFont font,
+            TableTreeNode parent,
+            CffTable ct,
+            int fontIndex) {
+        for (int i = 0; i < ct.getCharstringCount(fontIndex); ++i) {
+            Charstring cs = ct.getCharstring(fontIndex, i);
+            TableTreeNode n = new TableTreeNode(
+                String.valueOf(i) + " " + cs.getName(),
+                cs,
+                i);
+            parent.add(n);
+        }
+    }
+    
+    private static void addCffTable(OTFont font, TableTreeNode parent, CffTable ct) {
+        CffTable.NameIndex ni = ct.getNameIndex();
+        for (int i = 0; i < ni.getCount(); ++i) {
+            TableTreeNode n = new TableTreeNode(
+                ni.getName(i),
+                ni,
+                i);
+            parent.add(n);
+            addCffFont(font, n, ct, i);
+        }
+    }
+    
     private static void addTableDirectoryEntry(OTFont font, TableTreeNode parent, DirectoryEntry de) {
         TableTreeNode node = createNode(de.getTagAsString(), font.getTable(de.getTag()));
         parent.add(node);
@@ -227,8 +261,10 @@ public class TableTreeBuilder {
             addCmapTable(node, (CmapTable) font.getTable(Table.cmap));
         } else if (de.getTag() == Table.glyf) {
             addGlyfTable(font, node, (GlyfTable) font.getTable(Table.glyf));
-//        } else if (de.getTag() == Table.GSUB) {
-//            addGsubTable(node, (GsubTable) font.getTable(Table.GSUB));
+        } else if (de.getTag() == Table.CFF) {
+            addCffTable(font, node, (CffTable) font.getTable(Table.CFF));
+        } else if (de.getTag() == Table.GSUB) {
+            addGsubTable(node, (GsubTable) font.getTable(Table.GSUB));
         }
     }
 
