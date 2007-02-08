@@ -1,5 +1,5 @@
 /*
- * $Id: CffTable.java,v 1.1 2007-02-05 12:42:31 davidsch Exp $
+ * $Id: CffTable.java,v 1.2 2007-02-08 04:30:03 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -32,7 +32,7 @@ import java.util.Hashtable;
 
 /**
  * Compact Font Format Table
- * @version $Id: CffTable.java,v 1.1 2007-02-05 12:42:31 davidsch Exp $
+ * @version $Id: CffTable.java,v 1.2 2007-02-08 04:30:03 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CffTable implements Table {
@@ -263,7 +263,7 @@ public class CffTable implements Table {
         }
     }
     
-    private class NameIndex extends Index {
+    public class NameIndex extends Index {
 
         protected NameIndex(DataInput di) throws IOException {
             super(di);
@@ -307,6 +307,9 @@ public class CffTable implements Table {
                 return CffStandardStrings.standardStrings[index];
             } else {
                 index -= CffStandardStrings.standardStrings.length;
+                if (index >= getCount()) {
+                    return null;
+                }
                 int offset = getOffset(index) - 1;
                 int len = getOffset(index + 1) - offset - 1;
 
@@ -329,6 +332,144 @@ public class CffTable implements Table {
         }
     }
     
+    private class CharsetRange {
+        
+        private int _first;
+        private int _left;
+        
+        public int getFirst() {
+            return _first;
+        }
+
+        protected void setFirst(int first) {
+            _first = first;
+        }
+        
+        public int getLeft() {
+            return _left;
+        }
+
+        protected void setLeft(int left) {
+            _left = left;
+        }
+    }
+
+    private class CharsetRange1 extends CharsetRange {
+        
+        protected CharsetRange1(DataInput di) throws IOException {
+            setFirst(di.readUnsignedShort());
+            setLeft(di.readUnsignedByte());
+        }
+    }
+    
+    private class CharsetRange2 extends CharsetRange {
+        
+        protected CharsetRange2(DataInput di) throws IOException {
+            setFirst(di.readUnsignedShort());
+            setLeft(di.readUnsignedShort());
+        }
+    }
+    
+    private abstract class Charset {
+        
+        public abstract int getFormat();
+        
+        public abstract int getSID(int gid);
+    }
+    
+    private class CharsetFormat0 extends Charset {
+        
+        private int[] _glyph;
+        
+        protected CharsetFormat0(DataInput di, int glyphCount) throws IOException {
+            _glyph = new int[glyphCount - 1];  // minus 1 because .notdef is omitted
+            for (int i = 0; i < glyphCount - 1; ++i) {
+                _glyph[i] = di.readUnsignedShort();
+            }
+        }
+        
+        public int getFormat() {
+            return 0;
+        }
+
+        public int getSID(int gid) {
+            if (gid == 0) {
+                return 0;
+            }
+            return _glyph[gid - 1];
+        }
+    }
+    
+    private class CharsetFormat1 extends Charset {
+        
+        private ArrayList<CharsetRange> _charsetRanges = new ArrayList<CharsetRange>();
+        
+        protected CharsetFormat1(DataInput di, int glyphCount) throws IOException {
+            int glyphsCovered = glyphCount - 1;  // minus 1 because .notdef is omitted
+            while (glyphsCovered > 0) {
+                CharsetRange range = new CharsetRange1(di);
+                _charsetRanges.add(range);
+                glyphsCovered -= range.getLeft() + 1;
+            }
+        }
+
+        public int getFormat() {
+            return 1;
+        }
+
+        public int getSID(int gid) {
+            if (gid == 0) {
+                return 0;
+            }
+            
+            // Count through the ranges to find the one of interest
+            int count = 0;
+            for (CharsetRange range : _charsetRanges) {
+                count += range.getLeft();
+                if (gid < count) {
+                    int sid = gid - count + range.getFirst();
+                    return sid;
+                }
+            }
+            return 0;
+        }
+    }
+
+    private class CharsetFormat2 extends Charset {
+        
+        private ArrayList<CharsetRange> _charsetRanges = new ArrayList<CharsetRange>();
+        
+        protected CharsetFormat2(DataInput di, int glyphCount) throws IOException {
+            int glyphsCovered = glyphCount - 1;  // minus 1 because .notdef is omitted
+            while (glyphsCovered > 0) {
+                CharsetRange range = new CharsetRange2(di);
+                _charsetRanges.add(range);
+                glyphsCovered -= range.getLeft() + 1;
+            }
+        }
+
+        public int getFormat() {
+            return 2;
+        }
+
+        public int getSID(int gid) {
+            if (gid == 0) {
+                return 0;
+            }
+            
+            // Count through the ranges to find the one of interest
+            int count = 0;
+            for (CharsetRange range : _charsetRanges) {
+                if (gid < range.getLeft() + count) {
+                    int sid = gid - count + range.getFirst() - 1;
+                    return sid;
+                }
+                count += range.getLeft();
+            }
+            return 0;
+        }
+    }
+    
     private DirectoryEntry _de;
     private int _major;
     private int _minor;
@@ -337,6 +478,10 @@ public class CffTable implements Table {
     private NameIndex _nameIndex;
     private TopDictIndex _topDictIndex;
     private StringIndex _stringIndex;
+    private Index _globalSubrIndex;
+    private Index _charStringsIndexArray[];
+    private Charset[] _charsets;
+    private Charstring[][] _charstringsArray;
 
     private byte[] _buf;
 
@@ -365,19 +510,77 @@ public class CffTable implements Table {
         // String INDEX
         _stringIndex = new StringIndex(di2);
         
-        // Encodings goes here
+        // Global Subr INDEX
+        _globalSubrIndex = new Index(di2);
         
-        // Charsets
-        Integer charsetOffset = (Integer) _topDictIndex.getTopDict(0).getValue(15);
-        di2 = getDataInputForOffset(charsetOffset.intValue());
-        int format = di2.readUnsignedByte();
-        int foo = di2.readUnsignedByte();
+        // Encodings go here -- but since this is an OpenType font will this
+        // not always be a CIDFont?  In which case there are no encodings
+        // within the CFF data.
+        
+        // Load each of the fonts
+        _charStringsIndexArray = new Index[_topDictIndex.getCount()];
+        _charsets = new Charset[_topDictIndex.getCount()];
+        _charstringsArray = new Charstring[_topDictIndex.getCount()][];
+        for (int i = 0; i < _topDictIndex.getCount(); ++i) {
+
+            // Charstrings INDEX
+            // We load this before Charsets because we may need to know the number
+            // of glyphs
+            Integer charStringsOffset = (Integer) _topDictIndex.getTopDict(i).getValue(17);
+            di2 = getDataInputForOffset(charStringsOffset);
+            _charStringsIndexArray[i] = new Index(di2);
+            int glyphCount = _charStringsIndexArray[i].getCount();
+        
+            // Charsets
+            Integer charsetOffset = (Integer) _topDictIndex.getTopDict(i).getValue(15);
+            di2 = getDataInputForOffset(charsetOffset);
+            int format = di2.readUnsignedByte();
+            switch (format) {
+                case 0:
+                    _charsets[i] = new CharsetFormat0(di2, glyphCount);
+                    break;
+                case 1:
+                    _charsets[i] = new CharsetFormat1(di2, glyphCount);
+                    break;
+                case 2:
+                    _charsets[i] = new CharsetFormat2(di2, glyphCount);
+                    break;
+            }
+
+            // Create the charstrings
+            _charstringsArray[i] = new Charstring[glyphCount];
+            for (int j = 0; j < glyphCount; ++j) {
+                int offset = _charStringsIndexArray[i].getOffset(j) - 1;
+                int len = _charStringsIndexArray[i].getOffset(j + 1) - offset - 1;
+                _charstringsArray[i][j] = new CharstringType2(
+                        _stringIndex.getString(_charsets[i].getSID(j)),
+                        _charStringsIndexArray[i].getData(),
+                        offset,
+                        len);
+            }
+        }
     }
     
     private DataInput getDataInputForOffset(int offset) {
         return new DataInputStream(new ByteArrayInputStream(
                 _buf, offset,
                 _de.getLength() - offset));
+    }
+
+    public NameIndex getNameIndex() {
+        return _nameIndex;
+    }
+    
+    public Charset getCharset(int fontIndex) {
+        return _charsets[fontIndex];
+    }
+
+    public Charstring getCharstring(int fontIndex, int gid) {
+        return _charstringsArray[fontIndex][gid];
+    }
+    
+    public int getCharstringCount(int fontIndex) {
+        return _charstringsArray[fontIndex].length;
     }
 
     public int getType() {
@@ -393,6 +596,12 @@ public class CffTable implements Table {
         sb.append(_topDictIndex.toString());
         sb.append("\nString INDEX\n");
         sb.append(_stringIndex.toString());
+        sb.append("\nGlobal Subr INDEX\n");
+        sb.append(_globalSubrIndex.toString());
+        for (int i = 0; i < _charStringsIndexArray.length; ++i) {
+            sb.append("\nCharStrings INDEX ").append(i).append("\n");
+            sb.append(_charStringsIndexArray[i].toString());
+        }
         return sb.toString();
     }
     
