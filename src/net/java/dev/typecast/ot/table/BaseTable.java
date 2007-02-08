@@ -1,5 +1,5 @@
 /*
- * $Id: BaseTable.java,v 1.2 2007-02-05 12:41:06 davidsch Exp $
+ * $Id: BaseTable.java,v 1.3 2007-02-08 04:31:31 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -28,7 +28,7 @@ import net.java.dev.typecast.ot.Fixed;
 
 /**
  * Baseline Table
- * @version $Id: BaseTable.java,v 1.2 2007-02-05 12:41:06 davidsch Exp $
+ * @version $Id: BaseTable.java,v 1.3 2007-02-08 04:31:31 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class BaseTable implements Table {
@@ -409,15 +409,19 @@ public class BaseTable implements Table {
     }
 
     public String toString() {
-        return new StringBuffer()
+        StringBuffer sb = new StringBuffer()
             .append("; 'BASE' Table - Baseline\n;-------------------------------------\n\n")
             .append("BASEHeader BASEHeaderT").append(Integer.toHexString(0))
             .append("\n").append(Integer.toHexString(_version))
             .append("\nAxisT").append(Integer.toHexString(_horizAxisOffset))
-            .append("\nAxisT").append(Integer.toHexString(_vertAxisOffset))
-            .append("\n").append(_horizAxis.toString())
-            .append("\n").append(_vertAxis.toString())
-            .toString();
+            .append("\nAxisT").append(Integer.toHexString(_vertAxisOffset));
+        if (_horizAxis != null) {
+            sb.append("\n").append(_horizAxis.toString());
+        }
+        if (_vertAxis != null) {
+            sb.append("\n").append(_vertAxis.toString());
+        }
+        return sb.toString();
     }
     
     /**
