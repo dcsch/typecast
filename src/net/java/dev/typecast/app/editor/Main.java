@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.4 2007-02-05 12:39:16 davidsch Exp $
+ * $Id: Main.java,v 1.5 2007-02-08 23:49:26 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -24,9 +24,11 @@ import java.awt.Component;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Cursor;
 import java.awt.FileDialog;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,7 +93,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.4 2007-02-05 12:39:16 davidsch Exp $
+ * @version $Id: Main.java,v 1.5 2007-02-08 23:49:26 davidsch Exp $
  */
 public class Main {
 
@@ -282,6 +284,7 @@ public class Main {
     }
 
     protected void loadFont(String pathName) {
+        _frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
             File file = new File(pathName);
             OTFontCollection fc = OTFontCollection.create(file);
@@ -304,7 +307,8 @@ public class Main {
                 "Exception",
                 JOptionPane.ERROR_MESSAGE);
         }
-    }
+        _frame.setCursor(Cursor.getDefaultCursor());
+     }
 
     public static void main(String[] args) {
         new Main();
@@ -314,14 +318,25 @@ public class Main {
      * Display a file chooser and open the selected font file
      */
     protected void openFont() {
-        
+        String pathName = null;
+
+        // Display a file chooser, depending on what OS we're running on
         if (System.getProperty("os.name").equals("Mac OS X")) {
-            FileDialog fd = new FileDialog(_frame, "Open");
+            FileDialog fd = new FileDialog(_frame, "Open Font");
+            fd.setFilenameFilter(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    if (name.endsWith(".ttf")
+                        || name.endsWith(".ttc")
+                        || name.endsWith(".otf")
+                        || name.endsWith(".dfont")) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
             fd.setVisible(true);
             if (fd.getFile() != null) {
-                String pathName = fd.getDirectory() + fd.getFile();
-                loadFont(pathName);
-                _menu.addMru(pathName);
+                pathName = fd.getDirectory() + fd.getFile();
             }
         } else {
             JFileChooser chooser = new JFileChooser();
@@ -336,9 +351,13 @@ public class Main {
             chooser.setFileFilter(filter);
 
             if (chooser.showOpenDialog(_frame) == JFileChooser.APPROVE_OPTION) {
-                loadFont(chooser.getSelectedFile().getPath());
-                _menu.addMru(chooser.getSelectedFile().getPath());
+                pathName = chooser.getSelectedFile().getPath();
             }
+        }
+        
+        if (pathName != null) {
+            loadFont(pathName);
+            _menu.addMru(pathName);
         }
     }
 
@@ -460,6 +479,12 @@ public class Main {
             _glyphPane.setModel(font, obj);
             _tabbedPane.add(_glyphPane);
         }
+
+//        if (obj instanceof net.java.dev.typecast.ot.table.Charstring) {
+//            _glyphPane = new GlyphPanel(obj);
+//            _glyphPane.setModel(font, obj);
+//            _tabbedPane.add(_glyphPane);
+//        }
 
         // Character maps
         if (obj instanceof net.java.dev.typecast.ot.table.CmapFormat) {
