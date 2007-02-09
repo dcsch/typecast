@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.5 2007-02-08 23:49:26 davidsch Exp $
+ * $Id: Main.java,v 1.6 2007-02-09 00:55:32 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -93,7 +93,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.5 2007-02-08 23:49:26 davidsch Exp $
+ * @version $Id: Main.java,v 1.6 2007-02-09 00:55:32 davidsch Exp $
  */
 public class Main {
 
@@ -323,17 +323,7 @@ public class Main {
         // Display a file chooser, depending on what OS we're running on
         if (System.getProperty("os.name").equals("Mac OS X")) {
             FileDialog fd = new FileDialog(_frame, "Open Font");
-            fd.setFilenameFilter(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    if (name.endsWith(".ttf")
-                        || name.endsWith(".ttc")
-                        || name.endsWith(".otf")
-                        || name.endsWith(".dfont")) {
-                        return true;
-                    }
-                    return false;
-                }
-            });
+            fd.setFilenameFilter(new MacOSFilenameFilter());
             fd.setVisible(true);
             if (fd.getFile() != null) {
                 pathName = fd.getDirectory() + fd.getFile();
