@@ -1,5 +1,5 @@
 /*
- * $Id: CffTable.java,v 1.2 2007-02-08 04:30:03 davidsch Exp $
+ * $Id: CffTable.java,v 1.3 2007-02-21 12:25:19 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -32,7 +32,7 @@ import java.util.Hashtable;
 
 /**
  * Compact Font Format Table
- * @version $Id: CffTable.java,v 1.2 2007-02-08 04:30:03 davidsch Exp $
+ * @version $Id: CffTable.java,v 1.3 2007-02-21 12:25:19 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CffTable implements Table {
@@ -553,6 +553,7 @@ public class CffTable implements Table {
                 int offset = _charStringsIndexArray[i].getOffset(j) - 1;
                 int len = _charStringsIndexArray[i].getOffset(j + 1) - offset - 1;
                 _charstringsArray[i][j] = new CharstringType2(
+                        i,
                         _stringIndex.getString(_charsets[i].getSID(j)),
                         _charStringsIndexArray[i].getData(),
                         offset,

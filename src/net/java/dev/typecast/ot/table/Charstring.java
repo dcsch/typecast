@@ -1,5 +1,5 @@
 /*
- * $Id: Charstring.java,v 1.1 2007-02-08 04:30:03 davidsch Exp $
+ * $Id: Charstring.java,v 1.2 2007-02-21 12:25:19 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -22,10 +22,12 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * CFF Charstring
- * @version $Id: Charstring.java,v 1.1 2007-02-08 04:30:03 davidsch Exp $
+ * @version $Id: Charstring.java,v 1.2 2007-02-21 12:25:19 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public abstract class Charstring {
+
+    public abstract int getIndex();
     
     public abstract String getName();
 }
