@@ -52,10 +52,14 @@ package net.java.dev.typecast.ot;
 
 import net.java.dev.typecast.ot.table.GlyphDescription;
 import net.java.dev.typecast.ot.table.GlyfDescript;
+import net.java.dev.typecast.ot.table.Charstring;
+import net.java.dev.typecast.ot.table.CharstringType2;
+
+import net.java.dev.typecast.t2.T2Interpreter;
 
 /**
  * An individual glyph within a font.
- * @version $Id: Glyph.java,v 1.2 2004-12-15 14:09:44 davidsch Exp $
+ * @version $Id: Glyph.java,v 1.3 2007-02-21 12:23:54 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class Glyph {
@@ -64,10 +68,34 @@ public class Glyph {
     protected int _advanceWidth;
     private Point[] _points;
 
+    /**
+     * Construct a Glyph from a TrueType outline described by
+     * a GlyphDescription.
+     * @param cs The Charstring describing the glyph.
+     * @param lsb The Left Side Bearing.
+     * @param advance The advance width.
+     */
     public Glyph(GlyphDescription gd, short lsb, int advance) {
         _leftSideBearing = lsb;
         _advanceWidth = advance;
         describe(gd);
+    }
+
+    /**
+     * Construct a Glyph from a PostScript outline described by a Charstring.
+     * @param cs The Charstring describing the glyph.
+     * @param lsb The Left Side Bearing.
+     * @param advance The advance width.
+     */
+    public Glyph(Charstring cs, short lsb, int advance) {
+        _leftSideBearing = lsb;
+        _advanceWidth = advance;
+        if (cs instanceof CharstringType2) {
+            T2Interpreter t2i = new T2Interpreter();
+            _points = t2i.execute((CharstringType2) cs);
+        } else {
+            //throw unsupported charstring type
+        }
     }
 
     public int getAdvanceWidth() {

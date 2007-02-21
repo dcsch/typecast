@@ -1,9 +1,9 @@
 /*
- * $Id: GlyphPanel.java,v 1.3 2007-01-26 00:03:49 davidsch Exp $
+ * $Id: GlyphPanel.java,v 1.4 2007-02-21 12:22:55 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2007 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import net.java.dev.typecast.edit.GlyphEdit;
 import net.java.dev.typecast.ot.Glyph;
 import net.java.dev.typecast.ot.OTFont;
 
+import net.java.dev.typecast.ot.table.Charstring;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 
 import net.java.dev.typecast.app.editor.GlyphPanelToolBar;
@@ -43,7 +44,7 @@ import net.java.dev.typecast.app.editor.GlyphPanelStatusBar;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.3 2007-01-26 00:03:49 davidsch Exp $
+ * @version $Id: GlyphPanel.java,v 1.4 2007-02-21 12:22:55 davidsch Exp $
  */
 public class GlyphPanel extends JPanel implements EditorView {
 
@@ -90,6 +91,14 @@ public class GlyphPanel extends JPanel implements EditorView {
                     gd,
                     font.getHmtxTable().getLeftSideBearing(gd.getGlyphIndex()),
                     font.getHmtxTable().getAdvanceWidth(gd.getGlyphIndex())));
+        }
+        else if (obj instanceof Charstring) {
+            _glyphEdit.setFont(font);
+            Charstring cs = (Charstring) obj;
+            _glyphEdit.setGlyph(new Glyph(
+                    cs,
+                    font.getHmtxTable().getLeftSideBearing(cs.getIndex()),
+                    font.getHmtxTable().getAdvanceWidth(cs.getIndex())));
         }
     }
     

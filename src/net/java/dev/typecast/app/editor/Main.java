@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.6 2007-02-09 00:55:32 davidsch Exp $
+ * $Id: Main.java,v 1.7 2007-02-21 12:23:07 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -93,7 +93,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.6 2007-02-09 00:55:32 davidsch Exp $
+ * @version $Id: Main.java,v 1.7 2007-02-21 12:23:07 davidsch Exp $
  */
 public class Main {
 
@@ -181,6 +181,8 @@ public class Main {
                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             treePane.getViewport().add(_tree);
 
+            treePane.setBorder(null);
+
             // Listen for selection events from the tree
             TreeSelectionListener tsl = new TreeSelectionListener() {
                 public void valueChanged(TreeSelectionEvent e) {
@@ -224,7 +226,9 @@ public class Main {
             _splitPane.setOneTouchExpandable(true);
             _splitPane.setDividerLocation(_appPrefs.getTreeWidth());
             _frame.getContentPane().add("Center", _splitPane);
-
+            
+            _splitPane.setBorder(null);
+            
             // Create a menu bar
             _menu = new EditorMenu(this, _rb, _appPrefs);
             _frame.setJMenuBar(_menu.createMenuBar());
@@ -464,17 +468,12 @@ public class Main {
 //        }
 
         // Then add the panes we're interested in
-        if (obj instanceof GlyphDescription) {
+        if (obj instanceof GlyphDescription
+                || obj instanceof net.java.dev.typecast.ot.table.Charstring) {
             _glyphPane = new GlyphPanel(_appPrefs);
             _glyphPane.setModel(font, obj);
             _tabbedPane.add(_glyphPane);
         }
-
-//        if (obj instanceof net.java.dev.typecast.ot.table.Charstring) {
-//            _glyphPane = new GlyphPanel(obj);
-//            _glyphPane.setModel(font, obj);
-//            _tabbedPane.add(_glyphPane);
-//        }
 
         // Character maps
         if (obj instanceof net.java.dev.typecast.ot.table.CmapFormat) {
