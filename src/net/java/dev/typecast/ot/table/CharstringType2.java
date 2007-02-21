@@ -1,5 +1,5 @@
 /*
- * $Id: CharstringType2.java,v 1.1 2007-02-08 04:30:03 davidsch Exp $
+ * $Id: CharstringType2.java,v 1.2 2007-02-21 12:26:22 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -22,7 +22,7 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * CFF Type 2 Charstring
- * @version $Id: CharstringType2.java,v 1.1 2007-02-08 04:30:03 davidsch Exp $
+ * @version $Id: CharstringType2.java,v 1.2 2007-02-21 12:26:22 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CharstringType2 extends Charstring {
@@ -104,6 +104,7 @@ public class CharstringType2 extends Charstring {
         "-Reserved-"
     };
     
+    private int __index;
     private String _name;
     private int[] _data;
     private int _offset;
@@ -111,11 +112,16 @@ public class CharstringType2 extends Charstring {
     private int _index;
 
     /** Creates a new instance of CharstringType2 */
-    protected CharstringType2(String name, int[] data, int offset, int length) {
+    protected CharstringType2(int index, String name, int[] data, int offset, int length) {
+        _index = index;
         _name = name;
         _data = data;
         _offset = offset;
         _length = length;
+    }
+    
+    public int getIndex() {
+        return _index;
     }
 
     public String getName() {
@@ -123,15 +129,15 @@ public class CharstringType2 extends Charstring {
     }
     
     private void disassemble(StringBuffer sb) {
-        Object operand = null;
+        Number operand = null;
         while (isOperandAtIndex()) {
             operand = nextOperand();
             sb.append(operand).append(" ");
         }
-        int operator = _data[_index++];
+        int operator = nextByte();
         String mnemonic;
         if (operator == 12) {
-            operator = _data[_index++];
+            operator = nextByte();
             
             // Check we're not exceeding the upper limit of our mnemonics
             if (operator > 38) {
@@ -143,8 +149,12 @@ public class CharstringType2 extends Charstring {
         }
         sb.append(mnemonic);
     }
+    
+    public void resetIndex() {
+        _index = _offset;
+    }
 
-    private boolean isOperandAtIndex() {
+    public boolean isOperandAtIndex() {
         int b0 = _data[_index];
         if ((32 <= b0 && b0 <= 255) || b0 == 28) {
             return true;
@@ -152,15 +162,7 @@ public class CharstringType2 extends Charstring {
         return false;
     }
 
-//    private boolean isOperatorAtIndex() {
-//        int b0 = _data[_index];
-//        if ((0 <= b0 && b0 <= 27) || (29 <= b0 && b0 <= 31)) {
-//            return true;
-//        }
-//        return false;
-//    }
-
-    private Object nextOperand() {
+    public Number nextOperand() {
         int b0 = _data[_index];
         if (32 <= b0 && b0 <= 246) {
 
@@ -200,10 +202,18 @@ public class CharstringType2 extends Charstring {
         }
     }
     
+    public int nextByte() {
+        return _data[_index++];
+    }
+    
+    public boolean moreBytes() {
+        return _index < _offset + _length;
+    }
+    
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        _index = _offset;
-        while (_index < _offset + _length) {
+        resetIndex();
+        while (moreBytes()) {
             disassemble(sb);
             sb.append("\n");
         }
