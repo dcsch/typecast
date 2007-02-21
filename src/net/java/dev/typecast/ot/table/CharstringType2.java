@@ -1,5 +1,5 @@
 /*
- * $Id: CharstringType2.java,v 1.2 2007-02-21 12:26:22 davidsch Exp $
+ * $Id: CharstringType2.java,v 1.3 2007-02-21 12:30:00 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -22,7 +22,7 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * CFF Type 2 Charstring
- * @version $Id: CharstringType2.java,v 1.2 2007-02-21 12:26:22 davidsch Exp $
+ * @version $Id: CharstringType2.java,v 1.3 2007-02-21 12:30:00 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CharstringType2 extends Charstring {
@@ -104,12 +104,12 @@ public class CharstringType2 extends Charstring {
         "-Reserved-"
     };
     
-    private int __index;
+    private int _index;
     private String _name;
     private int[] _data;
     private int _offset;
     private int _length;
-    private int _index;
+    private int _ip;
 
     /** Creates a new instance of CharstringType2 */
     protected CharstringType2(int index, String name, int[] data, int offset, int length) {
@@ -150,12 +150,12 @@ public class CharstringType2 extends Charstring {
         sb.append(mnemonic);
     }
     
-    public void resetIndex() {
-        _index = _offset;
+    public void resetIP() {
+        _ip = _offset;
     }
 
     public boolean isOperandAtIndex() {
-        int b0 = _data[_index];
+        int b0 = _data[_ip];
         if ((32 <= b0 && b0 <= 255) || b0 == 28) {
             return true;
         }
@@ -163,39 +163,39 @@ public class CharstringType2 extends Charstring {
     }
 
     public Number nextOperand() {
-        int b0 = _data[_index];
+        int b0 = _data[_ip];
         if (32 <= b0 && b0 <= 246) {
 
             // 1 byte integer
-            ++_index;
+            ++_ip;
             return new Integer(b0 - 139);
         } else if (247 <= b0 && b0 <= 250) {
 
             // 2 byte integer
-            int b1 = _data[_index + 1];
-            _index += 2;
+            int b1 = _data[_ip + 1];
+            _ip += 2;
             return new Integer((b0 - 247) * 256 + b1 + 108);
         } else if (251 <= b0 && b0 <= 254) {
 
             // 2 byte integer
-            int b1 = _data[_index + 1];
-            _index += 2;
+            int b1 = _data[_ip + 1];
+            _ip += 2;
             return new Integer(-(b0 - 251) * 256 - b1 - 108);
         } else if (b0 == 28) {
 
             // 3 byte integer
-            int b1 = _data[_index + 1];
-            int b2 = _data[_index + 2];
-            _index += 3;
+            int b1 = _data[_ip + 1];
+            int b2 = _data[_ip + 2];
+            _ip += 3;
             return new Integer(b1 << 8 | b2);
         } else if (b0 == 255) {
 
             // 16-bit signed integer with 16 bits of fraction
-            int b1 = (byte) _data[_index + 1];
-            int b2 = _data[_index + 2];
-            int b3 = _data[_index + 3];
-            int b4 = _data[_index + 4];
-            _index += 5;
+            int b1 = (byte) _data[_ip + 1];
+            int b2 = _data[_ip + 2];
+            int b3 = _data[_ip + 3];
+            int b4 = _data[_ip + 4];
+            _ip += 5;
             return new Float((b1 << 8 | b2) + ((b3 << 8 | b4) / 65536.0));
         } else {
             return null;
@@ -203,16 +203,16 @@ public class CharstringType2 extends Charstring {
     }
     
     public int nextByte() {
-        return _data[_index++];
+        return _data[_ip++];
     }
     
     public boolean moreBytes() {
-        return _index < _offset + _length;
+        return _ip < _offset + _length;
     }
     
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        resetIndex();
+        resetIP();
         while (moreBytes()) {
             disassemble(sb);
             sb.append("\n");
