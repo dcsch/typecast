@@ -1,5 +1,5 @@
 /*
- * $Id: T2Interpreter.java,v 1.1 2007-02-21 12:30:48 davidsch Exp $
+ * $Id: T2Interpreter.java,v 1.2 2007-07-26 11:10:18 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -30,7 +30,7 @@ import net.java.dev.typecast.ot.table.CharstringType2;
  * Type 2 Charstring Interpreter.  Operator descriptions are quoted from
  * Adobe's Type 2 Charstring Format document -- 5117.Type2.pdf.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: T2Interpreter.java,v 1.1 2007-02-21 12:30:48 davidsch Exp $
+ * @version $Id: T2Interpreter.java,v 1.2 2007-07-26 11:10:18 davidsch Exp $
  */
 public class T2Interpreter {
     
@@ -90,11 +90,15 @@ public class T2Interpreter {
      */
     private void _rlineto() {
         int count = getArgCount() / 2;
+        int[] dx = new int[count];
+        int[] dy = new int[count];
         for (int i = 0; i < count; ++i) {
-            int dy = popArg().intValue();
-            int dx = popArg().intValue();
+            dy[count - i - 1] = popArg().intValue();
+            dx[count - i - 1] = popArg().intValue();
+        }
+        for (int i = 0; i < count; ++i) {
             Point lastPoint = getLastPoint();
-            lineTo(lastPoint.x + dx, lastPoint.y + dy);
+            lineTo(lastPoint.x + dx[i], lastPoint.y + dy[i]);
         }
         clearArg();
     }
@@ -110,18 +114,17 @@ public class T2Interpreter {
      * number of arguments on the stack.
      */
     private void _hlineto() {
-        boolean oddCount = getArgCount() % 2 == 1;
-        int count = getArgCount() / 2;
-        if (oddCount) {
-            for (int i = 0; i < count; ++i) {
-                double dxb = popArg().doubleValue();
-                double dya = popArg().doubleValue();
-            }
-            double dx1 = popArg().doubleValue();
-        } else {
-            for (int i = 0; i < count; ++i) {
-                double dyb = popArg().doubleValue();
-                double dxa = popArg().doubleValue();
+        int count = getArgCount();
+        Number[] nums = new Number[count];
+        for (int i = 0; i < count; ++i) {
+            nums[count - i - 1] = popArg();
+        }
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            if (i % 2 == 0) {
+                lineTo(lastPoint.x + nums[i].intValue(), lastPoint.y);
+            } else {
+                lineTo(lastPoint.x, lastPoint.y + nums[i].intValue());
             }
         }
         clearArg();
@@ -151,26 +154,11 @@ public class T2Interpreter {
                 lineTo(lastPoint.x + nums[i].intValue(), lastPoint.y);
             }
         }
-
-//        boolean oddCount = getArgCount() % 2 == 1;
-//        int count = getArgCount() / 2;
-//        if (oddCount) {
-//            for (int i = 0; i < count; ++i) {
-//                double dyb = popArg().doubleValue();
-//                double dxa = popArg().doubleValue();
-//            }
-//            double dy1 = popArg().doubleValue();
-//        } else {
-//            for (int i = 0; i < count; ++i) {
-//                double dxb = popArg().doubleValue();
-//                double dya = popArg().doubleValue();
-//            }
-//        }
         clearArg();
     }
     
     /**
-     * Appends a Bézier curve, defined by dxa...dyc, to the current
+     * Appends a Bezier curve, defined by dxa...dyc, to the current
      * point. For each subsequent set of six arguments, an additional
      * curve is appended to the current point. The number of curve
      * segments is determined from the number of arguments on the
@@ -179,32 +167,72 @@ public class T2Interpreter {
      */
     private void _rrcurveto() {
         int count = getArgCount() / 6;
+        int[] dxa = new int[count];
+        int[] dya = new int[count];
+        int[] dxb = new int[count];
+        int[] dyb = new int[count];
+        int[] dxc = new int[count];
+        int[] dyc = new int[count];
         for (int i = 0; i < count; ++i) {
-            double dyc = popArg().doubleValue();
-            double dxc = popArg().doubleValue();
-            double dyb = popArg().doubleValue();
-            double dxb = popArg().doubleValue();
-            double dya = popArg().doubleValue();
-            double dxa = popArg().doubleValue();
+            dyc[count - i - 1] = popArg().intValue();
+            dxc[count - i - 1] = popArg().intValue();
+            dyb[count - i - 1] = popArg().intValue();
+            dxb[count - i - 1] = popArg().intValue();
+            dya[count - i - 1] = popArg().intValue();
+            dxa[count - i - 1] = popArg().intValue();
+        }
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            int xa = lastPoint.x + dxa[i];
+            int ya = lastPoint.y + dya[i];
+            int xb = xa + dxb[i];
+            int yb = ya + dyb[i];
+            int xc = xb + dxc[i];
+            int yc = yb + dyc[i];
+            curveTo(xa, ya, xb, yb, xc, yc);
         }
         clearArg();
     }
     
     /**
-     * Appends one or more Bézier curves, as described by the
+     * Appends one or more Bezier curves, as described by the
      * dxa...dxc set of arguments, to the current point. For each curve,
      * if there are 4 arguments, the curve starts and ends horizontal.
      * The first curve need not start horizontal (the odd argument
      * case). Note the argument order for the odd argument case.
      */
     private void _hhcurveto() {
-        
+        int count = getArgCount() / 4;
+        int dy1 = 0;
+        int[] dxa = new int[count];
+        int[] dxb = new int[count];
+        int[] dyb = new int[count];
+        int[] dxc = new int[count];
+        for (int i = 0; i < count; ++i) {
+            dxc[count - i - 1] = popArg().intValue();
+            dyb[count - i - 1] = popArg().intValue();
+            dxb[count - i - 1] = popArg().intValue();
+            dxa[count - i - 1] = popArg().intValue();
+        }
+        if (getArgCount() == 1) {
+            dy1 = popArg().intValue();
+        }
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            int xa = lastPoint.x + dxa[i];
+            int ya = lastPoint.y + (i == 0 ? dy1 : 0);
+            int xb = xa + dxb[i];
+            int yb = ya + dyb[i];
+            int xc = xb + dxc[i];
+            int yc = yb;
+            curveTo(xa, ya, xb, yb, xc, yc);
+        }
         clearArg();
     }
     
     /**
-     * Appends one or more Bézier curves to the current point. The
-     * tangent for the first Bézier must be horizontal, and the second
+     * Appends one or more Bezier curves to the current point. The
+     * tangent for the first Bezier must be horizontal, and the second
      * must be vertical (except as noted below).
      * If there is a multiple of four arguments, the curve starts
      * horizontal and ends vertical. Note that the curves alternate
@@ -213,7 +241,95 @@ public class T2Interpreter {
      * end horizontal/vertical.
      */
     private void _hvcurveto() {
-        
+        if (getArgCount() % 8 <= 1) {
+            int count = getArgCount() / 8;
+            int[] dxa = new int[count];
+            int[] dxb = new int[count];
+            int[] dyb = new int[count];
+            int[] dyc = new int[count];
+            int[] dyd = new int[count];
+            int[] dxe = new int[count];
+            int[] dye = new int[count];
+            int[] dxf = new int[count];
+            int dyf = 0;
+            if (getArgCount() % 8 == 1) {
+                dyf = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                dxf[count - i - 1] = popArg().intValue();
+                dye[count - i - 1] = popArg().intValue();
+                dxe[count - i - 1] = popArg().intValue();
+                dyd[count - i - 1] = popArg().intValue();
+                dyc[count - i - 1] = popArg().intValue();
+                dyb[count - i - 1] = popArg().intValue();
+                dxb[count - i - 1] = popArg().intValue();
+                dxa[count - i - 1] = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                Point lastPoint = getLastPoint();
+                int xa = lastPoint.x + dxa[i];
+                int ya = lastPoint.y;
+                int xb = xa + dxb[i];
+                int yb = ya + dyb[i];
+                int xc = xb;
+                int yc = yb + dyc[i];
+                int xd = xc;
+                int yd = yc + dyd[i];
+                int xe = xd + dxe[i];
+                int ye = yd + dye[i];
+                int xf = xe + dxf[i];
+                int yf = ye + dyf;
+                curveTo(xa, ya, xb, yb, xc, yc);
+                curveTo(xd, yd, xe, ye, xf, yf);
+            }
+        } else {
+            int count = getArgCount() / 8;
+            int[] dya = new int[count];
+            int[] dxb = new int[count];
+            int[] dyb = new int[count];
+            int[] dxc = new int[count];
+            int[] dxd = new int[count];
+            int[] dxe = new int[count];
+            int[] dye = new int[count];
+            int[] dyf = new int[count];
+            int dxf = 0;
+            if (getArgCount() % 8 == 1) {
+                dxf = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                dyf[count - i - 1] = popArg().intValue();
+                dye[count - i - 1] = popArg().intValue();
+                dxe[count - i - 1] = popArg().intValue();
+                dxd[count - i - 1] = popArg().intValue();
+                dxc[count - i - 1] = popArg().intValue();
+                dyb[count - i - 1] = popArg().intValue();
+                dxb[count - i - 1] = popArg().intValue();
+                dya[count - i - 1] = popArg().intValue();
+            }
+            int dy3 = popArg().intValue();
+            int dy2 = popArg().intValue();
+            int dx2 = popArg().intValue();
+            int dx1 = popArg().intValue();
+            for (int i = 0; i < count; ++i) {
+                Point lastPoint = getLastPoint();
+                int xa = lastPoint.x;
+                int ya = lastPoint.y + dya[i];
+                int xb = xa + dxb[i];
+                int yb = ya + dyb[i];
+                int xc = xb + dxc[i];
+                int yc = yb;
+                int xd = xc + dxd[i];
+                int yd = yc;
+                int xe = xd + dxe[i];
+                int ye = yd + dye[i];
+                int xf = xe + dxf;
+                int yf = ye + dyf[i];
+                curveTo(xa, ya, xb, yb, xc, yc);
+                curveTo(xd, yd, xe, ye, xf, yf);
+                
+                // What on earth do we do with dx1, dx2, dy2 and dy3?
+            }
+        }
         clearArg();
     }
     
@@ -224,7 +340,36 @@ public class T2Interpreter {
      * on the argument stack.
      */
     private void _rcurveline() {
-        
+        int count = (getArgCount() - 2) / 6;
+        int[] dxa = new int[count];
+        int[] dya = new int[count];
+        int[] dxb = new int[count];
+        int[] dyb = new int[count];
+        int[] dxc = new int[count];
+        int[] dyc = new int[count];
+        int dyd = popArg().intValue();
+        int dxd = popArg().intValue();
+        for (int i = 0; i < count; ++i) {
+            dyc[count - i - 1] = popArg().intValue();
+            dxc[count - i - 1] = popArg().intValue();
+            dyb[count - i - 1] = popArg().intValue();
+            dxb[count - i - 1] = popArg().intValue();
+            dya[count - i - 1] = popArg().intValue();
+            dxa[count - i - 1] = popArg().intValue();
+        }
+        int xc = 0;
+        int yc = 0;
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            int xa = lastPoint.x + dxa[i];
+            int ya = lastPoint.y + dya[i];
+            int xb = xa + dxb[i];
+            int yb = ya + dyb[i];
+            xc = xb + dxc[i];
+            yc = yb + dyc[i];
+            curveTo(xa, ya, xb, yb, xc, yc);
+        }
+        lineTo(xc + dxd, yc + dyd);
         clearArg();
     }
     
@@ -235,18 +380,88 @@ public class T2Interpreter {
      * items on the argument stack.
      */
     private void _rlinecurve() {
-        
+        int count = (getArgCount() - 6) / 2;
+        int[] dxa = new int[count];
+        int[] dya = new int[count];
+        int dyd = popArg().intValue();
+        int dxd = popArg().intValue();
+        int dyc = popArg().intValue();
+        int dxc = popArg().intValue();
+        int dyb = popArg().intValue();
+        int dxb = popArg().intValue();
+        for (int i = 0; i < count; ++i) {
+            dya[count - i - 1] = popArg().intValue();
+            dxa[count - i - 1] = popArg().intValue();
+        }
+        int xa = 0;
+        int ya = 0;
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            xa = lastPoint.x + dxa[i];
+            ya = lastPoint.y + dya[i];
+            lineTo(xa, ya);
+        }
+        int xb = xa + dxb;
+        int yb = ya + dyb;
+        int xc = xb + dxc;
+        int yc = yb + dyc;
+        int xd = xc + dxd;
+        int yd = yc + dyd;
+        curveTo(xb, yb, xc, yc, xd, yd);
         clearArg();
     }
     
     /**
-     * Appends one or more Bézier curves to the current point, where
+     * Appends one or more Bezier curves to the current point, where
      * the first tangent is vertical and the second tangent is horizontal.
      * This command is the complement of hvcurveto; see the
      * description of hvcurveto for more information.
      */
     private void _vhcurveto() {
-        
+        if (getArgCount() % 8 <= 1) {
+            int count = getArgCount() / 8;
+            int[] dya = new int[count];
+            int[] dxb = new int[count];
+            int[] dyb = new int[count];
+            int[] dxc = new int[count];
+            int[] dxd = new int[count];
+            int[] dxe = new int[count];
+            int[] dye = new int[count];
+            int[] dyf = new int[count];
+            int dxf = 0;
+            if (getArgCount() % 8 == 1) {
+                dxf = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                dyf[count - i - 1] = popArg().intValue();
+                dye[count - i - 1] = popArg().intValue();
+                dxe[count - i - 1] = popArg().intValue();
+                dxd[count - i - 1] = popArg().intValue();
+                dxc[count - i - 1] = popArg().intValue();
+                dyb[count - i - 1] = popArg().intValue();
+                dxb[count - i - 1] = popArg().intValue();
+                dya[count - i - 1] = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                Point lastPoint = getLastPoint();
+                int xa = lastPoint.x;
+                int ya = lastPoint.y + dya[i];
+                int xb = xa + dxb[i];
+                int yb = ya + dyb[i];
+                int xc = xb + dxc[i];
+                int yc = yb;
+                int xd = xc + dxd[i];
+                int yd = yc;
+                int xe = xd + dxe[i];
+                int ye = yd + dye[i];
+                int xf = xe + dxf;
+                int yf = ye + dyf[i];
+                curveTo(xa, ya, xb, yb, xc, yc);
+                curveTo(xd, yd, xe, ye, xf, yf);
+            }
+        } else {
+            int foo = 0;
+        }
         clearArg();
     }
     
@@ -813,16 +1028,9 @@ public class T2Interpreter {
         _points.add(new Point(x, y, true, false));
     }
     
-    private void curveTo(int dcx1, int dcy1, int dcx2, int dcy2, int dx, int dy) {
-        Point lastPoint = getLastPoint();
-        int x = lastPoint.x + dcx1;
-        int y = lastPoint.y + dcy1;
-        _points.add(new Point(x, y, false, false));
-        x += dcx2;
-        y += dcy2;
-        _points.add(new Point(x, y, false, false));
-        x += dx;
-        y += dy;
+    private void curveTo(int cx1, int cy1, int cx2, int cy2, int x, int y) {
+        _points.add(new Point(cx1, cy1, false, false));
+        _points.add(new Point(cx2, cy2, false, false));
         _points.add(new Point(x, y, true, false));
     }
     
