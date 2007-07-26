@@ -1,5 +1,5 @@
 /*
- * $Id: HdmxTable.java,v 1.1 2007-01-30 03:46:38 davidsch Exp $
+ * $Id: HdmxTable.java,v 1.2 2007-07-26 11:12:30 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -21,15 +21,13 @@
 package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
-//import java.io.DataInputStream;
-//import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
  * The Horizontal Device Metrics table for TrueType outlines.  This stores
  * integer advance widths scaled to specific pixel sizes.
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: HdmxTable.java,v 1.1 2007-01-30 03:46:38 davidsch Exp $
+ * @version $Id: HdmxTable.java,v 1.2 2007-07-26 11:12:30 davidsch Exp $
  */
 public class HdmxTable implements Table {
     
