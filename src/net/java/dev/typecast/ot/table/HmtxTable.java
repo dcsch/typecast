@@ -50,12 +50,11 @@
 
 package net.java.dev.typecast.ot.table;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: HmtxTable.java,v 1.4 2007-01-30 03:49:34 davidsch Exp $
+ * @version $Id: HmtxTable.java,v 1.5 2007-07-26 11:11:48 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class HmtxTable implements Table {
