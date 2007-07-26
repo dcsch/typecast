@@ -1,5 +1,5 @@
 /*
- * $Id: CharstringType2.java,v 1.3 2007-02-21 12:30:00 davidsch Exp $
+ * $Id: CharstringType2.java,v 1.4 2007-07-26 11:13:44 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -20,9 +20,11 @@
 
 package net.java.dev.typecast.ot.table;
 
+import net.java.dev.typecast.ot.table.CffTable;
+
 /**
  * CFF Type 2 Charstring
- * @version $Id: CharstringType2.java,v 1.3 2007-02-21 12:30:00 davidsch Exp $
+ * @version $Id: CharstringType2.java,v 1.4 2007-07-26 11:13:44 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CharstringType2 extends Charstring {
@@ -109,15 +111,26 @@ public class CharstringType2 extends Charstring {
     private int[] _data;
     private int _offset;
     private int _length;
+    private CffTable.Index _localSubrIndex;
+    private CffTable.Index _globalSubrIndex;
     private int _ip;
 
     /** Creates a new instance of CharstringType2 */
-    protected CharstringType2(int index, String name, int[] data, int offset, int length) {
+    protected CharstringType2(
+            int index,
+            String name,
+            int[] data,
+            int offset,
+            int length,
+            CffTable.Index localSubrIndex,
+            CffTable.Index globalSubrIndex) {
         _index = index;
         _name = name;
         _data = data;
         _offset = offset;
         _length = length;
+        _localSubrIndex = localSubrIndex;
+        _globalSubrIndex = globalSubrIndex;
     }
     
     public int getIndex() {
