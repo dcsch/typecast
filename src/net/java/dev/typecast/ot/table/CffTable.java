@@ -1,5 +1,5 @@
 /*
- * $Id: CffTable.java,v 1.3 2007-02-21 12:25:19 davidsch Exp $
+ * $Id: CffTable.java,v 1.4 2007-07-26 11:15:06 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -32,12 +32,12 @@ import java.util.Hashtable;
 
 /**
  * Compact Font Format Table
- * @version $Id: CffTable.java,v 1.3 2007-02-21 12:25:19 davidsch Exp $
+ * @version $Id: CffTable.java,v 1.4 2007-07-26 11:15:06 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class CffTable implements Table {
     
-    private class Dict {
+    public class Dict {
         
         private Dictionary<Integer, Object> _entries = new Hashtable<Integer, Object>();
         private int[] _data;
@@ -180,7 +180,7 @@ public class CffTable implements Table {
         }
     }
     
-    private class Index {
+    public class Index {
         
         private int _count;
         private int _offSize;
@@ -242,7 +242,7 @@ public class CffTable implements Table {
         }
     }
     
-    private class TopDictIndex extends Index {
+    public class TopDictIndex extends Index {
 
         protected TopDictIndex(DataInput di) throws IOException {
             super(di);
@@ -296,7 +296,7 @@ public class CffTable implements Table {
         }
     }
 
-    private class StringIndex extends Index {
+    public class StringIndex extends Index {
 
         protected StringIndex(DataInput di) throws IOException {
             super(di);
@@ -557,7 +557,9 @@ public class CffTable implements Table {
                         _stringIndex.getString(_charsets[i].getSID(j)),
                         _charStringsIndexArray[i].getData(),
                         offset,
-                        len);
+                        len,
+                        null,
+                        null);
             }
         }
     }
