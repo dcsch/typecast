@@ -1,5 +1,5 @@
 /*
- * $Id: Main.java,v 1.7 2007-02-21 12:23:07 davidsch Exp $
+ * $Id: Main.java,v 1.8 2009-05-22 02:30:27 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -93,7 +93,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 
 /**
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.7 2007-02-21 12:23:07 davidsch Exp $
+ * @version $Id: Main.java,v 1.8 2009-05-22 02:30:27 davidsch Exp $
  */
 public class Main {
 
@@ -420,6 +420,14 @@ public class Main {
                 "\n" +
                 _rb.getString("Typecast.webHome"),
             _rb.getString("Typecast.about.title"),
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    protected void showPreferences() {
+        JOptionPane.showMessageDialog(
+            null,
+            "Typecast currently has no preferences page.",
+            "Typecast Preferences",
             JOptionPane.INFORMATION_MESSAGE);
     }
     

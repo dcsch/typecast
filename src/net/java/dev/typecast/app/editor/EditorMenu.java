@@ -1,5 +1,5 @@
 /*
- * $Id: EditorMenu.java,v 1.3 2007-01-25 23:57:16 davidsch Exp $
+ * $Id: EditorMenu.java,v 1.4 2009-05-22 02:30:27 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -42,7 +42,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /**
  * The application menu bar
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: EditorMenu.java,v 1.3 2007-01-25 23:57:16 davidsch Exp $
+ * @version $Id: EditorMenu.java,v 1.4 2009-05-22 02:30:27 davidsch Exp $
  */
 public class EditorMenu {
 
@@ -67,7 +67,7 @@ public class EditorMenu {
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         if (System.getProperty("os.name").equals("Mac OS X")) {
             _macPlatform = true;
-            new MacOSMenuHandler(_app);
+            registerForMacOSXEvents();
         } else {
             _macPlatform = false;
         }
@@ -605,5 +605,22 @@ public class EditorMenu {
     public void addMru(String mru) {
         _prefs.addMRU(mru);
         buildMRU();
+    }
+
+    // Generic registration with the Mac OS X application menu
+    // Checks the platform, then attempts to register with the Apple EAWT
+    // See OSXAdapter.java to see how this is done without directly referencing any Apple APIs
+    public void registerForMacOSXEvents() {
+        try {
+            // Generate and register the OSXAdapter, passing it a hash of all the methods we wish to
+            // use as delegates for various com.apple.eawt.ApplicationListener methods
+            OSXAdapter.setQuitHandler(_app, _app.getClass().getDeclaredMethod("close", (Class[])null));
+            OSXAdapter.setAboutHandler(_app, _app.getClass().getDeclaredMethod("showAbout", (Class[])null));
+            OSXAdapter.setPreferencesHandler(_app, _app.getClass().getDeclaredMethod("showPreferences", (Class[])null));
+            //OSXAdapter.setFileHandler(_app, _app.getClass().getDeclaredMethod("loadImageFile", new Class[] { String.class }));
+        } catch (Exception e) {
+            System.err.println("Error while loading the OSXAdapter:");
+            e.printStackTrace();
+        }
     }
 }
