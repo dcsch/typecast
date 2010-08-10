@@ -56,7 +56,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfTable.java,v 1.5 2007-01-30 03:49:46 davidsch Exp $
+ * @version $Id: GlyfTable.java,v 1.6 2010-08-10 11:46:30 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfTable implements Table {
@@ -79,7 +79,7 @@ public class GlyfTable implements Table {
         
         // Process all the simple glyphs
         for (int i = 0; i < maxp.getNumGlyphs(); i++) {
-            int len = loca.getOffset((short)(i + 1)) - loca.getOffset(i);
+            int len = loca.getOffset(i + 1) - loca.getOffset(i);
             if (len > 0) {
                 bais.reset();
                 bais.skip(loca.getOffset(i));
@@ -95,7 +95,7 @@ public class GlyfTable implements Table {
 
         // Now do all the composite glyphs
         for (int i = 0; i < maxp.getNumGlyphs(); i++) {
-            int len = loca.getOffset((short)(i + 1)) - loca.getOffset(i);
+            int len = loca.getOffset(i + 1) - loca.getOffset(i);
             if (len > 0) {
                 bais.reset();
                 bais.skip(loca.getOffset(i));
