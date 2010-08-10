@@ -54,7 +54,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfCompositeComp.java,v 1.2 2004-12-15 14:10:25 davidsch Exp $
+ * @version $Id: GlyfCompositeComp.java,v 1.3 2010-08-10 11:41:55 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class GlyfCompositeComp {
@@ -73,8 +73,8 @@ public class GlyfCompositeComp {
     private int _firstContour;
     private short _argument1;
     private short _argument2;
-    private short _flags;
-    private short _glyphIndex;
+    private int _flags;
+    private int _glyphIndex;
     private double _xscale = 1.0;
     private double _yscale = 1.0;
     private double _scale01 = 0.0;
@@ -88,8 +88,8 @@ public class GlyfCompositeComp {
     throws IOException {
         _firstIndex = firstIndex;
         _firstContour = firstContour;
-        _flags = di.readShort();
-        _glyphIndex = di.readShort();
+        _flags = di.readUnsignedShort();
+        _glyphIndex = di.readUnsignedShort();
 
         // Get the arguments as just their raw values
         if ((_flags & ARG_1_AND_2_ARE_WORDS) != 0) {
@@ -146,11 +146,11 @@ public class GlyfCompositeComp {
         return _argument2;
     }
 
-    public short getFlags() {
+    public int getFlags() {
         return _flags;
     }
 
-    public short getGlyphIndex() {
+    public int getGlyphIndex() {
         return _glyphIndex;
     }
 

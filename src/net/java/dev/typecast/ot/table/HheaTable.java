@@ -13,7 +13,7 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Fixed;
 
 /**
- * @version $Id: HheaTable.java,v 1.1.1.1 2004-12-05 23:14:44 davidsch Exp $
+ * @version $Id: HheaTable.java,v 1.2 2010-08-10 11:44:02 davidsch Exp $
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
  */
 public class HheaTable implements Table {
@@ -30,7 +30,7 @@ public class HheaTable implements Table {
     private short caretSlopeRise;
     private short caretSlopeRun;
     private short metricDataFormat;
-    private short numberOfHMetrics;
+    private int numberOfHMetrics;
 
     protected HheaTable(DirectoryEntry de, DataInput di) throws IOException {
         this.de = (DirectoryEntry) de.clone();
@@ -48,7 +48,7 @@ public class HheaTable implements Table {
             di.readShort();
         }
         metricDataFormat = di.readShort();
-        numberOfHMetrics = di.readShort();
+        numberOfHMetrics = di.readUnsignedShort();
     }
 
     public short getAdvanceWidthMax() {
@@ -87,7 +87,7 @@ public class HheaTable implements Table {
         return minRightSideBearing;
     }
 
-    public short getNumberOfHMetrics() {
+    public int getNumberOfHMetrics() {
         return numberOfHMetrics;
     }
 
