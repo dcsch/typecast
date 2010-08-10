@@ -1,5 +1,5 @@
 /*
- * $Id: OTFontCollection.java,v 1.5 2007-01-29 04:02:57 davidsch Exp $
+ * $Id: OTFontCollection.java,v 1.6 2010-08-10 11:38:11 davidsch Exp $
  *
  * Typecast - The Font Development Environment
  *
@@ -39,7 +39,7 @@ import net.java.dev.typecast.ot.table.TTCHeader;
 /**
  *
  * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
- * @version $Id: OTFontCollection.java,v 1.5 2007-01-29 04:02:57 davidsch Exp $
+ * @version $Id: OTFontCollection.java,v 1.6 2010-08-10 11:38:11 davidsch Exp $
  */
 public class OTFontCollection {
 
@@ -106,8 +106,7 @@ public class OTFontCollection {
         _fileName = file.getName();
 
         if (!file.exists()) {
-            // TODO: Throw TTException
-            return;
+            throw new IOException();
         }
 
         // Do we need to modify the path name to deal with font resources
@@ -115,8 +114,7 @@ public class OTFontCollection {
         if (file.length() == 0) {
             file = new File(file, "..namedfork/rsrc");
             if (!file.exists()) {
-                // TODO: Throw TTException
-                return;
+                throw new IOException();
             }
             _resourceFork = true;
         }
