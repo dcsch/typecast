@@ -25,7 +25,7 @@ import java.io.IOException;
 
 /**
  * TODO: To be implemented
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GposTable.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
  */
 public class GposTable implements Table {

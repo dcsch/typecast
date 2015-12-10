@@ -25,7 +25,7 @@ import net.java.dev.typecast.ot.table.CffTable;
 /**
  * CFF Type 2 Charstring
  * @version $Id: CharstringType2.java,v 1.4 2007-07-26 11:13:44 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CharstringType2 extends Charstring {
     

@@ -55,7 +55,7 @@ import net.java.dev.typecast.render.GlyphImageFactory;
 
 /**
  * An editor for the character-to-glyph map, as represented in the CmapTable.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: CharacterMap.java,v 1.4 2007-01-25 08:41:56 davidsch Exp $
  */
 public class CharacterMap extends JScrollPane implements EditorView {

@@ -55,7 +55,7 @@ import java.io.IOException;
 
 /**
  * @version $Id: CmapFormat4.java,v 1.3 2004-12-21 16:57:23 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat4 extends CmapFormat {
 

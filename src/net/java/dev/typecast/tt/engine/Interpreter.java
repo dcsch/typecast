@@ -27,7 +27,7 @@ import net.java.dev.typecast.ot.Point;
  * The interpreter shall remain ignorant of the table structure - the table
  * data will be extracted by supporting classes, whether it be the Parser
  * or some other.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: Interpreter.java,v 1.1.1.1 2004-12-05 23:15:05 davidsch Exp $
  */
 public class Interpreter {

@@ -33,7 +33,7 @@ import java.util.Hashtable;
 /**
  * Compact Font Format Table
  * @version $Id: CffTable.java,v 1.4 2007-07-26 11:15:06 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CffTable implements Table {
     

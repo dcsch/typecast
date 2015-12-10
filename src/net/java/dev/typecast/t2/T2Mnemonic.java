@@ -22,7 +22,7 @@ package net.java.dev.typecast.t2;
 
 /**
  * The Mnemonic representations of the Type 2 charstring instruction set.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: T2Mnemonic.java,v 1.1 2007-02-21 12:30:48 davidsch Exp $
  */
 public class T2Mnemonic {

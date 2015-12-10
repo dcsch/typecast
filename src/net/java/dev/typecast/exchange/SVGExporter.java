@@ -79,7 +79,7 @@ import org.apache.batik.util.XMLConstants;
  * Converts a TrueType font to an SVG embedded font.
  *
  * @version $Id: SVGExporter.java,v 1.3 2007-01-24 09:48:36 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class SVGExporter
         extends Exporter

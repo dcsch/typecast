@@ -59,7 +59,7 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /** 
  *
  * @version $Id: TableFactory.java,v 1.7 2007-02-05 12:39:51 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class TableFactory {
 

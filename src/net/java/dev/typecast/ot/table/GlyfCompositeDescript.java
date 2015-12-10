@@ -61,7 +61,7 @@ import java.util.ArrayList;
  * each.
  *
  * @version $Id: GlyfCompositeDescript.java,v 1.5 2007-01-25 08:43:18 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GlyfCompositeDescript extends GlyfDescript {
 

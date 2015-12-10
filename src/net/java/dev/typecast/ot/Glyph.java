@@ -60,7 +60,7 @@ import net.java.dev.typecast.t2.T2Interpreter;
 /**
  * An individual glyph within a font.
  * @version $Id: Glyph.java,v 1.3 2007-02-21 12:23:54 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class Glyph {
 

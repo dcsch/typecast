@@ -55,7 +55,7 @@ import java.io.IOException;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: FeatureList.java,v 1.3 2007-01-24 09:54:44 davidsch Exp $
  */
 public class FeatureList {

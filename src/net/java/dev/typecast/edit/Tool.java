@@ -25,7 +25,7 @@ import java.awt.Window;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: Tool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  */
 public abstract class Tool {

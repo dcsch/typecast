@@ -22,7 +22,7 @@ package net.java.dev.typecast.app.editor;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: TableTreeNode.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
  */
 public class TableTreeNode extends javax.swing.tree.DefaultMutableTreeNode {

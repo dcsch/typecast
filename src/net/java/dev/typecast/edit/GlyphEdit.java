@@ -51,7 +51,7 @@ import net.java.dev.typecast.render.GlyphPathFactory;
 /**
  * The glyph editor.  The user will perform operatons on the glyph within this
  * window using a variety of tools derived from {@link Tool Tool}.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GlyphEdit.java,v 1.4 2004-12-21 10:24:57 davidsch Exp $
  */
 public class GlyphEdit extends JPanel implements Scrollable {

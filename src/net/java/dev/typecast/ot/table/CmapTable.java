@@ -57,7 +57,7 @@ import java.util.Arrays;
 
 /**
  * @version $Id: CmapTable.java,v 1.3 2004-12-21 10:22:56 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapTable implements Table {
 

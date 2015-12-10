@@ -27,7 +27,7 @@ import net.java.dev.typecast.ot.Fixed;
 /**
  * Vertical Header Table
  * @version $Id: VheaTable.java,v 1.1 2007-01-31 01:17:40 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class VheaTable implements Table {
 

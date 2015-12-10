@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Vertical Metrics Table
  * @version $Id: VmtxTable.java,v 1.1 2007-01-31 01:18:04 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class VmtxTable implements Table {
 

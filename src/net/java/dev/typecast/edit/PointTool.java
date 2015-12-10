@@ -34,7 +34,7 @@ import net.java.dev.typecast.ot.Glyph;
  * A simple point selection and manipulation tool.  Allows the user to select a
  * point with the cursor, to move that point by dragging, and to move the point
  * on- and off-curve by selecting the point with the control key pressed.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: PointTool.java,v 1.3 2004-12-21 10:24:57 davidsch Exp $
  */
 public class PointTool extends Tool {

@@ -55,7 +55,7 @@ import java.io.IOException;
 
 /**
  * @version $Id: NameRecord.java,v 1.2 2004-12-09 23:47:23 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class NameRecord {
 

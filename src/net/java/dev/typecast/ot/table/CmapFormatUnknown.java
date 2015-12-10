@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * When we encounter a cmap format we don't understand, we can use this class
  * to hold the bare minimum information about it.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: CmapFormatUnknown.java,v 1.1 2004-12-21 10:21:23 davidsch Exp $
  */
 public class CmapFormatUnknown extends CmapFormat {

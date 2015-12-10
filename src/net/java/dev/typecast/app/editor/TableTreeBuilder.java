@@ -50,7 +50,7 @@ import net.java.dev.typecast.ot.table.Script;
 import net.java.dev.typecast.ot.table.Table;
 
 /**
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: TableTreeBuilder.java,v 1.2 2007-02-08 04:28:30 davidsch Exp $
  */
 public class TableTreeBuilder {

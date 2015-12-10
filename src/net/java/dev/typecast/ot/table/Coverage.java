@@ -55,7 +55,7 @@ import java.io.IOException;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: Coverage.java,v 1.3 2007-01-24 09:43:30 davidsch Exp $
  */
 public abstract class Coverage {

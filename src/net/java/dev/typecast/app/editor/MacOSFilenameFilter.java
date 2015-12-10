@@ -35,7 +35,7 @@ import net.java.dev.typecast.ot.mac.ResourceType;
 /**
  * A FilenameFilter implementation that includes font files based on their
  * extension and also by the presence of fonts in the resource fork.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: MacOSFilenameFilter.java,v 1.2 2007-02-09 00:54:26 davidsch Exp $
  */
 public class MacOSFilenameFilter implements FilenameFilter {

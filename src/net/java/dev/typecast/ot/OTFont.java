@@ -73,7 +73,7 @@ import net.java.dev.typecast.ot.table.TableFactory;
 /**
  * The TrueType font.
  * @version $Id: OTFont.java,v 1.6 2007-01-31 01:49:18 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class OTFont {
 

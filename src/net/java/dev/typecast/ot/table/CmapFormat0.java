@@ -57,7 +57,7 @@ import java.io.IOException;
  * Simple Macintosh cmap table, mapping only the ASCII character set to glyphs.
  *
  * @version $Id: CmapFormat0.java,v 1.2 2004-12-21 10:22:55 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat0 extends CmapFormat {
 

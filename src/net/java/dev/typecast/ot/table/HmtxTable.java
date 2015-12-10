@@ -55,7 +55,7 @@ import java.io.IOException;
 
 /**
  * @version $Id: HmtxTable.java,v 1.5 2007-07-26 11:11:48 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class HmtxTable implements Table {
 

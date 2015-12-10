@@ -33,7 +33,7 @@ import net.java.dev.typecast.ot.OTFont;
 
 /**
  * A simple view of an object's "toString()" output.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: DumpPanel.java,v 1.2 2007-01-25 08:39:24 davidsch Exp $
  */
 public class DumpPanel extends JPanel implements EditorView {

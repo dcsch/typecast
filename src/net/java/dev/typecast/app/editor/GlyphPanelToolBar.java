@@ -27,7 +27,7 @@ import javax.swing.JToolBar;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GlyphPanelToolBar.java,v 1.1 2007-01-24 09:37:00 davidsch Exp $
  */
 public class GlyphPanelToolBar extends javax.swing.JToolBar {

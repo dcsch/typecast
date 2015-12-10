@@ -24,7 +24,7 @@ package net.java.dev.typecast.ot.table;
  * Compact Font Format Standard Strings.  As per Appendix A of the Adobe
  * CFF specification.
  * @version $Id: CffStandardStrings.java,v 1.1 2007-02-05 12:41:52 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CffStandardStrings {
 

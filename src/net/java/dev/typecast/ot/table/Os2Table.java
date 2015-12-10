@@ -56,7 +56,7 @@ import net.java.dev.typecast.ot.Fixed;
 
 /**
  * @version $Id: Os2Table.java,v 1.2 2004-12-09 23:46:21 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class Os2Table implements Table {
 

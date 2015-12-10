@@ -14,7 +14,7 @@ import java.io.DataInput;
 /**
  *
  * @version $Id: SignatureBlock.java,v 1.1.1.1 2004-12-05 23:14:58 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class SignatureBlock {
 

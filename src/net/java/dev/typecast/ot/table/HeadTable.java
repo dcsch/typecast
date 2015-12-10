@@ -57,7 +57,7 @@ import net.java.dev.typecast.ot.Fixed;
 
 /**
  * @version $Id: HeadTable.java,v 1.2 2004-12-21 10:23:20 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class HeadTable implements Table {
 

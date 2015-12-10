@@ -31,7 +31,7 @@ import net.java.dev.typecast.ot.Point;
 
 /**
  * A factory for generating Graphics2D paths from glyph outlines.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GlyphPathFactory.java,v 1.1 2004-12-21 10:18:11 davidsch Exp $
  */
 public class GlyphPathFactory {

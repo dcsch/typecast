@@ -92,7 +92,7 @@ import net.java.dev.typecast.app.editor.EditorPrefs;
 import net.java.dev.typecast.app.framework.EditorView;
 
 /**
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: Main.java,v 1.8 2009-05-22 02:30:27 davidsch Exp $
  */
 public class Main {

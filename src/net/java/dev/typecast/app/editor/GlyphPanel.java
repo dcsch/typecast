@@ -43,7 +43,7 @@ import net.java.dev.typecast.app.editor.GlyphPanelStatusBar;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GlyphPanel.java,v 1.4 2007-02-21 12:22:55 davidsch Exp $
  */
 public class GlyphPanel extends JPanel implements EditorView {

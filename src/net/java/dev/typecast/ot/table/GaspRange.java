@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: GaspRange.java,v 1.1.1.1 2004-12-05 23:14:38 davidsch Exp $
  */
 public class GaspRange {

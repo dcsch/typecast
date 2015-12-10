@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream;
 
 /**
  * @version $Id: Program.java,v 1.1.1.1 2004-12-05 23:14:57 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class Program {
 

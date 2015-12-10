@@ -29,7 +29,7 @@ import net.java.dev.typecast.ot.table.CharstringType2;
 /**
  * Type 2 Charstring Interpreter.  Operator descriptions are quoted from
  * Adobe's Type 2 Charstring Format document -- 5117.Type2.pdf.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: T2Interpreter.java,v 1.2 2007-07-26 11:10:18 davidsch Exp $
  */
 public class T2Interpreter {
@@ -477,7 +477,7 @@ public class T2Interpreter {
     }
     
     /**
-     * Causes two Bézier curves, as described by the arguments (as
+     * Causes two BÃ©zier curves, as described by the arguments (as
      * shown in Figure 2 below), to be rendered as a straight line when
      * the flex depth is less than fd /100 device pixels, and as curved lines
      * when the flex depth is greater than or equal to fd/100 device
@@ -523,7 +523,7 @@ public class T2Interpreter {
     
     /**
      * Finishes a charstring outline definition, and must be the
-     * last operator in a character’s outline.
+     * last operator in a character's outline.
      */
     private void _endchar() {
         endContour();
@@ -667,7 +667,7 @@ public class T2Interpreter {
     }
     
     /**
-     * Performs a circular shift of the elements num(N–1) ... num0 on
+     * Performs a circular shift of the elements num(N-1) ... num0 on
      * the argument stack by the amount J. Positive J indicates upward
      * motion of the stack; negative J indicates downward motion.
      * The value N must be a non-negative integer, otherwise the

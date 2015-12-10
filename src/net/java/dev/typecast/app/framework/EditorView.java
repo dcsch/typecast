@@ -24,7 +24,7 @@ import net.java.dev.typecast.ot.OTFont;
 
 /**
  * The standard interface for all Typecast editor "view" components.
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: EditorView.java,v 1.1 2007-01-24 09:37:57 davidsch Exp $
  */
 public interface EditorView {

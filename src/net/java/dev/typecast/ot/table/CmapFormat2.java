@@ -56,7 +56,7 @@ import java.io.IOException;
 /**
  * High-byte mapping through table cmap format.
  * @version $Id: CmapFormat2.java,v 1.3 2004-12-21 16:56:54 davidsch Exp $
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat2 extends CmapFormat {
 

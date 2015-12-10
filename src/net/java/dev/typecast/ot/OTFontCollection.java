@@ -38,7 +38,7 @@ import net.java.dev.typecast.ot.table.TTCHeader;
 
 /**
  *
- * @author <a href="mailto:davidsch@dev.java.net">David Schweinsberg</a>
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * @version $Id: OTFontCollection.java,v 1.6 2010-08-10 11:38:11 davidsch Exp $
  */
 public class OTFontCollection {
