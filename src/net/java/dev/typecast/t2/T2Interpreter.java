@@ -1,9 +1,7 @@
 /*
- * $Id: T2Interpreter.java,v 1.2 2007-07-26 11:10:18 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +19,13 @@
 package net.java.dev.typecast.t2;
 
 import java.util.ArrayList;
-
 import net.java.dev.typecast.ot.Point;
-
 import net.java.dev.typecast.ot.table.CharstringType2;
 
 /**
  * Type 2 Charstring Interpreter.  Operator descriptions are quoted from
  * Adobe's Type 2 Charstring Format document -- 5117.Type2.pdf.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: T2Interpreter.java,v 1.2 2007-07-26 11:10:18 davidsch Exp $
  */
 public class T2Interpreter {
     
@@ -796,7 +791,7 @@ public class T2Interpreter {
     }
     
     public Point[] execute(CharstringType2 cs) {
-        _points = new ArrayList<Point>();
+        _points = new ArrayList<>();
         cs.resetIP();
         while (cs.moreBytes()) {
             while (cs.isOperandAtIndex()) {

@@ -1,9 +1,7 @@
 /*
- * $Id: CharstringType2.java,v 1.4 2007-07-26 11:13:44 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +18,8 @@
 
 package net.java.dev.typecast.ot.table;
 
-import net.java.dev.typecast.ot.table.CffTable;
-
 /**
  * CFF Type 2 Charstring
- * @version $Id: CharstringType2.java,v 1.4 2007-07-26 11:13:44 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CharstringType2 extends Charstring {
@@ -106,16 +101,23 @@ public class CharstringType2 extends Charstring {
         "-Reserved-"
     };
     
-    private int _index;
-    private String _name;
-    private int[] _data;
-    private int _offset;
-    private int _length;
-    private CffTable.Index _localSubrIndex;
-    private CffTable.Index _globalSubrIndex;
+    private final int _index;
+    private final String _name;
+    private final int[] _data;
+    private final int _offset;
+    private final int _length;
+    private final CffTable.Index _localSubrIndex;
+    private final CffTable.Index _globalSubrIndex;
     private int _ip;
 
-    /** Creates a new instance of CharstringType2 */
+    /** Creates a new instance of CharstringType2
+     * @param index
+     * @param name
+     * @param data
+     * @param offset
+     * @param length
+     * @param localSubrIndex
+     * @param globalSubrIndex */
     protected CharstringType2(
             int index,
             String name,
@@ -133,18 +135,19 @@ public class CharstringType2 extends Charstring {
         _globalSubrIndex = globalSubrIndex;
     }
     
+    @Override
     public int getIndex() {
         return _index;
     }
 
+    @Override
     public String getName() {
         return _name;
     }
     
     private void disassemble(StringBuffer sb) {
-        Number operand = null;
         while (isOperandAtIndex()) {
-            operand = nextOperand();
+            Number operand = nextOperand();
             sb.append(operand).append(" ");
         }
         int operator = nextByte();
@@ -169,10 +172,7 @@ public class CharstringType2 extends Charstring {
 
     public boolean isOperandAtIndex() {
         int b0 = _data[_ip];
-        if ((32 <= b0 && b0 <= 255) || b0 == 28) {
-            return true;
-        }
-        return false;
+        return (32 <= b0 && b0 <= 255) || b0 == 28;
     }
 
     public Number nextOperand() {
@@ -181,26 +181,26 @@ public class CharstringType2 extends Charstring {
 
             // 1 byte integer
             ++_ip;
-            return new Integer(b0 - 139);
+            return b0 - 139;
         } else if (247 <= b0 && b0 <= 250) {
 
             // 2 byte integer
             int b1 = _data[_ip + 1];
             _ip += 2;
-            return new Integer((b0 - 247) * 256 + b1 + 108);
+            return (b0 - 247) * 256 + b1 + 108;
         } else if (251 <= b0 && b0 <= 254) {
 
             // 2 byte integer
             int b1 = _data[_ip + 1];
             _ip += 2;
-            return new Integer(-(b0 - 251) * 256 - b1 - 108);
+            return -(b0 - 251) * 256 - b1 - 108;
         } else if (b0 == 28) {
 
             // 3 byte integer
-            int b1 = _data[_ip + 1];
+            int b1 = (byte)_data[_ip + 1];
             int b2 = _data[_ip + 2];
             _ip += 3;
-            return new Integer(b1 << 8 | b2);
+            return b1 << 8 | b2;
         } else if (b0 == 255) {
 
             // 16-bit signed integer with 16 bits of fraction
@@ -223,6 +223,7 @@ public class CharstringType2 extends Charstring {
         return _ip < _offset + _length;
     }
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         resetIP();
