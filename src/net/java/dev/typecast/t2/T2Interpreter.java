@@ -39,6 +39,8 @@ public class T2Interpreter {
     private int _subrStackIndex = 0;
     private final Number[] _transientArray = new Number[TRANSIENT_ARRAY_ELEMENT_COUNT];
     
+    private int _stemCount = 0;
+    
     private ArrayList<Point> _points;
 
     /** Creates a new instance of T2Interpreter */
@@ -536,22 +538,30 @@ public class T2Interpreter {
     }
     
     private void _hstemhm() {
-        
+        _stemCount += getArgCount() / 2;
         clearArg();
     }
     
     private void _vstemhm() {
-        
+        _stemCount += getArgCount() / 2;
         clearArg();
     }
     
-    private void _hintmask() {
-        
+    private void _hintmask(CharstringType2 cs) {
+        _stemCount += getArgCount() / 2;
+        int maskLen = (_stemCount - 1) / 8 + 1;
+        for (int i = 0; i < maskLen; ++i) {
+            cs.nextByte();
+        }
         clearArg();
     }
     
-    private void _cntrmask() {
-        
+    private void _cntrmask(CharstringType2 cs) {
+        _stemCount += getArgCount() / 2;
+        int maskLen = (_stemCount - 1) / 8 + 1;
+        for (int i = 0; i < maskLen; ++i) {
+            cs.nextByte();
+        }
         clearArg();
     }
     
@@ -917,10 +927,10 @@ public class T2Interpreter {
                     _hstemhm();
                     break;
                 case T2Mnemonic.HINTMASK:
-                    _hintmask();
+                    _hintmask(cs);
                     break;
                 case T2Mnemonic.CNTRMASK:
-                    _cntrmask();
+                    _cntrmask(cs);
                     break;
                 case T2Mnemonic.RMOVETO:
                     _rmoveto();
