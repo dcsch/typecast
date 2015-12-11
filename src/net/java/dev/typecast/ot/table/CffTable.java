@@ -1,9 +1,7 @@
 /*
- * $Id: CffTable.java,v 1.4 2007-07-26 11:15:06 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,23 +22,21 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Compact Font Format Table
- * @version $Id: CffTable.java,v 1.4 2007-07-26 11:15:06 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CffTable implements Table {
     
-    public class Dict {
+    public static class Dict {
         
-        private Dictionary<Integer, Object> _entries = new Hashtable<Integer, Object>();
-        private int[] _data;
+        private final Map<Integer, Object> _entries = new HashMap<>();
+        private final int[] _data;
         private int _index;
         
         protected Dict(int[] data, int offset, int length) {
@@ -56,7 +52,7 @@ public class CffTable implements Table {
         }
         
         private boolean addKeyAndValueEntry() {
-            ArrayList<Object> operands = new ArrayList<Object>();
+            ArrayList<Object> operands = new ArrayList<>();
             Object operand = null;
             while (isOperandAtIndex()) {
                 operand = nextOperand();
@@ -77,22 +73,16 @@ public class CffTable implements Table {
         
         private boolean isOperandAtIndex() {
             int b0 = _data[_index];
-            if ((32 <= b0 && b0 <= 254)
+            return (32 <= b0 && b0 <= 254)
                     || b0 == 28
                     || b0 == 29
-                    || b0 == 30) {
-                return true;
-            }
-            return false;
+                    || b0 == 30;
         }
 
-        private boolean isOperatorAtIndex() {
-            int b0 = _data[_index];
-            if (0 <= b0 && b0 <= 21) {
-                return true;
-            }
-            return false;
-        }
+//        private boolean isOperatorAtIndex() {
+//            int b0 = _data[_index];
+//            return 0 <= b0 && b0 <= 21;
+//        }
 
         private Object nextOperand() {
             int b0 = _data[_index];
@@ -100,26 +90,26 @@ public class CffTable implements Table {
                 
                 // 1 byte integer
                 ++_index;
-                return new Integer(b0 - 139);
+                return b0 - 139;
             } else if (247 <= b0 && b0 <= 250) {
                 
                 // 2 byte integer
                 int b1 = _data[_index + 1];
                 _index += 2;
-                return new Integer((b0 - 247) * 256 + b1 + 108);
+                return (b0 - 247) * 256 + b1 + 108;
             } else if (251 <= b0 && b0 <= 254) {
                 
                 // 2 byte integer
                 int b1 = _data[_index + 1];
                 _index += 2;
-                return new Integer(-(b0 - 251) * 256 - b1 - 108);
+                return -(b0 - 251) * 256 - b1 - 108;
             } else if (b0 == 28) {
                 
                 // 3 byte integer
                 int b1 = _data[_index + 1];
                 int b2 = _data[_index + 2];
                 _index += 3;
-                return new Integer(b1 << 8 | b2);
+                return b1 << 8 | b2;
             } else if (b0 == 29) {
                 
                 // 5 byte integer
@@ -128,11 +118,11 @@ public class CffTable implements Table {
                 int b3 = _data[_index + 3];
                 int b4 = _data[_index + 4];
                 _index += 5;
-                return new Integer(b1 << 24 | b2 << 16 | b3 << 8 | b4);
+                return b1 << 24 | b2 << 16 | b3 << 8 | b4;
             } else if (b0 == 30) {
                 
                 // Real number
-                StringBuffer fString = new StringBuffer();
+                StringBuilder fString = new StringBuilder();
                 int nibble1 = 0;
                 int nibble2 = 0;
                 ++_index;
@@ -143,7 +133,7 @@ public class CffTable implements Table {
                     fString.append(decodeRealNibble(nibble1));
                     fString.append(decodeRealNibble(nibble2));
                 }                
-                return new Float(fString.toString());
+                return Float.valueOf(fString.toString());
             } else {
                 return null;
             }
@@ -164,13 +154,14 @@ public class CffTable implements Table {
             return "";
         }
         
+        @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
-            Enumeration<Integer> keys = _entries.keys();
-            while (keys.hasMoreElements()) {
-                Integer key = keys.nextElement();
-                if ((key.intValue() & 0xc00) == 0xc00) {
-                    sb.append("12 ").append(key.intValue() & 0xff).append(": ");
+            StringBuilder sb = new StringBuilder();
+            Iterator<Integer> keys = _entries.keySet().iterator();
+            while (keys.hasNext()) {
+                Integer key = keys.next();
+                if ((key & 0xc00) == 0xc00) {
+                    sb.append("12 ").append(key & 0xff).append(": ");
                 } else {
                     sb.append(key.toString()).append(": ");
                 }
@@ -182,10 +173,10 @@ public class CffTable implements Table {
     
     public class Index {
         
-        private int _count;
-        private int _offSize;
-        private int[] _offset;
-        private int[] _data;
+        private final int _count;
+        private final int _offSize;
+        private final int[] _offset;
+        private final int[] _data;
         
         protected Index(DataInput di) throws IOException {
             _count = di.readUnsignedShort();
@@ -204,24 +195,25 @@ public class CffTable implements Table {
             }
         }
         
-        public int getCount() {
+        public final int getCount() {
             return _count;
         }
         
-        public int getOffset(int index) {
+        public final int getOffset(int index) {
             return _offset[index];
         }
         
-        public int getDataLength() {
+        public final int getDataLength() {
             return _offset[_offset.length - 1] - 1;
         }
         
-        public int[] getData() {
+        public final int[] getData() {
             return _data;
         }
 
+        @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("DICT\n");
             sb.append("count: ").append(_count).append("\n");
             sb.append("offSize: ").append(_offSize).append("\n");
@@ -254,8 +246,9 @@ public class CffTable implements Table {
             return new Dict(getData(), offset, len);
         }
 
+        @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < getCount(); ++i) {
                 sb.append(getTopDict(i).toString()).append("\n");
             }
@@ -276,7 +269,7 @@ public class CffTable implements Table {
 
             // Ensure the name hasn't been deleted
             if (getData()[offset] != 0) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (int i = offset; i < offset + len; ++i) {
                     sb.append((char) getData()[i]);
                 }
@@ -287,8 +280,9 @@ public class CffTable implements Table {
             return name;
         }
         
+        @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < getCount(); ++i) {
                 sb.append(getName(i)).append("\n");
             }
@@ -313,7 +307,7 @@ public class CffTable implements Table {
                 int offset = getOffset(index) - 1;
                 int len = getOffset(index + 1) - offset - 1;
 
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (int i = offset; i < offset + len; ++i) {
                     sb.append((char) getData()[i]);
                 }
@@ -321,9 +315,10 @@ public class CffTable implements Table {
             }
         }
         
+        @Override
         public String toString() {
             int nonStandardBase = CffStandardStrings.standardStrings.length;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < getCount(); ++i) {
                 sb.append(nonStandardBase + i).append(": ");
                 sb.append(getString(nonStandardBase + i)).append("\n");
@@ -337,19 +332,19 @@ public class CffTable implements Table {
         private int _first;
         private int _left;
         
-        public int getFirst() {
+        public final int getFirst() {
             return _first;
         }
 
-        protected void setFirst(int first) {
+        protected final void setFirst(int first) {
             _first = first;
         }
         
-        public int getLeft() {
+        public final int getLeft() {
             return _left;
         }
 
-        protected void setLeft(int left) {
+        protected final void setLeft(int left) {
             _left = left;
         }
     }
@@ -379,7 +374,7 @@ public class CffTable implements Table {
     
     private class CharsetFormat0 extends Charset {
         
-        private int[] _glyph;
+        private final int[] _glyph;
         
         protected CharsetFormat0(DataInput di, int glyphCount) throws IOException {
             _glyph = new int[glyphCount - 1];  // minus 1 because .notdef is omitted
@@ -388,10 +383,12 @@ public class CffTable implements Table {
             }
         }
         
+        @Override
         public int getFormat() {
             return 0;
         }
 
+        @Override
         public int getSID(int gid) {
             if (gid == 0) {
                 return 0;
@@ -402,7 +399,7 @@ public class CffTable implements Table {
     
     private class CharsetFormat1 extends Charset {
         
-        private ArrayList<CharsetRange> _charsetRanges = new ArrayList<CharsetRange>();
+        private final ArrayList<CharsetRange> _charsetRanges = new ArrayList<>();
         
         protected CharsetFormat1(DataInput di, int glyphCount) throws IOException {
             int glyphsCovered = glyphCount - 1;  // minus 1 because .notdef is omitted
@@ -413,10 +410,12 @@ public class CffTable implements Table {
             }
         }
 
+        @Override
         public int getFormat() {
             return 1;
         }
 
+        @Override
         public int getSID(int gid) {
             if (gid == 0) {
                 return 0;
@@ -437,7 +436,7 @@ public class CffTable implements Table {
 
     private class CharsetFormat2 extends Charset {
         
-        private ArrayList<CharsetRange> _charsetRanges = new ArrayList<CharsetRange>();
+        private final ArrayList<CharsetRange> _charsetRanges = new ArrayList<>();
         
         protected CharsetFormat2(DataInput di, int glyphCount) throws IOException {
             int glyphsCovered = glyphCount - 1;  // minus 1 because .notdef is omitted
@@ -448,10 +447,12 @@ public class CffTable implements Table {
             }
         }
 
+        @Override
         public int getFormat() {
             return 2;
         }
 
+        @Override
         public int getSID(int gid) {
             if (gid == 0) {
                 return 0;
@@ -485,7 +486,10 @@ public class CffTable implements Table {
 
     private byte[] _buf;
 
-    /** Creates a new instance of CffTable */
+    /** Creates a new instance of CffTable
+     * @param de
+     * @param di
+     * @throws java.io.IOException */
     protected CffTable(DirectoryEntry de, DataInput di) throws IOException {
         _de = (DirectoryEntry) de.clone();
 
@@ -574,9 +578,9 @@ public class CffTable implements Table {
         return _nameIndex;
     }
     
-    public Charset getCharset(int fontIndex) {
-        return _charsets[fontIndex];
-    }
+//    public Charset getCharset(int fontIndex) {
+//        return _charsets[fontIndex];
+//    }
 
     public Charstring getCharstring(int fontIndex, int gid) {
         return _charstringsArray[fontIndex][gid];
@@ -586,12 +590,14 @@ public class CffTable implements Table {
         return _charstringsArray[fontIndex].length;
     }
 
+    @Override
     public int getType() {
         return CFF;
     }
 
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'CFF' Table - Compact Font Format\n---------------------------------\n");
         sb.append("\nName INDEX\n");
         sb.append(_nameIndex.toString());
@@ -614,6 +620,7 @@ public class CffTable implements Table {
      * particular table.
      * @return A directory entry
      */
+    @Override
     public DirectoryEntry getDirectoryEntry() {
         return _de;
     }
