@@ -1,9 +1,7 @@
 /*
- * $Id: Charstring.java,v 1.2 2007-02-21 12:25:19 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +20,6 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * CFF Charstring
- * @version $Id: Charstring.java,v 1.2 2007-02-21 12:25:19 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class Charstring {

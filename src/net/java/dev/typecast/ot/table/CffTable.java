@@ -422,13 +422,13 @@ public class CffTable implements Table {
             }
             
             // Count through the ranges to find the one of interest
-            int count = 0;
+            int count = 1;
             for (CharsetRange range : _charsetRanges) {
-                count += range.getLeft();
-                if (gid < count) {
+                if (gid <= range.getLeft() + count) {
                     int sid = gid - count + range.getFirst();
                     return sid;
                 }
+                count += range.getLeft() + 1;
             }
             return 0;
         }
@@ -459,13 +459,13 @@ public class CffTable implements Table {
             }
             
             // Count through the ranges to find the one of interest
-            int count = 0;
+            int count = 1;
             for (CharsetRange range : _charsetRanges) {
-                if (gid < range.getLeft() + count) {
-                    int sid = gid - count + range.getFirst() - 1;
+                if (gid <= range.getLeft() + count) {
+                    int sid = gid - count + range.getFirst();
                     return sid;
                 }
-                count += range.getLeft();
+                count += range.getLeft() + 1;
             }
             return 0;
         }
