@@ -1,9 +1,7 @@
 /*
- * $Id: Main.java,v 1.8 2009-05-22 02:30:27 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,80 +18,44 @@
 
 package net.java.dev.typecast.app.editor;
 
-import java.awt.Component;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.Cursor;
 import java.awt.FileDialog;
-
+import java.awt.HeadlessException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StreamTokenizer;
-
-import java.net.URL;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.ResourceBundle;
-
 import java.util.prefs.Preferences;
-
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-
-import javax.swing.table.AbstractTableModel;
-
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-
+import net.java.dev.typecast.app.framework.EditorView;
 import net.java.dev.typecast.edit.CharacterMap;
-
-import net.java.dev.typecast.ot.table.DirectoryEntry;
-import net.java.dev.typecast.ot.table.GlyfDescript;
-import net.java.dev.typecast.ot.table.GlyphDescription;
-import net.java.dev.typecast.ot.table.Table;
-
-import net.java.dev.typecast.ot.OTFont;
-import net.java.dev.typecast.ot.OTFontCollection;
-
 import net.java.dev.typecast.exchange.Exporter;
 import net.java.dev.typecast.exchange.SVGExporter;
-
-import net.java.dev.typecast.app.editor.Main;
-import net.java.dev.typecast.app.editor.TableTreeCellRenderer;
-import net.java.dev.typecast.app.editor.EditorFileFilter;
-import net.java.dev.typecast.app.editor.EditorMenu;
-import net.java.dev.typecast.app.editor.TableTreeNode;
-import net.java.dev.typecast.app.editor.Splash;
-import net.java.dev.typecast.app.editor.GlyphPanel;
-import net.java.dev.typecast.app.editor.TableTreeBuilder;
-import net.java.dev.typecast.app.editor.EditorPrefs;
-
-import net.java.dev.typecast.app.framework.EditorView;
+import net.java.dev.typecast.ot.OTFont;
+import net.java.dev.typecast.ot.OTFontCollection;
+import net.java.dev.typecast.ot.table.GlyphDescription;
+import net.java.dev.typecast.ot.table.TableException;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Main.java,v 1.8 2009-05-22 02:30:27 davidsch Exp $
  */
 public class Main {
 
@@ -102,8 +64,7 @@ public class Main {
     private JTree _tree;
     private JSplitPane _splitPane;
     private DefaultTreeModel _treeModel;
-    private ArrayList<OTFontCollection> _fontCollections =
-            new ArrayList<OTFontCollection>();
+    private ArrayList<OTFontCollection> _fontCollections = new ArrayList<>();
     private EditorPrefs _appPrefs = new EditorPrefs();
     private JTabbedPane _tabbedPane;
     private GlyphPanel _glyphPane;
@@ -122,7 +83,7 @@ public class Main {
     }
     
     private List<ModelViewPair> _modelViewPairs =
-            new ArrayList<ModelViewPair>();
+            new ArrayList<>();
     
     /**
      * Typecast constructor.
@@ -184,33 +145,31 @@ public class Main {
             treePane.setBorder(null);
 
             // Listen for selection events from the tree
-            TreeSelectionListener tsl = new TreeSelectionListener() {
-                public void valueChanged(TreeSelectionEvent e) {
-                    TreePath selPath = e.getPath();
-                    if(selPath != null) {
-
-                        // Pick the font collection out of the path
-                        if (selPath.getPathCount() >= 2) {
-                            _selectedCollectionNode =
-                                    (TableTreeNode) selPath.getPathComponent(1);
-                            _menu.setSelectedFontCollection(
-                                    (OTFontCollection)
-                                    _selectedCollectionNode.getUserObject());
-                        }
-
-                        // Pick the selected font out of the path
-                        OTFont font = null;
-                        if (selPath.getPathCount() >= 3) {
-                            TableTreeNode fontNode =
-                                    (TableTreeNode) selPath.getPathComponent(2);
-                            font = (OTFont) fontNode.getUserObject();
-                        }
-
-                        // Now get the actually selected node
-                        TableTreeNode tn =
-                                (TableTreeNode) selPath.getLastPathComponent();
-                        selectElement(font, tn);
+            TreeSelectionListener tsl = (TreeSelectionEvent e) -> {
+                TreePath selPath = e.getPath();
+                if(selPath != null) {
+                    
+                    // Pick the font collection out of the path
+                    if (selPath.getPathCount() >= 2) {
+                        _selectedCollectionNode =
+                                (TableTreeNode) selPath.getPathComponent(1);
+                        _menu.setSelectedFontCollection(
+                                (OTFontCollection)
+                                        _selectedCollectionNode.getUserObject());
                     }
+                    
+                    // Pick the selected font out of the path
+                    OTFont font = null;
+                    if (selPath.getPathCount() >= 3) {
+                        TableTreeNode fontNode =
+                                (TableTreeNode) selPath.getPathComponent(2);
+                        font = (OTFont) fontNode.getUserObject();
+                    }
+                    
+                    // Now get the actually selected node
+                    TableTreeNode tn =
+                            (TableTreeNode) selPath.getLastPathComponent();
+                    selectElement(font, tn);
                 }
             };
             _tree.addTreeSelectionListener(tsl);
@@ -235,6 +194,7 @@ public class Main {
 
             _frame.addWindowListener(
                 new WindowAdapter() {
+                    @Override
                     public void windowClosing(WindowEvent e) {
                         close();
                     }
@@ -244,8 +204,7 @@ public class Main {
             // We're built, so make the main frame visible and hide the splash
             _frame.pack();
             _frame.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException | HeadlessException e) {
             JOptionPane.showMessageDialog(
                 null,
                 e.toString(),
@@ -254,37 +213,6 @@ public class Main {
         } finally {
             splash.setVisible(false);
         }
-    }
-
-    private JTable createPropertyTable() {
-        AbstractTableModel tableModel = new AbstractTableModel() {
-            private static final long serialVersionUID = 1L;
-
-            Object[][] rowData = {
-                {"Mary", "Campione",
-                "Snowboarding", new Integer(5), new Boolean(false)},
-                {"Alison", "Huml",
-                "Rowing", new Integer(3), new Boolean(true)},
-                {"Kathy", "Walrath",
-                "Chasing toddlers", new Integer(2), new Boolean(false)},
-                {"Mark", "Andrews",
-                "Speed reading", new Integer(20), new Boolean(true)},
-                {"Angela", "Lih",
-                "Teaching high school", new Integer(4), new Boolean(false)}
-            };
-            String[] columnNames = {"First Name",
-                "Last Name",
-                "Sport",
-                "# of Years",
-            "Vegetarian"};
-        public String getColumnName(int col) { return columnNames[col].toString(); }
-        public int getRowCount() { return rowData.length; }
-        public int getColumnCount() { return columnNames.length; }
-        public Object getValueAt(int row, int col) { return rowData[row][col]; }
-        public boolean isCellEditable(int row, int col) { return false; }
-        };
-
-        return new JTable(tableModel);
     }
 
     protected void loadFont(String pathName) {
@@ -297,14 +225,12 @@ public class Main {
             // Create the tree to put the information in
             TableTreeBuilder.addFontTree(_treeModel, fc);
         } catch (IOException e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
                 e.toString(),
                 "I/O Exception",
                 JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(
                 null,
                 e.toString(),
@@ -381,12 +307,11 @@ public class Main {
 
             if (chooser.showSaveDialog(_frame) == JFileChooser.APPROVE_OPTION) {
                 try {
-                    FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().getPath());
-                    Exporter exporter = new SVGExporter(_selectedFont);
-                    exporter.export(fos);
-                    fos.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    try (FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().getPath())) {
+                        Exporter exporter = new SVGExporter(_selectedFont);
+                        exporter.export(fos);
+                    }
+                } catch (IOException | TableException e) {
                     JOptionPane.showMessageDialog(
                         null,
                         e.toString(),
