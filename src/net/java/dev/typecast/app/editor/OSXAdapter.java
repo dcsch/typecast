@@ -59,7 +59,6 @@ Copyright � 2003-2007 Apple, Inc., All Rights Reserved
 package net.java.dev.typecast.app.editor;
 
 import java.lang.reflect.*;
-import java.util.HashMap;
 
 
 public class OSXAdapter implements InvocationHandler {
@@ -87,10 +86,9 @@ public class OSXAdapter implements InvocationHandler {
         // com.apple.eawt.Application reflectively
         try {
             Method enableAboutMethod = macOSXApplication.getClass().getDeclaredMethod("setEnabledAboutMenu", new Class[] { boolean.class });
-            enableAboutMethod.invoke(macOSXApplication, new Object[] { Boolean.valueOf(enableAboutMenu) });
-        } catch (Exception ex) {
+            enableAboutMethod.invoke(macOSXApplication, new Object[] { enableAboutMenu});
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             System.err.println("OSXAdapter could not access the About Menu");
-            ex.printStackTrace();
         }
     }
     
@@ -105,10 +103,9 @@ public class OSXAdapter implements InvocationHandler {
         // com.apple.eawt.Application reflectively
         try {
             Method enablePrefsMethod = macOSXApplication.getClass().getDeclaredMethod("setEnabledPreferencesMenu", new Class[] { boolean.class });
-            enablePrefsMethod.invoke(macOSXApplication, new Object[] { Boolean.valueOf(enablePrefsMenu) });
-        } catch (Exception ex) {
+            enablePrefsMethod.invoke(macOSXApplication, new Object[] { enablePrefsMenu });
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             System.err.println("OSXAdapter could not access the About Menu");
-            ex.printStackTrace();
         }
     }
     
@@ -119,13 +116,14 @@ public class OSXAdapter implements InvocationHandler {
         setHandler(new OSXAdapter("handleOpenFile", target, fileHandler) {
             // Override OSXAdapter.callTarget to send information on the
             // file to be opened
+            @Override
             public boolean callTarget(Object appleEvent) {
                 if (appleEvent != null) {
                     try {
                         Method getFilenameMethod = appleEvent.getClass().getDeclaredMethod("getFilename", (Class[])null);
                         String filename = (String) getFilenameMethod.invoke(appleEvent, (Object[])null);
                         this.targetMethod.invoke(this.targetObject, new Object[] { filename });
-                    } catch (Exception ex) {
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                         
                     }
                 }
@@ -148,9 +146,8 @@ public class OSXAdapter implements InvocationHandler {
             addListenerMethod.invoke(macOSXApplication, new Object[] { osxAdapterProxy });
         } catch (ClassNotFoundException cnfe) {
             System.err.println("This version of Mac OS X does not support the Apple EAWT.  ApplicationEvent handling has been disabled (" + cnfe + ")");
-        } catch (Exception ex) {  // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {  // Likely a NoSuchMethodException or an IllegalAccessException loading/invoking eawt.Application methods
             System.err.println("Mac OS X Adapter could not talk to EAWT:");
-            ex.printStackTrace();
         }
     }
 
@@ -170,11 +167,12 @@ public class OSXAdapter implements InvocationHandler {
         if (result == null) {
             return true;
         }
-        return Boolean.valueOf(result.toString()).booleanValue();
+        return Boolean.valueOf(result.toString());
     }
     
     // InvocationHandler implementation
     // This is the entry point for our proxy object; it is called every time an ApplicationListener method is invoked
+    @Override
     public Object invoke (Object proxy, Method method, Object[] args) throws Throwable {
         if (isCorrectMethod(method, args)) {
             boolean handled = callTarget(args[0]);
@@ -197,10 +195,9 @@ public class OSXAdapter implements InvocationHandler {
             try {
                 Method setHandledMethod = event.getClass().getDeclaredMethod("setHandled", new Class[] { boolean.class });
                 // If the target method returns a boolean, use that as a hint
-                setHandledMethod.invoke(event, new Object[] { Boolean.valueOf(handled) });
-            } catch (Exception ex) {
+                setHandledMethod.invoke(event, new Object[] { handled});
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 System.err.println("OSXAdapter was unable to handle an ApplicationEvent: " + event);
-                ex.printStackTrace();
             }
         }
     }

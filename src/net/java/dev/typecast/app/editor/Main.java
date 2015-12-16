@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
@@ -45,7 +44,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import net.java.dev.typecast.app.framework.EditorView;
 import net.java.dev.typecast.edit.CharacterMap;
 import net.java.dev.typecast.exchange.Exporter;
 import net.java.dev.typecast.exchange.SVGExporter;
@@ -72,18 +70,6 @@ public class Main {
     private ResourceBundle _rb;
     private OTFont _selectedFont = null;
     private TableTreeNode _selectedCollectionNode;
-    
-    private class ModelViewPair {
-        Class _model;
-        Class<EditorView> _view;
-        ModelViewPair(Class model, Class<EditorView> view) {
-            _model = model;
-            _view = view;
-        }
-    }
-    
-    private List<ModelViewPair> _modelViewPairs =
-            new ArrayList<>();
     
     /**
      * Typecast constructor.
