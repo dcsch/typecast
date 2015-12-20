@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +44,17 @@ public class CffTable implements Table {
             _data = data;
             _index = offset;
             while (_index < offset + length) {
+                addKeyAndValueEntry();
+            }
+        }
+        
+        protected Dict(DataInput di, int length) throws IOException {
+            _data = new int[length];
+            for (int i = 0; i < length; ++i) {
+                _data[i] = di.readUnsignedByte();
+            }
+            _index = 0;
+            while (_index < length) {
                 addKeyAndValueEntry();
             }
         }
@@ -483,6 +495,8 @@ public class CffTable implements Table {
     private Index _charStringsIndexArray[];
     private Charset[] _charsets;
     private Charstring[][] _charstringsArray;
+    private Dict _privateDictArray[];
+    private Index _localSubrsIndexArray[];
 
     private byte[] _buf;
 
@@ -522,9 +536,12 @@ public class CffTable implements Table {
         // within the CFF data.
         
         // Load each of the fonts
+        // TODO Bundle the following into an individual font class
         _charStringsIndexArray = new Index[_topDictIndex.getCount()];
         _charsets = new Charset[_topDictIndex.getCount()];
         _charstringsArray = new Charstring[_topDictIndex.getCount()][];
+        _privateDictArray = new Dict[_topDictIndex.getCount()];
+        _localSubrsIndexArray = new Index[_topDictIndex.getCount()];
         for (int i = 0; i < _topDictIndex.getCount(); ++i) {
 
             // Charstrings INDEX
@@ -534,6 +551,18 @@ public class CffTable implements Table {
             di2 = getDataInputForOffset(charStringsOffset);
             _charStringsIndexArray[i] = new Index(di2);
             int glyphCount = _charStringsIndexArray[i].getCount();
+
+            // Private DICT
+            List<Integer> privateSizeAndOffset = (List<Integer>) _topDictIndex.getTopDict(i).getValue(18);
+            di2 = getDataInputForOffset(privateSizeAndOffset.get(1));
+            _privateDictArray[i] = new Dict(di2, privateSizeAndOffset.get(0));
+            
+            // Local Subrs INDEX
+            Integer localSubrsOffset = (Integer) _privateDictArray[i].getValue(19);
+            if (localSubrsOffset != null) {
+                di2 = getDataInputForOffset(privateSizeAndOffset.get(1) + localSubrsOffset);
+                _localSubrsIndexArray[i] = new Index(di2);
+            }
         
             // Charsets
             Integer charsetOffset = (Integer) _topDictIndex.getTopDict(i).getValue(15);
