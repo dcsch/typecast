@@ -9,7 +9,6 @@
 package net.java.dev.typecast.ot.table;
 
 /**
- * @version $Id: Table.java,v 1.1.1.1 2004-12-05 23:14:59 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public interface Table {

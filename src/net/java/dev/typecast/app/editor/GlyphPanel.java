@@ -1,9 +1,7 @@
 /*
- * $Id: GlyphPanel.java,v 1.4 2007-02-21 12:22:55 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,38 +20,27 @@ package net.java.dev.typecast.app.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-
-import java.util.Properties;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import net.java.dev.typecast.app.framework.EditorView;
-
 import net.java.dev.typecast.edit.GlyphEdit;
-
 import net.java.dev.typecast.ot.Glyph;
 import net.java.dev.typecast.ot.OTFont;
-
 import net.java.dev.typecast.ot.table.Charstring;
 import net.java.dev.typecast.ot.table.GlyphDescription;
-
-import net.java.dev.typecast.app.editor.GlyphPanelToolBar;
-import net.java.dev.typecast.app.editor.GlyphPanelStatusBar;
 
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphPanel.java,v 1.4 2007-02-21 12:22:55 davidsch Exp $
  */
 public class GlyphPanel extends JPanel implements EditorView {
 
     private static final long serialVersionUID = 1L;
 
-    private EditorPrefs _prefs;
-    private GlyphEdit _glyphEdit = new GlyphEdit();
-    private GlyphPanelToolBar _toolBar = new GlyphPanelToolBar();
-    private GlyphPanelStatusBar _glyphPanelStatusBar =
+    private final EditorPrefs _prefs;
+    private final GlyphEdit _glyphEdit = new GlyphEdit();
+    private final GlyphPanelToolBar _toolBar = new GlyphPanelToolBar();
+    private final GlyphPanelStatusBar _glyphPanelStatusBar =
             new GlyphPanelStatusBar();
 
     /** Creates new GlyphPanel */
@@ -83,6 +70,7 @@ public class GlyphPanel extends JPanel implements EditorView {
      * The GlyphPanel deals with GlyphDescriptions, so the Object parameter must
      * implement the GlyphDescription interface.
      */
+    @Override
     public void setModel(OTFont font, Object obj) {
         if (obj instanceof GlyphDescription) {
             _glyphEdit.setFont(font);
@@ -98,7 +86,9 @@ public class GlyphPanel extends JPanel implements EditorView {
             _glyphEdit.setGlyph(new Glyph(
                     cs,
                     font.getHmtxTable().getLeftSideBearing(cs.getIndex()),
-                    font.getHmtxTable().getAdvanceWidth(cs.getIndex())));
+                    font.getHmtxTable().getAdvanceWidth(cs.getIndex()),
+                    font.getCffTable().getFont(cs.getIndex()).getLocalSubrsIndex(),
+                    font.getCffTable().getGlobalSubrIndex()));
         }
     }
     

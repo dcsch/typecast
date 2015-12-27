@@ -20,6 +20,7 @@ package net.java.dev.typecast.t2;
 
 import java.util.ArrayList;
 import net.java.dev.typecast.ot.Point;
+import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.CharstringType2;
 
 /**
@@ -42,9 +43,13 @@ public class T2Interpreter {
     private int _stemCount = 0;
     
     private ArrayList<Point> _points;
+    private final CffTable.Index _localSubrIndex;
+    private final CffTable.Index _globalSubrIndex;
 
     /** Creates a new instance of T2Interpreter */
-    public T2Interpreter() {
+    public T2Interpreter(CffTable.Index localSubrIndex, CffTable.Index globalSubrIndex) {
+        _localSubrIndex = localSubrIndex;
+        _globalSubrIndex = globalSubrIndex;
     }
     
     /**
@@ -780,15 +785,37 @@ public class T2Interpreter {
      * act according to the manner in which the subroutine is coded.
      * Calling an undefined subr (gsubr) has undefined results.
      */
-    private void _callsubr() {
-        
+    private void _callsubr(CharstringType2 cs) {
+        int bias;
+        int subrsCount = _localSubrIndex.getCount();
+        if (subrsCount < 1240) {
+            bias = 107;
+        } else if (subrsCount < 33900) {
+            bias = 1131;
+        } else {
+            bias = 32768;
+        }
+        int i = popArg().intValue();
+        int offset = _localSubrIndex.getOffset(i + bias);
+        int offset2 = _localSubrIndex.getOffset(i + bias + 1);
     }
     
     /**
      * Operates in the same manner as callsubr except that it calls a
      * global subroutine.
      */
-    private void _callgsubr() {
+    private void _callgsubr(CharstringType2 cs) {
+        int bias;
+        int subrsCount = _localSubrIndex.getCount();
+        if (subrsCount < 1240) {
+            bias = 107;
+        } else if (subrsCount < 33900) {
+            bias = 1131;
+        } else {
+            bias = 32768;
+        }
+        int i = popArg().intValue();
+        int offset = _localSubrIndex.getOffset(i + bias);
         
     }
     
@@ -796,8 +823,8 @@ public class T2Interpreter {
      * Returns from either a local or global charstring subroutine, and
      * continues execution after the corresponding call(g)subr.
      */
-    private void _return() {
-        
+    private void _return(CharstringType2 cs) {
+        //_ip = popSubr();
     }
     
     public Point[] execute(CharstringType2 cs) {
@@ -915,10 +942,10 @@ public class T2Interpreter {
                     _rrcurveto();
                     break;
                 case T2Mnemonic.CALLSUBR:
-                    _callsubr();
+                    _callsubr(cs);
                     break;
                 case T2Mnemonic.RETURN:
-                    _return();
+                    _return(cs);
                     break;
                 case T2Mnemonic.ENDCHAR:
                     _endchar();
@@ -954,7 +981,7 @@ public class T2Interpreter {
                     _hhcurveto();
                     break;
                 case T2Mnemonic.CALLGSUBR:
-                    _callgsubr();
+                    _callgsubr(cs);
                     break;
                 case T2Mnemonic.VHCURVETO:
                     _vhcurveto();

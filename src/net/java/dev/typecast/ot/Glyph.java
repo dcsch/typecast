@@ -50,6 +50,7 @@
 
 package net.java.dev.typecast.ot;
 
+import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 import net.java.dev.typecast.ot.table.GlyfDescript;
 import net.java.dev.typecast.ot.table.Charstring;
@@ -59,7 +60,6 @@ import net.java.dev.typecast.t2.T2Interpreter;
 
 /**
  * An individual glyph within a font.
- * @version $Id: Glyph.java,v 1.3 2007-02-21 12:23:54 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class Glyph {
@@ -86,12 +86,19 @@ public class Glyph {
      * @param cs The Charstring describing the glyph.
      * @param lsb The Left Side Bearing.
      * @param advance The advance width.
+     * @param localSubrIndex
+     * @param globalSubrIndex
      */
-    public Glyph(Charstring cs, short lsb, int advance) {
+    public Glyph(
+            Charstring cs,
+            short lsb,
+            int advance,
+            CffTable.Index localSubrIndex,
+            CffTable.Index globalSubrIndex) {
         _leftSideBearing = lsb;
         _advanceWidth = advance;
         if (cs instanceof CharstringType2) {
-            T2Interpreter t2i = new T2Interpreter();
+            T2Interpreter t2i = new T2Interpreter(localSubrIndex, globalSubrIndex);
             _points = t2i.execute((CharstringType2) cs);
         } else {
             //throw unsupported charstring type

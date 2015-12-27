@@ -106,8 +106,6 @@ public class CharstringType2 extends Charstring {
     private final int[] _data;
     private final int _offset;
     private final int _length;
-    private final CffTable.Index _localSubrIndex;
-    private final CffTable.Index _globalSubrIndex;
     private int _ip;
 
     /** Creates a new instance of CharstringType2
@@ -115,24 +113,18 @@ public class CharstringType2 extends Charstring {
      * @param name
      * @param data
      * @param offset
-     * @param length
-     * @param localSubrIndex
-     * @param globalSubrIndex */
+     * @param length */
     protected CharstringType2(
             int index,
             String name,
             int[] data,
             int offset,
-            int length,
-            CffTable.Index localSubrIndex,
-            CffTable.Index globalSubrIndex) {
+            int length) {
         _index = index;
         _name = name;
         _data = data;
         _offset = offset;
         _length = length;
-        _localSubrIndex = localSubrIndex;
-        _globalSubrIndex = globalSubrIndex;
     }
     
     @Override
@@ -145,7 +137,7 @@ public class CharstringType2 extends Charstring {
         return _name;
     }
     
-    private void disassemble(StringBuffer sb) {
+    private void disassemble(StringBuilder sb) {
         while (isOperandAtIndex()) {
             Number operand = nextOperand();
             sb.append(operand).append(" ");
@@ -222,10 +214,10 @@ public class CharstringType2 extends Charstring {
     public boolean moreBytes() {
         return _ip < _offset + _length;
     }
-    
+
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         resetIP();
         while (moreBytes()) {
             disassemble(sb);

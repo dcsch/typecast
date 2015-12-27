@@ -483,6 +483,47 @@ public class CffTable implements Table {
         }
     }
     
+    public class CffFont {
+        private Index _charStringsIndex;
+        private Dict _privateDict;
+        private Index _localSubrsIndex;
+        private Charset _charset;
+        private Charstring[] _charstrings;
+        
+        public CffFont(
+                Index charStringsIndex,
+                Dict privateDict,
+                Index localSubrsIndex,
+                Charset charset,
+                Charstring[] charstrings) {
+            _charStringsIndex = charStringsIndex;
+            _privateDict = privateDict;
+            _localSubrsIndex = localSubrsIndex;
+            _charset = charset;
+            _charstrings = charstrings;
+        }
+        
+        public Index getCharStringsIndex() {
+            return _charStringsIndex;
+        }
+        
+        public Dict getPrivateDict() {
+            return _privateDict;
+        }
+        
+        public Index getLocalSubrsIndex() {
+            return _localSubrsIndex;
+        }
+        
+        public Charset getCharset() {
+            return _charset;
+        }
+        
+        public Charstring[] getCharstrings() {
+            return _charstrings;
+        }
+    }
+    
     private DirectoryEntry _de;
     private int _major;
     private int _minor;
@@ -492,11 +533,7 @@ public class CffTable implements Table {
     private TopDictIndex _topDictIndex;
     private StringIndex _stringIndex;
     private Index _globalSubrIndex;
-    private Index _charStringsIndexArray[];
-    private Charset[] _charsets;
-    private Charstring[][] _charstringsArray;
-    private Dict _privateDictArray[];
-    private Index _localSubrsIndexArray[];
+    private CffFont[] _fonts;
 
     private byte[] _buf;
 
@@ -531,17 +568,21 @@ public class CffTable implements Table {
         // Global Subr INDEX
         _globalSubrIndex = new Index(di2);
         
+        // TESTING
+        Charstring gscs = new CharstringType2(
+                0,
+                "Global subrs",
+                _globalSubrIndex.getData(),
+                _globalSubrIndex.getOffset(0) - 1,
+                _globalSubrIndex.getDataLength());
+        System.out.println(gscs.toString());
+
         // Encodings go here -- but since this is an OpenType font will this
         // not always be a CIDFont?  In which case there are no encodings
         // within the CFF data.
         
         // Load each of the fonts
-        // TODO Bundle the following into an individual font class
-        _charStringsIndexArray = new Index[_topDictIndex.getCount()];
-        _charsets = new Charset[_topDictIndex.getCount()];
-        _charstringsArray = new Charstring[_topDictIndex.getCount()][];
-        _privateDictArray = new Dict[_topDictIndex.getCount()];
-        _localSubrsIndexArray = new Index[_topDictIndex.getCount()];
+        _fonts = new CffFont[_topDictIndex.getCount()];
         for (int i = 0; i < _topDictIndex.getCount(); ++i) {
 
             // Charstrings INDEX
@@ -549,51 +590,53 @@ public class CffTable implements Table {
             // of glyphs
             Integer charStringsOffset = (Integer) _topDictIndex.getTopDict(i).getValue(17);
             di2 = getDataInputForOffset(charStringsOffset);
-            _charStringsIndexArray[i] = new Index(di2);
-            int glyphCount = _charStringsIndexArray[i].getCount();
+            Index charStringsIndex = new Index(di2);
+            int glyphCount = charStringsIndex.getCount();
 
             // Private DICT
             List<Integer> privateSizeAndOffset = (List<Integer>) _topDictIndex.getTopDict(i).getValue(18);
             di2 = getDataInputForOffset(privateSizeAndOffset.get(1));
-            _privateDictArray[i] = new Dict(di2, privateSizeAndOffset.get(0));
+            Dict privateDict = new Dict(di2, privateSizeAndOffset.get(0));
             
             // Local Subrs INDEX
-            Integer localSubrsOffset = (Integer) _privateDictArray[i].getValue(19);
+            Index localSubrsIndex = null;
+            Integer localSubrsOffset = (Integer) privateDict.getValue(19);
             if (localSubrsOffset != null) {
                 di2 = getDataInputForOffset(privateSizeAndOffset.get(1) + localSubrsOffset);
-                _localSubrsIndexArray[i] = new Index(di2);
+                localSubrsIndex = new Index(di2);
             }
         
             // Charsets
+            Charset charset = null;
             Integer charsetOffset = (Integer) _topDictIndex.getTopDict(i).getValue(15);
             di2 = getDataInputForOffset(charsetOffset);
             int format = di2.readUnsignedByte();
             switch (format) {
                 case 0:
-                    _charsets[i] = new CharsetFormat0(di2, glyphCount);
+                    charset = new CharsetFormat0(di2, glyphCount);
                     break;
                 case 1:
-                    _charsets[i] = new CharsetFormat1(di2, glyphCount);
+                    charset = new CharsetFormat1(di2, glyphCount);
                     break;
                 case 2:
-                    _charsets[i] = new CharsetFormat2(di2, glyphCount);
+                    charset = new CharsetFormat2(di2, glyphCount);
                     break;
             }
 
             // Create the charstrings
-            _charstringsArray[i] = new Charstring[glyphCount];
+            Charstring[] charstrings = new Charstring[glyphCount];
             for (int j = 0; j < glyphCount; ++j) {
-                int offset = _charStringsIndexArray[i].getOffset(j) - 1;
-                int len = _charStringsIndexArray[i].getOffset(j + 1) - offset - 1;
-                _charstringsArray[i][j] = new CharstringType2(
+                int offset = charStringsIndex.getOffset(j) - 1;
+                int len = charStringsIndex.getOffset(j + 1) - offset - 1;
+                charstrings[j] = new CharstringType2(
                         i,
-                        _stringIndex.getString(_charsets[i].getSID(j)),
-                        _charStringsIndexArray[i].getData(),
+                        _stringIndex.getString(charset.getSID(j)),
+                        charStringsIndex.getData(),
                         offset,
-                        len,
-                        null,
-                        null);
+                        len);
             }
+            
+            _fonts[i] = new CffFont(charStringsIndex, privateDict, localSubrsIndex, charset, charstrings);
         }
     }
     
@@ -607,18 +650,26 @@ public class CffTable implements Table {
         return _nameIndex;
     }
     
+    public Index getGlobalSubrIndex() {
+        return _globalSubrIndex;
+    }
+
+    public CffFont getFont(int fontIndex) {
+        return _fonts[fontIndex];
+    }
+
 //    public Charset getCharset(int fontIndex) {
 //        return _charsets[fontIndex];
 //    }
 
     public Charstring getCharstring(int fontIndex, int gid) {
-        return _charstringsArray[fontIndex][gid];
+        return _fonts[fontIndex].getCharstrings()[gid];
     }
     
     public int getCharstringCount(int fontIndex) {
-        return _charstringsArray[fontIndex].length;
+        return _fonts[fontIndex].getCharstrings().length;
     }
-
+    
     @Override
     public int getType() {
         return CFF;
@@ -636,9 +687,9 @@ public class CffTable implements Table {
         sb.append(_stringIndex.toString());
         sb.append("\nGlobal Subr INDEX\n");
         sb.append(_globalSubrIndex.toString());
-        for (int i = 0; i < _charStringsIndexArray.length; ++i) {
+        for (int i = 0; i < _fonts.length; ++i) {
             sb.append("\nCharStrings INDEX ").append(i).append("\n");
-            sb.append(_charStringsIndexArray[i].toString());
+            sb.append(_fonts[i].getCharStringsIndex().toString());
         }
         return sb.toString();
     }

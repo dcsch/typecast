@@ -52,13 +52,9 @@ package net.java.dev.typecast.ot;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-
-import net.java.dev.typecast.ot.table.DirectoryEntry;
-import net.java.dev.typecast.ot.table.TTCHeader;
-import net.java.dev.typecast.ot.table.TableDirectory;
-import net.java.dev.typecast.ot.table.Table;
-import net.java.dev.typecast.ot.table.Os2Table;
+import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.CmapTable;
+import net.java.dev.typecast.ot.table.DirectoryEntry;
 import net.java.dev.typecast.ot.table.GlyfTable;
 import net.java.dev.typecast.ot.table.HeadTable;
 import net.java.dev.typecast.ot.table.HheaTable;
@@ -66,21 +62,24 @@ import net.java.dev.typecast.ot.table.HmtxTable;
 import net.java.dev.typecast.ot.table.LocaTable;
 import net.java.dev.typecast.ot.table.MaxpTable;
 import net.java.dev.typecast.ot.table.NameTable;
+import net.java.dev.typecast.ot.table.Os2Table;
 import net.java.dev.typecast.ot.table.PostTable;
-import net.java.dev.typecast.ot.table.VheaTable;
+import net.java.dev.typecast.ot.table.Table;
+import net.java.dev.typecast.ot.table.TableDirectory;
 import net.java.dev.typecast.ot.table.TableFactory;
+import net.java.dev.typecast.ot.table.VheaTable;
 
 /**
  * The TrueType font.
- * @version $Id: OTFont.java,v 1.6 2007-01-31 01:49:18 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class OTFont {
 
-    private OTFontCollection _fc;
+    private final OTFontCollection _fc;
     private TableDirectory _tableDirectory = null;
     private Table[] _tables;
     private Os2Table _os2;
+    private CffTable _cff;
     private CmapTable _cmap;
     private GlyfTable _glyf;
     private HeadTable _head;
@@ -100,9 +99,9 @@ public class OTFont {
     }
 
     public Table getTable(int tableType) {
-        for (int i = 0; i < _tables.length; i++) {
-            if ((_tables[i] != null) && (_tables[i].getType() == tableType)) {
-                return _tables[i];
+        for (Table _table : _tables) {
+            if ((_table != null) && (_table.getType() == tableType)) {
+                return _table;
             }
         }
         return null;
@@ -110,6 +109,10 @@ public class OTFont {
 
     public Os2Table getOS2Table() {
         return _os2;
+    }
+    
+    public CffTable getCffTable() {
+        return _cff;
     }
     
     public CmapTable getCmapTable() {
@@ -194,8 +197,9 @@ public class OTFont {
      * offset is retrieved from the resource headers.
      * @param tablesOrigin The point the table offsets are calculated from.
      * Once again, in a regular TTF file, this will be zero.  In a TTC is is
-     * also zero, but within a Mac resource, it is the beggining of the
+     * also zero, but within a Mac resource, it is the beginning of the
      * individual font resource data.
+     * @throws java.io.IOException
      */
     protected void read(
             DataInputStream dis,
@@ -244,6 +248,7 @@ public class OTFont {
 
         // Get references to commonly used tables (these happen to be all the
         // required tables)
+        _cff = (CffTable) getTable(Table.CFF);
         _cmap = (CmapTable) getTable(Table.cmap);
         _hmtx = (HmtxTable) getTable(Table.hmtx);
         _name = (NameTable) getTable(Table.name);
