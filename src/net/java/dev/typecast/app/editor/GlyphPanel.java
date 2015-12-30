@@ -26,7 +26,7 @@ import net.java.dev.typecast.app.framework.EditorView;
 import net.java.dev.typecast.edit.GlyphEdit;
 import net.java.dev.typecast.ot.Glyph;
 import net.java.dev.typecast.ot.OTFont;
-import net.java.dev.typecast.ot.table.Charstring;
+import net.java.dev.typecast.t2.Charstring;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 
 /**

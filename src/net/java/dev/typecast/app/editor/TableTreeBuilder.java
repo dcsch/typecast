@@ -37,12 +37,13 @@ import net.java.dev.typecast.ot.table.GlyfCompositeDescript;
 import net.java.dev.typecast.ot.table.GlyfDescript;
 import net.java.dev.typecast.ot.table.GlyfTable;
 import net.java.dev.typecast.ot.table.CffTable;
-import net.java.dev.typecast.ot.table.Charstring;
+import net.java.dev.typecast.t2.Charstring;
 import net.java.dev.typecast.ot.table.GsubTable;
 import net.java.dev.typecast.ot.table.ID;
 import net.java.dev.typecast.ot.table.LangSys;
 import net.java.dev.typecast.ot.table.Lookup;
 import net.java.dev.typecast.ot.table.LookupSubtable;
+import net.java.dev.typecast.t2.NameIndex;
 import net.java.dev.typecast.ot.table.NameRecord;
 import net.java.dev.typecast.ot.table.NameTable;
 import net.java.dev.typecast.ot.table.PostTable;
@@ -241,7 +242,7 @@ public class TableTreeBuilder {
     }
     
     private static void addCffTable(OTFont font, TableTreeNode parent, CffTable ct) {
-        CffTable.NameIndex ni = ct.getNameIndex();
+        NameIndex ni = ct.getNameIndex();
         for (int i = 0; i < ni.getCount(); ++i) {
             TableTreeNode n = new TableTreeNode(
                 ni.getName(i),

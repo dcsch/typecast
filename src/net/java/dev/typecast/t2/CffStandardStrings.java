@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.ot.table;
+package net.java.dev.typecast.t2;
 
 /**
  * Compact Font Format Standard Strings.  As per Appendix A of the Adobe

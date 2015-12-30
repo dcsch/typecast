@@ -20,8 +20,6 @@ package net.java.dev.typecast.t2;
 
 import java.util.ArrayList;
 import net.java.dev.typecast.ot.Point;
-import net.java.dev.typecast.ot.table.CffTable;
-import net.java.dev.typecast.ot.table.CharstringType2;
 
 /**
  * Type 2 Charstring Interpreter.  Operator descriptions are quoted from
@@ -43,11 +41,11 @@ public class T2Interpreter {
     private int _stemCount = 0;
     
     private ArrayList<Point> _points;
-    private final CffTable.Index _localSubrIndex;
-    private final CffTable.Index _globalSubrIndex;
+    private final Index _localSubrIndex;
+    private final Index _globalSubrIndex;
 
     /** Creates a new instance of T2Interpreter */
-    public T2Interpreter(CffTable.Index localSubrIndex, CffTable.Index globalSubrIndex) {
+    public T2Interpreter(Index localSubrIndex, Index globalSubrIndex) {
         _localSubrIndex = localSubrIndex;
         _globalSubrIndex = globalSubrIndex;
     }

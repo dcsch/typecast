@@ -53,8 +53,9 @@ package net.java.dev.typecast.ot;
 import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 import net.java.dev.typecast.ot.table.GlyfDescript;
-import net.java.dev.typecast.ot.table.Charstring;
-import net.java.dev.typecast.ot.table.CharstringType2;
+import net.java.dev.typecast.t2.Charstring;
+import net.java.dev.typecast.t2.CharstringType2;
+import net.java.dev.typecast.t2.Index;
 
 import net.java.dev.typecast.t2.T2Interpreter;
 
@@ -93,8 +94,8 @@ public class Glyph {
             Charstring cs,
             short lsb,
             int advance,
-            CffTable.Index localSubrIndex,
-            CffTable.Index globalSubrIndex) {
+            Index localSubrIndex,
+            Index globalSubrIndex) {
         _leftSideBearing = lsb;
         _advanceWidth = advance;
         if (cs instanceof CharstringType2) {

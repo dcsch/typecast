@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.ot.table;
+package net.java.dev.typecast.t2;
 
 /**
  * CFF Type 2 Charstring
@@ -114,7 +114,7 @@ public class CharstringType2 extends Charstring {
      * @param data
      * @param offset
      * @param length */
-    protected CharstringType2(
+    public CharstringType2(
             int index,
             String name,
             int[] data,
