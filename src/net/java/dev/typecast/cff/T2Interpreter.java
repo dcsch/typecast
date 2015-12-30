@@ -41,13 +41,12 @@ public class T2Interpreter {
     private int _stemCount = 0;
     
     private ArrayList<Point> _points;
-    private final Index _localSubrIndex;
-    private final Index _globalSubrIndex;
+    private Index _localSubrIndex;
+    private Index _globalSubrIndex;
+    private int _ip;
 
     /** Creates a new instance of T2Interpreter */
-    public T2Interpreter(Index localSubrIndex, Index globalSubrIndex) {
-        _localSubrIndex = localSubrIndex;
-        _globalSubrIndex = globalSubrIndex;
+    public T2Interpreter() {
     }
     
     /**
@@ -550,21 +549,15 @@ public class T2Interpreter {
         clearArg();
     }
     
-    private void _hintmask(CharstringType2 cs) {
+    private void _hintmask() {
         _stemCount += getArgCount() / 2;
-        int maskLen = (_stemCount - 1) / 8 + 1;
-        for (int i = 0; i < maskLen; ++i) {
-            cs.nextByte();
-        }
+        _ip += (_stemCount - 1) / 8 + 1;
         clearArg();
     }
     
-    private void _cntrmask(CharstringType2 cs) {
+    private void _cntrmask() {
         _stemCount += getArgCount() / 2;
-        int maskLen = (_stemCount - 1) / 8 + 1;
-        for (int i = 0; i < maskLen; ++i) {
-            cs.nextByte();
-        }
+        _ip += (_stemCount - 1) / 8 + 1;
         clearArg();
     }
     
@@ -826,15 +819,18 @@ public class T2Interpreter {
     }
     
     public Point[] execute(CharstringType2 cs) {
+        _localSubrIndex = cs.getFont().getLocalSubrIndex();
+        _globalSubrIndex = cs.getFont().getTable().getGlobalSubrIndex();
         _points = new ArrayList<>();
-        cs.resetIP();
-        while (cs.moreBytes()) {
-            while (cs.isOperandAtIndex()) {
-                pushArg(cs.nextOperand());
+        _ip = cs.getFirstIndex();
+        while (cs.moreBytes(_ip)) {
+            while (cs.isOperandAtIndex(_ip)) {
+                pushArg(cs.operandAtIndex(_ip));
+                _ip = cs.nextOperandIndex(_ip);
             }
-            int operator = cs.nextByte();
+            int operator = cs.byteAtIndex(_ip++);
             if (operator == 12) {
-                operator = cs.nextByte();
+                operator = cs.byteAtIndex(_ip++);
 
                 // Two-byte operators
                 switch (operator) {
@@ -952,10 +948,10 @@ public class T2Interpreter {
                     _hstemhm();
                     break;
                 case T2Mnemonic.HINTMASK:
-                    _hintmask(cs);
+                    _hintmask();
                     break;
                 case T2Mnemonic.CNTRMASK:
-                    _cntrmask(cs);
+                    _cntrmask();
                     break;
                 case T2Mnemonic.RMOVETO:
                     _rmoveto();

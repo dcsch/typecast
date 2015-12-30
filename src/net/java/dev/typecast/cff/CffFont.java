@@ -32,7 +32,7 @@ public class CffFont {
     private final Dict _topDict;
     private final Index _charStringsIndex;
     private final Dict _privateDict;
-    private final Index _localSubrsIndex;
+    private final Index _localSubrIndex;
     private final Charset _charset;
     private final Charstring[] _charstrings;
 
@@ -60,9 +60,9 @@ public class CffFont {
         Integer localSubrsOffset = (Integer) _privateDict.getValue(19);
         if (localSubrsOffset != null) {
             di = table.getDataInputForOffset(privateSizeAndOffset.get(1) + localSubrsOffset);
-            _localSubrsIndex = new Index(di);
+            _localSubrIndex = new Index(di);
         } else {
-            _localSubrsIndex = null;
+            _localSubrIndex = null;
             //throw new Exception();
         }
 
@@ -100,6 +100,10 @@ public class CffFont {
         }
     }
 
+    public CffTable getTable() {
+        return _table;
+    }
+
     public Index getCharStringsIndex() {
         return _charStringsIndex;
     }
@@ -108,8 +112,8 @@ public class CffFont {
         return _privateDict;
     }
 
-    public Index getLocalSubrsIndex() {
-        return _localSubrsIndex;
+    public Index getLocalSubrIndex() {
+        return _localSubrIndex;
     }
 
     public Charset getCharset() {

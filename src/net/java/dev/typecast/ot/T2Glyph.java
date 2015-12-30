@@ -18,7 +18,6 @@
 package net.java.dev.typecast.ot;
 
 import net.java.dev.typecast.cff.CharstringType2;
-import net.java.dev.typecast.cff.Index;
 import net.java.dev.typecast.cff.T2Interpreter;
 
 /**
@@ -35,19 +34,15 @@ public class T2Glyph extends Glyph {
      * @param cs The CharstringType2 describing the glyph.
      * @param lsb The Left Side Bearing.
      * @param advance The advance width.
-     * @param localSubrIndex
-     * @param globalSubrIndex
      */
     public T2Glyph(
             CharstringType2 cs,
             short lsb,
-            int advance,
-            Index localSubrIndex,
-            Index globalSubrIndex) {
+            int advance) {
         _leftSideBearing = lsb;
         _advanceWidth = advance;
-        T2Interpreter t2i = new T2Interpreter(localSubrIndex, globalSubrIndex);
-        _points = t2i.execute((CharstringType2) cs);
+        T2Interpreter t2i = new T2Interpreter();
+        _points = t2i.execute(cs);
     }
 
     @Override

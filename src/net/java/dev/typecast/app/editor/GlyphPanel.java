@@ -87,9 +87,7 @@ public class GlyphPanel extends JPanel implements EditorView {
             _glyphEdit.setGlyph(new T2Glyph(
                     cs,
                     font.getHmtxTable().getLeftSideBearing(cs.getIndex()),
-                    font.getHmtxTable().getAdvanceWidth(cs.getIndex()),
-                    font.getCffTable().getFont(cs.getIndex()).getLocalSubrsIndex(),
-                    font.getCffTable().getGlobalSubrIndex()));
+                    font.getHmtxTable().getAdvanceWidth(cs.getIndex())));
         }
     }
     
