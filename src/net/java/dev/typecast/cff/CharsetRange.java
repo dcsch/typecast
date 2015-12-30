@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 /**
- * CFF Charstring
- * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ *
+ * @author dschweinsberg
  */
-public abstract class Charstring {
-
-    public abstract int getIndex();
+public class CharsetRange {
     
-    public abstract String getName();
+    private int _first;
+    private int _left;
+
+    CharsetRange() {
+    }
+
+    public final int getFirst() {
+        return _first;
+    }
+
+    protected final void setFirst(int first) {
+        _first = first;
+    }
+
+    public final int getLeft() {
+        return _left;
+    }
+
+    protected final void setLeft(int left) {
+        _left = left;
+    }
+    
 }

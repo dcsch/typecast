@@ -1,5 +1,7 @@
 /*
- * Copyright 2015 dschweinsberg.
+ * Typecast - The Font Development Environment
+ *
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -22,34 +24,37 @@ import java.io.IOException;
  *
  * @author dschweinsberg
  */
-public class NameIndex extends Index {
+public class StringIndex extends Index {
     
-    public NameIndex(DataInput di) throws IOException {
+    public StringIndex(DataInput di) throws IOException {
         super(di);
     }
 
-    public String getName(int index) {
-        String name = null;
-        int offset = getOffset(index) - 1;
-        int len = getOffset(index + 1) - offset - 1;
-        // Ensure the name hasn't been deleted
-        if (getData()[offset] != 0) {
+    public String getString(int index) {
+        if (index < CffStandardStrings.standardStrings.length) {
+            return CffStandardStrings.standardStrings[index];
+        } else {
+            index -= CffStandardStrings.standardStrings.length;
+            if (index >= getCount()) {
+                return null;
+            }
+            int offset = getOffset(index) - 1;
+            int len = getOffset(index + 1) - offset - 1;
             StringBuilder sb = new StringBuilder();
             for (int i = offset; i < offset + len; ++i) {
                 sb.append((char) getData()[i]);
             }
-            name = sb.toString();
-        } else {
-            name = "DELETED NAME";
+            return sb.toString();
         }
-        return name;
     }
 
     @Override
     public String toString() {
+        int nonStandardBase = CffStandardStrings.standardStrings.length;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < getCount(); ++i) {
-            sb.append(getName(i)).append("\n");
+            sb.append(nonStandardBase + i).append(": ");
+            sb.append(getString(nonStandardBase + i)).append("\n");
         }
         return sb.toString();
     }

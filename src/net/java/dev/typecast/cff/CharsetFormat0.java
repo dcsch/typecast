@@ -15,34 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
+
+import java.io.DataInput;
+import java.io.IOException;
 
 /**
  *
  * @author dschweinsberg
  */
-public class CharsetRange {
+public class CharsetFormat0 extends Charset {
     
-    private int _first;
-    private int _left;
+    private final int[] _glyph;
 
-    CharsetRange() {
+    public CharsetFormat0(DataInput di, int glyphCount) throws IOException {
+        _glyph = new int[glyphCount - 1]; // minus 1 because .notdef is omitted
+        for (int i = 0; i < glyphCount - 1; ++i) {
+            _glyph[i] = di.readUnsignedShort();
+        }
+    } // minus 1 because .notdef is omitted
+
+    @Override
+    public int getFormat() {
+        return 0;
     }
 
-    public final int getFirst() {
-        return _first;
-    }
-
-    protected final void setFirst(int first) {
-        _first = first;
-    }
-
-    public final int getLeft() {
-        return _left;
-    }
-
-    protected final void setLeft(int left) {
-        _left = left;
+    @Override
+    public int getSID(int gid) {
+        if (gid == 0) {
+            return 0;
+        }
+        return _glyph[gid - 1];
     }
     
 }

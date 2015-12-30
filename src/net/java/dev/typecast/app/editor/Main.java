@@ -388,7 +388,7 @@ public class Main {
 
         // Then add the panes we're interested in
         if (obj instanceof GlyphDescription
-                || obj instanceof net.java.dev.typecast.t2.Charstring) {
+                || obj instanceof net.java.dev.typecast.cff.Charstring) {
             _glyphPane = new GlyphPanel(_appPrefs);
             _glyphPane.setModel(font, obj);
             _tabbedPane.add(_glyphPane);

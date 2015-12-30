@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 import java.util.ArrayList;
 import net.java.dev.typecast.ot.Point;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 /**
  * CFF Type 2 Charstring

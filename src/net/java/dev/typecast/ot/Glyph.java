@@ -53,11 +53,10 @@ package net.java.dev.typecast.ot;
 import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 import net.java.dev.typecast.ot.table.GlyfDescript;
-import net.java.dev.typecast.t2.Charstring;
-import net.java.dev.typecast.t2.CharstringType2;
-import net.java.dev.typecast.t2.Index;
-
-import net.java.dev.typecast.t2.T2Interpreter;
+import net.java.dev.typecast.cff.Charstring;
+import net.java.dev.typecast.cff.CharstringType2;
+import net.java.dev.typecast.cff.Index;
+import net.java.dev.typecast.cff.T2Interpreter;
 
 /**
  * An individual glyph within a font.

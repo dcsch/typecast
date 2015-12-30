@@ -23,18 +23,18 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
-import net.java.dev.typecast.t2.CffFont;
-import net.java.dev.typecast.t2.Charset;
-import net.java.dev.typecast.t2.CharsetFormat0;
-import net.java.dev.typecast.t2.CharsetFormat1;
-import net.java.dev.typecast.t2.CharsetFormat2;
-import net.java.dev.typecast.t2.Charstring;
-import net.java.dev.typecast.t2.CharstringType2;
-import net.java.dev.typecast.t2.Dict;
-import net.java.dev.typecast.t2.Index;
-import net.java.dev.typecast.t2.NameIndex;
-import net.java.dev.typecast.t2.StringIndex;
-import net.java.dev.typecast.t2.TopDictIndex;
+import net.java.dev.typecast.cff.CffFont;
+import net.java.dev.typecast.cff.Charset;
+import net.java.dev.typecast.cff.CharsetFormat0;
+import net.java.dev.typecast.cff.CharsetFormat1;
+import net.java.dev.typecast.cff.CharsetFormat2;
+import net.java.dev.typecast.cff.Charstring;
+import net.java.dev.typecast.cff.CharstringType2;
+import net.java.dev.typecast.cff.Dict;
+import net.java.dev.typecast.cff.Index;
+import net.java.dev.typecast.cff.NameIndex;
+import net.java.dev.typecast.cff.StringIndex;
+import net.java.dev.typecast.cff.TopDictIndex;
 
 /**
  * Compact Font Format Table

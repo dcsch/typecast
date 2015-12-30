@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 /**
  * The Mnemonic representations of the Type 2 charstring instruction set.

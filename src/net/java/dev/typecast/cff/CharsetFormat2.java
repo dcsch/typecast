@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -25,14 +25,14 @@ import java.util.ArrayList;
  *
  * @author dschweinsberg
  */
-public class CharsetFormat1 extends Charset {
+public class CharsetFormat2 extends Charset {
 
     private final ArrayList<CharsetRange> _charsetRanges = new ArrayList<>();
 
-    public CharsetFormat1(DataInput di, int glyphCount) throws IOException {
+    public CharsetFormat2(DataInput di, int glyphCount) throws IOException {
         int glyphsCovered = glyphCount - 1;  // minus 1 because .notdef is omitted
         while (glyphsCovered > 0) {
-            CharsetRange range = new CharsetRange1(di);
+            CharsetRange range = new CharsetRange2(di);
             _charsetRanges.add(range);
             glyphsCovered -= range.getLeft() + 1;
         }
@@ -40,7 +40,7 @@ public class CharsetFormat1 extends Charset {
 
     @Override
     public int getFormat() {
-        return 1;
+        return 2;
     }
 
     @Override

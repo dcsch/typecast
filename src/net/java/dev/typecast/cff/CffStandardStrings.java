@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.t2;
+package net.java.dev.typecast.cff;
 
 /**
  * Compact Font Format Standard Strings.  As per Appendix A of the Adobe
