@@ -23,10 +23,11 @@ import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import net.java.dev.typecast.app.framework.EditorView;
+import net.java.dev.typecast.cff.CharstringType2;
 import net.java.dev.typecast.edit.GlyphEdit;
-import net.java.dev.typecast.ot.Glyph;
 import net.java.dev.typecast.ot.OTFont;
-import net.java.dev.typecast.cff.Charstring;
+import net.java.dev.typecast.ot.T2Glyph;
+import net.java.dev.typecast.ot.TTGlyph;
 import net.java.dev.typecast.ot.table.GlyphDescription;
 
 /**
@@ -75,15 +76,15 @@ public class GlyphPanel extends JPanel implements EditorView {
         if (obj instanceof GlyphDescription) {
             _glyphEdit.setFont(font);
             GlyphDescription gd = (GlyphDescription) obj;
-            _glyphEdit.setGlyph(new Glyph(
+            _glyphEdit.setGlyph(new TTGlyph(
                     gd,
                     font.getHmtxTable().getLeftSideBearing(gd.getGlyphIndex()),
                     font.getHmtxTable().getAdvanceWidth(gd.getGlyphIndex())));
         }
-        else if (obj instanceof Charstring) {
+        else if (obj instanceof CharstringType2) {
             _glyphEdit.setFont(font);
-            Charstring cs = (Charstring) obj;
-            _glyphEdit.setGlyph(new Glyph(
+            CharstringType2 cs = (CharstringType2) obj;
+            _glyphEdit.setGlyph(new T2Glyph(
                     cs,
                     font.getHmtxTable().getLeftSideBearing(cs.getIndex()),
                     font.getHmtxTable().getAdvanceWidth(cs.getIndex()),

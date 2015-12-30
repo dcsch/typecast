@@ -101,6 +101,7 @@ public class CharstringType2 extends Charstring {
         "-Reserved-"
     };
     
+    private final CffFont _font;
     private final int _index;
     private final String _name;
     private final int[] _data;
@@ -109,22 +110,29 @@ public class CharstringType2 extends Charstring {
     private int _ip;
 
     /** Creates a new instance of CharstringType2
+     * @param font
      * @param index
      * @param name
      * @param data
      * @param offset
      * @param length */
     public CharstringType2(
+            CffFont font,
             int index,
             String name,
             int[] data,
             int offset,
             int length) {
+        _font = font;
         _index = index;
         _name = name;
         _data = data;
         _offset = offset;
         _length = length;
+    }
+    
+    public CffFont getFont() {
+        return _font;
     }
     
     @Override

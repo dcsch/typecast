@@ -17,12 +17,19 @@
  */
 package net.java.dev.typecast.cff;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.List;
+import net.java.dev.typecast.ot.table.CffTable;
+
 /**
  *
  * @author dschweinsberg
  */
 public class CffFont {
     
+    private final CffTable _table;
+    private final Dict _topDict;
     private final Index _charStringsIndex;
     private final Dict _privateDict;
     private final Index _localSubrsIndex;
@@ -30,16 +37,67 @@ public class CffFont {
     private final Charstring[] _charstrings;
 
     public CffFont(
-            Index charStringsIndex,
-            Dict privateDict,
-            Index localSubrsIndex,
-            Charset charset,
-            Charstring[] charstrings) {
-        _charStringsIndex = charStringsIndex;
-        _privateDict = privateDict;
-        _localSubrsIndex = localSubrsIndex;
-        _charset = charset;
-        _charstrings = charstrings;
+            CffTable table,
+            int index,
+            Dict topDict) throws IOException {
+        _table = table;
+        _topDict = topDict;
+
+        // Charstrings INDEX
+        // We load this before Charsets because we may need to know the number
+        // of glyphs
+        Integer charStringsOffset = (Integer) _topDict.getValue(17);
+        DataInput di = _table.getDataInputForOffset(charStringsOffset);
+        _charStringsIndex = new Index(di);
+        int glyphCount = _charStringsIndex.getCount();
+
+        // Private DICT
+        List<Integer> privateSizeAndOffset = (List<Integer>) _topDict.getValue(18);
+        di = _table.getDataInputForOffset(privateSizeAndOffset.get(1));
+        _privateDict = new Dict(di, privateSizeAndOffset.get(0));
+
+        // Local Subrs INDEX
+        Integer localSubrsOffset = (Integer) _privateDict.getValue(19);
+        if (localSubrsOffset != null) {
+            di = table.getDataInputForOffset(privateSizeAndOffset.get(1) + localSubrsOffset);
+            _localSubrsIndex = new Index(di);
+        } else {
+            _localSubrsIndex = null;
+            //throw new Exception();
+        }
+
+        // Charsets
+        Integer charsetOffset = (Integer) _topDict.getValue(15);
+        di = table.getDataInputForOffset(charsetOffset);
+        int format = di.readUnsignedByte();
+        switch (format) {
+            case 0:
+                _charset = new CharsetFormat0(di, glyphCount);
+                break;
+            case 1:
+                _charset = new CharsetFormat1(di, glyphCount);
+                break;
+            case 2:
+                _charset = new CharsetFormat2(di, glyphCount);
+                break;
+            default:
+                _charset = null;
+                //throw new Exception();
+        }
+
+        // Create the charstrings
+        _charstrings = new Charstring[glyphCount];
+        for (int i = 0; i < glyphCount; ++i) {
+            int offset = _charStringsIndex.getOffset(i) - 1;
+            int len = _charStringsIndex.getOffset(i + 1) - offset - 1;
+            _charstrings[i] = new CharstringType2(
+                    this,
+                    index,
+                    table.getStringIndex().getString(_charset.getSID(i)),
+                    _charStringsIndex.getData(),
+                    offset,
+                    len);
+        }
     }
 
     public Index getCharStringsIndex() {

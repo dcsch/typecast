@@ -163,9 +163,10 @@ public class OTFont {
         return _maxp.getNumGlyphs();
     }
 
+    // TODO What happens with the following when dealing with PostScript?
     public Glyph getGlyph(int i) {
         return (_glyf.getDescription(i) != null)
-            ? new Glyph(
+            ? new TTGlyph(
                 _glyf.getDescription(i),
                 _hmtx.getLeftSideBearing(i),
                 _hmtx.getAdvanceWidth(i))
