@@ -58,7 +58,11 @@ public class CffFont {
         return _charset;
     }
 
-    public Charstring[] getCharstrings() {
-        return _charstrings;
+    public Charstring getCharstring(int gid) {
+        return _charstrings[gid];
+    }
+    
+    public int getCharstringCount() {
+        return _charstrings.length;
     }
 }

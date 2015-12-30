@@ -176,18 +176,6 @@ public class CffTable implements Table {
         return _fonts[fontIndex];
     }
 
-//    public Charset getCharset(int fontIndex) {
-//        return _charsets[fontIndex];
-//    }
-
-    public Charstring getCharstring(int fontIndex, int gid) {
-        return _fonts[fontIndex].getCharstrings()[gid];
-    }
-    
-    public int getCharstringCount(int fontIndex) {
-        return _fonts[fontIndex].getCharstrings().length;
-    }
-    
     @Override
     public int getType() {
         return CFF;

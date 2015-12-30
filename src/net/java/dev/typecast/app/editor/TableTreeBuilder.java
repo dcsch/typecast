@@ -1,9 +1,7 @@
 /*
- * $Id: TableTreeBuilder.java,v 1.2 2007-02-08 04:28:30 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2007 David Schweinsberg
+ * Copyright (c) 2004-2015 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +18,14 @@
 
 package net.java.dev.typecast.app.editor;
 
-import java.util.Enumeration;
-
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-
+import net.java.dev.typecast.cff.CffFont;
+import net.java.dev.typecast.cff.Charstring;
+import net.java.dev.typecast.cff.NameIndex;
 import net.java.dev.typecast.ot.OTFont;
 import net.java.dev.typecast.ot.OTFontCollection;
-
+import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.CmapIndexEntry;
 import net.java.dev.typecast.ot.table.CmapTable;
 import net.java.dev.typecast.ot.table.DirectoryEntry;
@@ -36,14 +34,11 @@ import net.java.dev.typecast.ot.table.GlyfCompositeComp;
 import net.java.dev.typecast.ot.table.GlyfCompositeDescript;
 import net.java.dev.typecast.ot.table.GlyfDescript;
 import net.java.dev.typecast.ot.table.GlyfTable;
-import net.java.dev.typecast.ot.table.CffTable;
-import net.java.dev.typecast.cff.Charstring;
 import net.java.dev.typecast.ot.table.GsubTable;
 import net.java.dev.typecast.ot.table.ID;
 import net.java.dev.typecast.ot.table.LangSys;
 import net.java.dev.typecast.ot.table.Lookup;
 import net.java.dev.typecast.ot.table.LookupSubtable;
-import net.java.dev.typecast.cff.NameIndex;
 import net.java.dev.typecast.ot.table.NameRecord;
 import net.java.dev.typecast.ot.table.NameTable;
 import net.java.dev.typecast.ot.table.PostTable;
@@ -52,7 +47,6 @@ import net.java.dev.typecast.ot.table.Table;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: TableTreeBuilder.java,v 1.2 2007-02-08 04:28:30 davidsch Exp $
  */
 public class TableTreeBuilder {
 
@@ -229,10 +223,9 @@ public class TableTreeBuilder {
     private static void addCffFont(
             OTFont font,
             TableTreeNode parent,
-            CffTable ct,
-            int fontIndex) {
-        for (int i = 0; i < ct.getCharstringCount(fontIndex); ++i) {
-            Charstring cs = ct.getCharstring(fontIndex, i);
+            CffFont cf) {
+        for (int i = 0; i < cf.getCharstringCount(); ++i) {
+            Charstring cs = cf.getCharstring(i);
             TableTreeNode n = new TableTreeNode(
                 String.valueOf(i) + " " + cs.getName(),
                 cs,
@@ -249,7 +242,7 @@ public class TableTreeBuilder {
                 ni,
                 i);
             parent.add(n);
-            addCffFont(font, n, ct, i);
+            addCffFont(font, n, ct.getFont(i));
         }
     }
     
