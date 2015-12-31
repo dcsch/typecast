@@ -24,7 +24,7 @@ import net.java.dev.typecast.ot.table.CffTable;
 
 /**
  *
- * @author dschweinsberg
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CffFont {
     

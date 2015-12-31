@@ -28,13 +28,22 @@ import net.java.dev.typecast.ot.Point;
  */
 public class T2Interpreter {
     
+    private class SubrPair {
+        final CharstringType2 cs;
+        final int ip;
+        SubrPair(CharstringType2 cs, int ip) {
+            this.cs = cs;
+            this.ip = ip;
+        }
+    }
+    
     private static final int ARGUMENT_STACK_LIMIT = 48;
     private static final int SUBR_STACK_LIMIT = 10;
     private static final int TRANSIENT_ARRAY_ELEMENT_COUNT = 32;
     
     private final Number[] _argStack = new Number[ARGUMENT_STACK_LIMIT];
     private int _argStackIndex = 0;
-    private final int[] _subrStack = new int[SUBR_STACK_LIMIT];
+    private final SubrPair[] _subrStack = new SubrPair[SUBR_STACK_LIMIT];
     private int _subrStackIndex = 0;
     private final Number[] _transientArray = new Number[TRANSIENT_ARRAY_ELEMENT_COUNT];
     
@@ -43,6 +52,9 @@ public class T2Interpreter {
     private ArrayList<Point> _points;
     private Index _localSubrIndex;
     private Index _globalSubrIndex;
+    private CharstringType2 _localSubrs;
+    private CharstringType2 _globalSubrs;
+    private CharstringType2 _cs;
     private int _ip;
 
     /** Creates a new instance of T2Interpreter */
@@ -527,6 +539,11 @@ public class T2Interpreter {
     private void _endchar() {
         endContour();
         clearArg();
+        while (_subrStackIndex > 0) {
+            SubrPair sp = popSubr();
+            _cs = sp.cs;
+            _ip = sp.ip;
+        }
     }
     
     private void _hstem() {
@@ -776,7 +793,7 @@ public class T2Interpreter {
      * act according to the manner in which the subroutine is coded.
      * Calling an undefined subr (gsubr) has undefined results.
      */
-    private void _callsubr(CharstringType2 cs) {
+    private void _callsubr() {
         int bias;
         int subrsCount = _localSubrIndex.getCount();
         if (subrsCount < 1240) {
@@ -787,17 +804,19 @@ public class T2Interpreter {
             bias = 32768;
         }
         int i = popArg().intValue();
-        int offset = _localSubrIndex.getOffset(i + bias);
-        int offset2 = _localSubrIndex.getOffset(i + bias + 1);
+        int offset = _localSubrIndex.getOffset(i + bias) - 1;
+        pushSubr(new SubrPair(_cs, _ip));
+        _cs = _localSubrs;
+        _ip = offset;
     }
     
     /**
      * Operates in the same manner as callsubr except that it calls a
      * global subroutine.
      */
-    private void _callgsubr(CharstringType2 cs) {
+    private void _callgsubr() {
         int bias;
-        int subrsCount = _localSubrIndex.getCount();
+        int subrsCount = _globalSubrIndex.getCount();
         if (subrsCount < 1240) {
             bias = 107;
         } else if (subrsCount < 33900) {
@@ -806,31 +825,52 @@ public class T2Interpreter {
             bias = 32768;
         }
         int i = popArg().intValue();
-        int offset = _localSubrIndex.getOffset(i + bias);
-        
+        int offset = _globalSubrIndex.getOffset(i + bias) - 1;
+        pushSubr(new SubrPair(_cs, _ip));
+        _cs = _globalSubrs;
+        _ip = offset;
     }
     
     /**
      * Returns from either a local or global charstring subroutine, and
      * continues execution after the corresponding call(g)subr.
      */
-    private void _return(CharstringType2 cs) {
-        //_ip = popSubr();
+    private void _return() {
+        SubrPair sp = popSubr();
+        _cs = sp.cs;
+        _ip = sp.ip;
     }
     
     public Point[] execute(CharstringType2 cs) {
         _localSubrIndex = cs.getFont().getLocalSubrIndex();
         _globalSubrIndex = cs.getFont().getTable().getGlobalSubrIndex();
+        _localSubrs = new CharstringType2(
+                null,
+                0,
+                "Local subrs",
+                _localSubrIndex.getData(),
+                _localSubrIndex.getOffset(0) - 1,
+                _localSubrIndex.getDataLength());
+        _globalSubrs = new CharstringType2(
+                null,
+                0,
+                "Global subrs",
+                _globalSubrIndex.getData(),
+                _globalSubrIndex.getOffset(0) - 1,
+                _globalSubrIndex.getDataLength());
+        _cs = cs;
+        System.out.println(_localSubrs.toString());
+
         _points = new ArrayList<>();
-        _ip = cs.getFirstIndex();
-        while (cs.moreBytes(_ip)) {
-            while (cs.isOperandAtIndex(_ip)) {
-                pushArg(cs.operandAtIndex(_ip));
-                _ip = cs.nextOperandIndex(_ip);
+        _ip = _cs.getFirstIndex();
+        while (_cs.moreBytes(_ip)) {
+            while (_cs.isOperandAtIndex(_ip)) {
+                pushArg(_cs.operandAtIndex(_ip));
+                _ip = _cs.nextOperandIndex(_ip);
             }
-            int operator = cs.byteAtIndex(_ip++);
+            int operator = _cs.byteAtIndex(_ip++);
             if (operator == 12) {
-                operator = cs.byteAtIndex(_ip++);
+                operator = _cs.byteAtIndex(_ip++);
 
                 // Two-byte operators
                 switch (operator) {
@@ -936,10 +976,10 @@ public class T2Interpreter {
                     _rrcurveto();
                     break;
                 case T2Mnemonic.CALLSUBR:
-                    _callsubr(cs);
+                    _callsubr();
                     break;
                 case T2Mnemonic.RETURN:
-                    _return(cs);
+                    _return();
                     break;
                 case T2Mnemonic.ENDCHAR:
                     _endchar();
@@ -975,7 +1015,7 @@ public class T2Interpreter {
                     _hhcurveto();
                     break;
                 case T2Mnemonic.CALLGSUBR:
-                    _callgsubr(cs);
+                    _callgsubr();
                     break;
                 case T2Mnemonic.VHCURVETO:
                     _vhcurveto();
@@ -1005,6 +1045,11 @@ public class T2Interpreter {
      * Pop a value off the argument stack
      */
     private Number popArg() {
+//        System.out.print("popArg: " + _argStack[_argStackIndex - 1] + " (");
+//        for (int i = 0; i < _argStackIndex - 1; ++i) {
+//            System.out.print(" " + _argStack[i]);
+//        }
+//        System.out.println(")");
         return _argStack[--_argStackIndex];
     }
 
@@ -1013,20 +1058,26 @@ public class T2Interpreter {
      */
     private void pushArg(Number n) {
         _argStack[_argStackIndex++] = n;
+//        System.out.print("pushArg: " + n + " (");
+//        for (int i = 0; i < _argStackIndex - 1; ++i) {
+//            System.out.print(" " + _argStack[i]);
+//        }
+//        System.out.println(")");
     }
     
     /**
      * Pop a value off the subroutine stack
      */
-    private int popSubr() {
+    private SubrPair popSubr() {
         return _subrStack[--_subrStackIndex];
     }
 
     /**
      * Push a value on to the subroutine stack
      */
-    private void pushSubr(int n) {
-        _subrStack[_subrStackIndex++] = n;
+    private void pushSubr(SubrPair sp) {
+        _subrStack[_subrStackIndex] = sp;
+        _subrStackIndex++;
     }
     
     /**

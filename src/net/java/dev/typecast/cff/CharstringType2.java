@@ -250,6 +250,8 @@ public class CharstringType2 extends Charstring {
         StringBuilder sb = new StringBuilder();
         int ip = getFirstIndex();
         while (moreBytes(ip)) {
+            sb.append(ip);
+            sb.append(": ");
             ip = disassemble(ip, sb);
             sb.append("\n");
         }
