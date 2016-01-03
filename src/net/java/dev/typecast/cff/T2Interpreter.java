@@ -321,8 +321,18 @@ public class T2Interpreter {
             int dy2 = popArg().intValue();
             int dx2 = popArg().intValue();
             int dx1 = popArg().intValue();
+            
+            Point lastPoint = getLastPoint();
+            int x1 = lastPoint.x + dx1;
+            int y1 = lastPoint.y;
+            int x2 = x1 + dx2;
+            int y2 = y1 + dy2;
+            int x3 = x2;
+            int y3 = y2 + dy3;
+            curveTo(x1, y1, x2, y2, x3, y3);
+
             for (int i = 0; i < count; ++i) {
-                Point lastPoint = getLastPoint();
+                lastPoint = getLastPoint();
                 int xa = lastPoint.x;
                 int ya = lastPoint.y + dya[i];
                 int xb = xa + dxb[i];
@@ -337,8 +347,6 @@ public class T2Interpreter {
                 int yf = ye + dyf[i];
                 curveTo(xa, ya, xb, yb, xc, yc);
                 curveTo(xd, yd, xe, ye, xf, yf);
-                
-                // What on earth do we do with dx1, dx2, dy2 and dy3?
             }
         }
         clearArg();
@@ -471,7 +479,60 @@ public class T2Interpreter {
                 curveTo(xd, yd, xe, ye, xf, yf);
             }
         } else {
-            int foo = 0;
+            int count = getArgCount() / 8;
+            int[] dxa = new int[count];
+            int[] dxb = new int[count];
+            int[] dyb = new int[count];
+            int[] dyc = new int[count];
+            int[] dyd = new int[count];
+            int[] dxe = new int[count];
+            int[] dye = new int[count];
+            int[] dxf = new int[count];
+            int dyf = 0;
+            if (getArgCount() % 8 == 1) {
+                dyf = popArg().intValue();
+            }
+            for (int i = 0; i < count; ++i) {
+                dxf[count - i - 1] = popArg().intValue();
+                dye[count - i - 1] = popArg().intValue();
+                dxe[count - i - 1] = popArg().intValue();
+                dyd[count - i - 1] = popArg().intValue();
+                dyc[count - i - 1] = popArg().intValue();
+                dyb[count - i - 1] = popArg().intValue();
+                dxb[count - i - 1] = popArg().intValue();
+                dxa[count - i - 1] = popArg().intValue();
+            }
+            int dx3 = popArg().intValue();
+            int dy2 = popArg().intValue();
+            int dx2 = popArg().intValue();
+            int dy1 = popArg().intValue();
+
+            Point lastPoint = getLastPoint();
+            int x1 = lastPoint.x;
+            int y1 = lastPoint.y + dy1;
+            int x2 = x1 + dx2;
+            int y2 = y1 + dy2;
+            int x3 = x2 + dx3;
+            int y3 = y2;
+            curveTo(x1, y1, x2, y2, x3, y3);
+
+            for (int i = 0; i < count; ++i) {
+                lastPoint = getLastPoint();
+                int xa = lastPoint.x + dxa[i];
+                int ya = lastPoint.y;
+                int xb = xa + dxb[i];
+                int yb = ya + dyb[i];
+                int xc = xb;
+                int yc = yb + dyc[i];
+                int xd = xc;
+                int yd = yc + dyd[i];
+                int xe = xd + dxe[i];
+                int ye = yd + dye[i];
+                int xf = xe + dxf[i];
+                int yf = ye + dyf;
+                curveTo(xa, ya, xb, yb, xc, yc);
+                curveTo(xd, yd, xe, ye, xf, yf);
+            }
         }
         clearArg();
     }
@@ -483,6 +544,31 @@ public class T2Interpreter {
      * vertical tangent.
      */
     private void _vvcurveto() {
+        int count = getArgCount() / 4;
+        int dx1 = 0;
+        int[] dya = new int[count];
+        int[] dxb = new int[count];
+        int[] dyb = new int[count];
+        int[] dyc = new int[count];
+        for (int i = 0; i < count; ++i) {
+            dyc[count - i - 1] = popArg().intValue();
+            dyb[count - i - 1] = popArg().intValue();
+            dxb[count - i - 1] = popArg().intValue();
+            dya[count - i - 1] = popArg().intValue();
+        }
+        if (getArgCount() == 1) {
+            dx1 = popArg().intValue();
+        }
+        for (int i = 0; i < count; ++i) {
+            Point lastPoint = getLastPoint();
+            int xa = lastPoint.x + (i == 0 ? dx1 : 0);
+            int ya = lastPoint.y + dya[i];
+            int xb = xa + dxb[i];
+            int yb = ya + dyb[i];
+            int xc = xb;
+            int yc = yb + dyc[i];
+            curveTo(xa, ya, xb, yb, xc, yc);
+        }
         
         clearArg();
     }
