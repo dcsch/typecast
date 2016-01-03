@@ -859,7 +859,6 @@ public class T2Interpreter {
                 _globalSubrIndex.getOffset(0) - 1,
                 _globalSubrIndex.getDataLength());
         _cs = cs;
-        System.out.println(_localSubrs.toString());
 
         _points = new ArrayList<>();
         _ip = _cs.getFirstIndex();
