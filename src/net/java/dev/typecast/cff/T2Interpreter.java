@@ -1,7 +1,7 @@
 /*
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2015 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -304,7 +304,7 @@ public class T2Interpreter {
             int[] dye = new int[count];
             int[] dyf = new int[count];
             int dxf = 0;
-            if (getArgCount() % 8 == 1) {
+            if (getArgCount() % 4 == 1) {
                 dxf = popArg().intValue();
             }
             for (int i = 0; i < count; ++i) {
@@ -327,7 +327,7 @@ public class T2Interpreter {
             int y1 = lastPoint.y;
             int x2 = x1 + dx2;
             int y2 = y1 + dy2;
-            int x3 = x2;
+            int x3 = x2 + (count == 0 ? dxf : 0);
             int y3 = y2 + dy3;
             curveTo(x1, y1, x2, y2, x3, y3);
 
@@ -489,7 +489,7 @@ public class T2Interpreter {
             int[] dye = new int[count];
             int[] dxf = new int[count];
             int dyf = 0;
-            if (getArgCount() % 8 == 1) {
+            if (getArgCount() % 4 == 1) {
                 dyf = popArg().intValue();
             }
             for (int i = 0; i < count; ++i) {
@@ -513,7 +513,7 @@ public class T2Interpreter {
             int x2 = x1 + dx2;
             int y2 = y1 + dy2;
             int x3 = x2 + dx3;
-            int y3 = y2;
+            int y3 = y2 + (count == 0 ? dyf : 0);
             curveTo(x1, y1, x2, y2, x3, y3);
 
             for (int i = 0; i < count; ++i) {
