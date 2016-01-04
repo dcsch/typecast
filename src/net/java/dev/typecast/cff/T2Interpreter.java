@@ -289,7 +289,7 @@ public class T2Interpreter {
                 int xe = xd + dxe[i];
                 int ye = yd + dye[i];
                 int xf = xe + dxf[i];
-                int yf = ye + dyf;
+                int yf = ye + (i == count - 1 ? dyf : 0);
                 curveTo(xa, ya, xb, yb, xc, yc);
                 curveTo(xd, yd, xe, ye, xf, yf);
             }
@@ -343,7 +343,7 @@ public class T2Interpreter {
                 int yd = yc;
                 int xe = xd + dxe[i];
                 int ye = yd + dye[i];
-                int xf = xe + dxf;
+                int xf = xe + (i == count - 1 ? dxf : 0);
                 int yf = ye + dyf[i];
                 curveTo(xa, ya, xb, yb, xc, yc);
                 curveTo(xd, yd, xe, ye, xf, yf);
@@ -473,7 +473,7 @@ public class T2Interpreter {
                 int yd = yc;
                 int xe = xd + dxe[i];
                 int ye = yd + dye[i];
-                int xf = xe + dxf;
+                int xf = xe + (i == count - 1 ? dxf : 0);
                 int yf = ye + dyf[i];
                 curveTo(xa, ya, xb, yb, xc, yc);
                 curveTo(xd, yd, xe, ye, xf, yf);
@@ -529,7 +529,7 @@ public class T2Interpreter {
                 int xe = xd + dxe[i];
                 int ye = yd + dye[i];
                 int xf = xe + dxf[i];
-                int yf = ye + dyf;
+                int yf = ye + (i == count - 1 ? dyf : 0);
                 curveTo(xa, ya, xb, yb, xc, yc);
                 curveTo(xd, yd, xe, ye, xf, yf);
             }
