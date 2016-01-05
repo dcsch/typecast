@@ -20,6 +20,8 @@ package net.java.dev.typecast.cff;
 
 import java.util.ArrayList;
 import net.java.dev.typecast.ot.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Type 2 Charstring Interpreter.  Operator descriptions are quoted from
@@ -40,6 +42,8 @@ public class T2Interpreter {
     private static final int ARGUMENT_STACK_LIMIT = 48;
     private static final int SUBR_STACK_LIMIT = 10;
     private static final int TRANSIENT_ARRAY_ELEMENT_COUNT = 32;
+    
+    static final Logger logger = LoggerFactory.getLogger(T2Interpreter.class);
     
     private final Number[] _argStack = new Number[ARGUMENT_STACK_LIMIT];
     private int _argStackIndex = 0;
@@ -1130,11 +1134,12 @@ public class T2Interpreter {
      * Pop a value off the argument stack
      */
     private Number popArg() {
-//        System.out.print("popArg: " + _argStack[_argStackIndex - 1] + " (");
-//        for (int i = 0; i < _argStackIndex - 1; ++i) {
-//            System.out.print(" " + _argStack[i]);
-//        }
-//        System.out.println(")");
+        if (logger.isTraceEnabled()) {
+            logger.trace(
+                    "popArg: {} {}",
+                    _argStack[_argStackIndex - 1],
+                    java.util.Arrays.copyOfRange(_argStack, 0, _argStackIndex - 1));
+        }
         return _argStack[--_argStackIndex];
     }
 
@@ -1143,11 +1148,12 @@ public class T2Interpreter {
      */
     private void pushArg(Number n) {
         _argStack[_argStackIndex++] = n;
-//        System.out.print("pushArg: " + n + " (");
-//        for (int i = 0; i < _argStackIndex - 1; ++i) {
-//            System.out.print(" " + _argStack[i]);
-//        }
-//        System.out.println(")");
+        if (logger.isTraceEnabled()) {
+            logger.trace(
+                    "pushArg: {} {}",
+                    n,
+                    java.util.Arrays.copyOfRange(_argStack, 0, _argStackIndex - 1));
+        }
     }
     
     /**
