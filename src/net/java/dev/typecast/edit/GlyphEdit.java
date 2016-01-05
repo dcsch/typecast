@@ -1,9 +1,7 @@
 /*
- * $Id: GlyphEdit.java,v 1.4 2004-12-21 10:24:57 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,39 +18,29 @@
 
 package net.java.dev.typecast.edit;
 
-//import java.beans.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-
-import java.awt.event.MouseEvent;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
-
 import javax.swing.event.MouseInputListener;
-
-import net.java.dev.typecast.ot.Point;
-import net.java.dev.typecast.ot.OTFont;
 import net.java.dev.typecast.ot.Glyph;
-
+import net.java.dev.typecast.ot.OTFont;
+import net.java.dev.typecast.ot.Point;
 import net.java.dev.typecast.render.GlyphPathFactory;
 
 /**
- * The glyph editor.  The user will perform operatons on the glyph within this
+ * The glyph editor.  The user will perform operations on the glyph within this
  * window using a variety of tools derived from {@link Tool Tool}.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphEdit.java,v 1.4 2004-12-21 10:24:57 davidsch Exp $
  */
 public class GlyphEdit extends JPanel implements Scrollable {
 
@@ -69,21 +57,13 @@ public class GlyphEdit extends JPanel implements Scrollable {
 
     private boolean _drawControlPoints = true;
     private boolean _preview = false;
-    private Set<Point> _selectedPoints = new HashSet<Point>();
-
-    //private static final String PROP_SAMPLE_PROPERTY = "SampleProperty";
-
-    //private String sampleProperty;
-
-    //private PropertyChangeSupport _propertySupport;
+    private final Set<Point> _selectedPoints = new HashSet<>();
 
     /** Creates new GlyphEdit */
     public GlyphEdit() {
-//        _propertySupport = new PropertyChangeSupport(this);
 
         setName("ContourView");
         setLayout(null);
-//        setPreferredSize(new Dimension(1024, 1024));
 
         _tool = new PointTool(this);
 
@@ -116,24 +96,6 @@ public class GlyphEdit extends JPanel implements Scrollable {
         addMouseListener(mil);
         addMouseMotionListener(mil);
     }
-
-    //public String getSampleProperty () {
-    //    return sampleProperty;
-    //}
-
-    //public void setSampleProperty (String value) {
-    //    String oldValue = sampleProperty;
-    //    sampleProperty = value;
-    //    _propertySupport.firePropertyChange (PROP_SAMPLE_PROPERTY, oldValue, sampleProperty);
-    //}
-
-//    public void addPropertyChangeListener (PropertyChangeListener listener) {
-//        _propertySupport.addPropertyChangeListener (listener);
-//    }
-//
-//    public void removePropertyChangeListener (PropertyChangeListener listener) {
-//        _propertySupport.removePropertyChangeListener (listener);
-//    }
 
     public void paint(Graphics graphics) {
         super.paint(graphics);
@@ -307,23 +269,27 @@ public class GlyphEdit extends JPanel implements Scrollable {
 //    public void executeCommand(Command command) {
 //    }
     
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         return false;
     }
     
+    @Override
     public int getScrollableBlockIncrement(java.awt.Rectangle rectangle, int param, int param2) {
         return 10;
     }
     
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
     
+    @Override
     public java.awt.Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
-//        return new Dimension(1024, 1024);
     }
     
+    @Override
     public int getScrollableUnitIncrement(java.awt.Rectangle rectangle, int param, int param2) {
         return 1;
     }

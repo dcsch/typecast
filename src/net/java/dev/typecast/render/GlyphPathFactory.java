@@ -1,9 +1,7 @@
 /*
- * $Id: GlyphPathFactory.java,v 1.1 2004-12-21 10:18:11 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +18,18 @@
 
 package net.java.dev.typecast.render;
 
+import java.awt.Shape;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.QuadCurve2D;
-
-import java.awt.Shape;
-
 import net.java.dev.typecast.ot.Glyph;
 import net.java.dev.typecast.ot.Point;
+import net.java.dev.typecast.ot.T2Glyph;
 
 /**
  * A factory for generating Graphics2D paths from glyph outlines.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphPathFactory.java,v 1.1 2004-12-21 10:18:11 davidsch Exp $
  */
 public class GlyphPathFactory {
     
@@ -40,6 +37,8 @@ public class GlyphPathFactory {
      * Build a {@link java.awt.geom.GeneralPath GeneralPath} from a
      * {@link net.java.dev.typecast.ot.Glyph Glyph}.  This glyph path can then
      * be transformed and rendered.
+     * @param glyph
+     * @return 
      */
     public static GeneralPath buildPath(Glyph glyph) {
         
@@ -56,7 +55,11 @@ public class GlyphPathFactory {
         for (int i = 0; i < glyph.getPointCount(); i++) {
             count++;
             if (glyph.getPoint(i).endOfContour) {
-                addContourToPath(glyphPath, glyph, firstIndex, count);
+                if (glyph instanceof T2Glyph) {
+                    addContourToPath(glyphPath, (T2Glyph) glyph, firstIndex, count);
+                } else {
+                    addContourToPath(glyphPath, glyph, firstIndex, count);
+                }
                 firstIndex = i + 1;
                 count = 0;
             }
@@ -113,7 +116,39 @@ public class GlyphPathFactory {
                     -point_plus1.y);
                 offset++;
             } else {
-                System.out.println("drawGlyph case not catered for!!");
+                System.out.println("addContourToPath case not catered for!!");
+                break;
+            }
+            gp.append(s, connect);
+            connect = true;
+        }
+    }
+    
+    private static void addContourToPath(GeneralPath gp, T2Glyph glyph, int startIndex, int count) {
+        int offset = 0;
+        boolean connect = false;
+        while (offset < count) {
+            Shape s;
+            Point point = glyph.getPoint(startIndex + offset%count);
+            Point point_plus1 = glyph.getPoint(startIndex + (offset+1)%count);
+            Point point_plus2 = glyph.getPoint(startIndex + (offset+2)%count);
+            Point point_plus3 = glyph.getPoint(startIndex + (offset+3)%count);
+            if (point.onCurve && point_plus1.onCurve) {
+                s = new Line2D.Float(point.x, -point.y, point_plus1.x, -point_plus1.y);
+                offset++;
+            } else if (point.onCurve && !point_plus1.onCurve && !point_plus2.onCurve && point_plus3.onCurve) {
+                s = new CubicCurve2D.Float(
+                    point.x,
+                    -point.y,
+                    point_plus1.x,
+                    -point_plus1.y,
+                    point_plus2.x,
+                    -point_plus2.y,
+                    point_plus3.x,
+                    -point_plus3.y);
+                offset+=3;
+            } else {
+                System.out.println("addContourToPath case not catered for!!");
                 break;
             }
             gp.append(s, connect);
