@@ -52,6 +52,7 @@ package net.java.dev.typecast.ot;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import net.java.dev.typecast.cff.CharstringType2;
 import net.java.dev.typecast.ot.table.CffTable;
 import net.java.dev.typecast.ot.table.CmapTable;
 import net.java.dev.typecast.ot.table.DirectoryEntry;
@@ -165,12 +166,19 @@ public class OTFont {
 
     // TODO What happens with the following when dealing with PostScript?
     public Glyph getGlyph(int i) {
-        return (_glyf.getDescription(i) != null)
-            ? new TTGlyph(
-                _glyf.getDescription(i),
-                _hmtx.getLeftSideBearing(i),
-                _hmtx.getAdvanceWidth(i))
-            : null;
+        if (_glyf != null && _glyf.getDescription(i) != null) {
+            return new TTGlyph(
+                    _glyf.getDescription(i),
+                    _hmtx.getLeftSideBearing(i),
+                    _hmtx.getAdvanceWidth(i));
+        } else if (_cff != null && _cff.getFont(0).getCharstring(i) != null) {
+            return new T2Glyph(
+                    (CharstringType2) _cff.getFont(0).getCharstring(i),
+                    _hmtx.getLeftSideBearing(i),
+                    _hmtx.getAdvanceWidth(i));
+        } else {
+            return null;
+        }
     }
 
     public TableDirectory getTableDirectory() {

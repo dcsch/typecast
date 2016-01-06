@@ -52,16 +52,14 @@ package net.java.dev.typecast.exchange;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-
 import net.java.dev.typecast.ot.Glyph;
-import net.java.dev.typecast.ot.Point;
 import net.java.dev.typecast.ot.OTFont;
-import net.java.dev.typecast.ot.OTFontCollection;
-import net.java.dev.typecast.ot.table.ID;
+import net.java.dev.typecast.ot.Point;
 import net.java.dev.typecast.ot.table.CmapFormat;
 import net.java.dev.typecast.ot.table.Feature;
 import net.java.dev.typecast.ot.table.FeatureTags;
 import net.java.dev.typecast.ot.table.GsubTable;
+import net.java.dev.typecast.ot.table.ID;
 import net.java.dev.typecast.ot.table.KernSubtable;
 import net.java.dev.typecast.ot.table.KernTable;
 import net.java.dev.typecast.ot.table.KerningPair;
@@ -78,7 +76,6 @@ import org.apache.batik.util.XMLConstants;
 /**
  * Converts a TrueType font to an SVG embedded font.
  *
- * @version $Id: SVGExporter.java,v 1.3 2007-01-24 09:48:36 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class SVGExporter
@@ -101,45 +98,52 @@ public class SVGExporter
         EOL = temp;
     }
     
-    static private String QUOT_EOL = XML_CHAR_QUOT + EOL;
+    private static final String QUOT_EOL = XML_CHAR_QUOT + EOL;
 
     /**
      * Defines the start of the generated SVG document
      * {0} SVG public ID
      * {1} SVG system ID
      */
-    static private String CONFIG_SVG_BEGIN = 
+    private static final String CONFIG_SVG_BEGIN = 
         "SVGFont.config.svg.begin";
 
     /**
      * Defines the SVG start fragment that exercise the generated
      * Font.
      */
-    static private String CONFIG_SVG_TEST_CARD_START = 
+    private static final String CONFIG_SVG_TEST_CARD_START = 
         "SVGFont.config.svg.test.card.start";
 
     /**
      * Defines the end of the SVG fragment that exercise the generated
      * Font.
      */
-    static private String CONFIG_SVG_TEST_CARD_END = 
+    private static final String CONFIG_SVG_TEST_CARD_END = 
         "SVGFont.config.svg.test.card.end";
 
     protected static String encodeEntities(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == XML_CHAR_LT) {
-                sb.append(XML_ENTITY_LT);
-            } else if (s.charAt(i) == XML_CHAR_GT) {
-                sb.append(XML_ENTITY_GT);
-            } else if (s.charAt(i) == XML_CHAR_AMP) {
-                sb.append(XML_ENTITY_AMP);
-            } else if (s.charAt(i) == XML_CHAR_APOS) {
-                sb.append(XML_ENTITY_APOS);
-            } else if(s.charAt(i) == XML_CHAR_QUOT) {
-                sb.append(XML_ENTITY_QUOT);
-            } else {
-                sb.append(s.charAt(i));
+            switch (s.charAt(i)) {
+                case XML_CHAR_LT:
+                    sb.append(XML_ENTITY_LT);
+                    break;
+                case XML_CHAR_GT:
+                    sb.append(XML_ENTITY_GT);
+                    break;
+                case XML_CHAR_AMP:
+                    sb.append(XML_ENTITY_AMP);
+                    break;
+                case XML_CHAR_APOS:
+                    sb.append(XML_ENTITY_APOS);
+                    break;
+                case XML_CHAR_QUOT:
+                    sb.append(XML_ENTITY_QUOT);
+                    break;
+                default:
+                    sb.append(s.charAt(i));
+                    break;
             }
         }
         return sb.toString();
@@ -152,7 +156,7 @@ public class SVGExporter
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int offset = 0;
 
         while (offset < count) {
@@ -227,7 +231,7 @@ public class SVGExporter
     }
 
     protected static String getSVGFontFaceElement(OTFont font) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String fontFamily = font.getNameTable().getRecordString(ID.nameFontFamilyName);
         short unitsPerEm = font.getHeadTable().getUnitsPerEm();
         String panose = font.getOS2Table().getPanose().toString();
@@ -287,11 +291,13 @@ public class SVGExporter
     /**
      * Returns a <font>...</font> block, defining the specified font.
      *
+     * @param ps
      * @param font The TrueType font to be converted to SVG
      * @param id An XML id attribute for the font element
      * @param first The first character in the output range
      * @param last The last character in the output range
      * @param forceAscii Force the use of the ASCII character map
+     * @throws net.java.dev.typecast.ot.table.TableException
      */
     protected static void writeFontAsSVGFragment(PrintStream ps, OTFont font, String id, int first, int last, boolean forceAscii)
     throws TableException {
@@ -416,7 +422,7 @@ public class SVGExporter
             String attrib,
             String code) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int firstIndex = 0;
         int count = 0;
         int i;
@@ -445,7 +451,7 @@ public class SVGExporter
         }
 
         if (attrib != null) {
-            sb.append(attrib);
+            sb.append(XML_SPACE).append(attrib);
         }
 
         if (glyph != null) {
@@ -479,7 +485,7 @@ public class SVGExporter
             SingleSubst arabTermSubst,
             String code) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean substituted = false;
         
         // arabic = "initial | medial | terminal | isolated"
@@ -554,7 +560,7 @@ public class SVGExporter
     }
 
     protected static String getKerningPairAsSVG(KerningPair kp, PostTable post) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(XML_OPEN_TAG_START).append(SVG_HKERN_TAG).append(XML_SPACE);
         sb.append(SVG_G1_ATTRIBUTE).append(XML_EQUAL_QUOT);
 
@@ -595,12 +601,12 @@ public class SVGExporter
         ps.println(Messages.formatMessage(CONFIG_SVG_TEST_CARD_END, null));
     }
 
-    private OTFont _font;
-    private int _low = 32;
+    private final OTFont _font;
+    private final int _low = 32;
     private int _high = 127;
     private String _id;
-    private boolean _ascii = false;
-    private boolean _testCard = true;
+    private final boolean _ascii = false;
+    private final boolean _testCard = true;
     
     public SVGExporter(OTFont font) {
         _font = font;
@@ -609,7 +615,9 @@ public class SVGExporter
     /**
      * Does the deed
      * @param os the stream to put the SVG data to
+     * @throws net.java.dev.typecast.ot.table.TableException
      */
+    @Override
     public void export(OutputStream os) throws TableException {
         PrintStream ps = new PrintStream(os);
         
@@ -634,7 +642,7 @@ public class SVGExporter
         writeSvgEnd(ps);
     }
 
-    private static void chopUpStringBuffer(StringBuffer sb) {
+    private static void chopUpStringBuffer(StringBuilder sb) {
         if (sb.length() < 256) {
             return;
         } else {
