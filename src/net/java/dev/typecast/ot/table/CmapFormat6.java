@@ -22,36 +22,45 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * TODO: To be implemented
+ * Format 6: Trimmed table mapping
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat6 extends CmapFormat {
 
-    private short _firstCode;
-    private short _entryCount;
-    private short[] _glyphIdArray;
+    private final int _firstCode;
+    private final int _entryCount;
+    private final int[] _glyphIdArray;
 
     protected CmapFormat6(DataInput di) throws IOException {
         super(di);
         _format = 6;
-        
-        // HACK: As this is not yet implemented, we need to skip over the bytes
-        // we should be consuming
-        di.skipBytes(_length - 6);
+        _firstCode = di.readUnsignedShort();
+        _entryCount = di.readUnsignedShort();
+        _glyphIdArray = new int[_entryCount];
+        for (int i = 0; i < _entryCount; i++) {
+            _glyphIdArray[i] = di.readUnsignedShort();
+        }
     }
 
     @Override
     public int getRangeCount() {
-        return 0;
+        return 1;
     }
     
     @Override
     public Range getRange(int index) throws ArrayIndexOutOfBoundsException {
-        throw new ArrayIndexOutOfBoundsException();
+        if (index != 0) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        return new Range(_firstCode, _entryCount);
     }
 
     @Override
     public int mapCharCode(int charCode) {
-        return 0;
+        if (_firstCode <= charCode && charCode < _firstCode + _entryCount) {
+            return _glyphIdArray[charCode - _firstCode];
+        } else {
+            return 0;
+        }
     }
 }
