@@ -37,7 +37,7 @@ public class CmapFormatUnknown extends CmapFormat {
         _format = format;
         
         // We don't know how to handle this data, so we'll just skip over it
-        di.skipBytes(_length - 4);
+        di.skipBytes(_length - 6);
     }
 
     @Override
