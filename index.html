@@ -1,43 +1,32 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Typecast by dcsch</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Typecast</h1>
-        <p>OpenType Font Design System for Java</p>
+    <section class="page-header">
+      <h1 class="project-name">Typecast</h1>
+      <h2 class="project-tagline">OpenType Font Design System for Java</h2>
+      <a href="https://github.com/dcsch/typecast" class="btn">View on GitHub</a>
+      <a href="https://github.com/dcsch/typecast/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/dcsch/typecast/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/dcsch/typecast">View the Project on GitHub <small>dcsch/typecast</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/dcsch/typecast/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/dcsch/typecast/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/dcsch/typecast">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="typecast" class="anchor" href="#typecast" aria-hidden="true"><span class="octicon octicon-link"></span></a>Typecast</h1>
 
-<p><a href="https://java.net/projects/typecast">Retired java.net home</a></p>
-
-<p>Typecast is a font development environment for OpenType font technology.
+<p><a href="http://dcsch.github.io/typecast/">Typecast</a> is a font development environment for OpenType font technology.
 Developments include:</p>
 
 <ul>
-<li>An outline editor for both TrueType and PostScript outlines</li>
+<li>An outline editor for both TrueType and PostScript (CFF) outlines</li>
 <li>TrueType hinting engine</li>
 <li>PostScript hinting engine</li>
 <li>Hinting debuggers</li>
@@ -46,11 +35,10 @@ Developments include:</p>
 </ul>
 
 <p>Parts of the Typecast libraries are used in the Apache Batik project, for
-conversion from TrueType to SVG fonts. Further contributions will be made to
-Batik - particularly in the areas of PostScript outlines and font hinting.</p>
+conversion from TrueType to SVG fonts.</p>
 
 <h2>
-<a id="file-formats-native" class="anchor" href="#file-formats-native" aria-hidden="true"><span class="octicon octicon-link"></span></a>File Formats (Native)</h2>
+<a id="file-formats" class="anchor" href="#file-formats" aria-hidden="true"><span class="octicon octicon-link"></span></a>File Formats</h2>
 
 <p>OpenType fonts come in a small range of file format flavours. Typecast supports
 the following:</p>
@@ -67,23 +55,16 @@ the data fork - as utilised by MacOS X</li>
 </ul>
 
 <h2>
-<a id="file-formats-export" class="anchor" href="#file-formats-export" aria-hidden="true"><span class="octicon octicon-link"></span></a>File Formats (Export)</h2>
+<a id="export-formats" class="anchor" href="#export-formats" aria-hidden="true"><span class="octicon octicon-link"></span></a>Export Formats</h2>
 
 <ul>
 <li>svg - Scalable Vector Graphics font data</li>
 </ul>
 
 <h2>
-<a id="file-formats-import" class="anchor" href="#file-formats-import" aria-hidden="true"><span class="octicon octicon-link"></span></a>File Formats (Import)</h2>
-
-<p>No import file formats are supported as yet, but traditional PostScript Type 1
-and Compact Font Format (CFF) font import are under development.</p>
-
-<h2>
 <a id="outlines" class="anchor" href="#outlines" aria-hidden="true"><span class="octicon octicon-link"></span></a>Outlines</h2>
 
-<p>Current outline support is for TrueType outlines. But of course, PostScript
-outlines are on the development roadmap.</p>
+<p>Outline support includes both TrueType and PostScript Charstring Type 2 outlines.</p>
 
 <h2>
 <a id="advanced-typographic-tables" class="anchor" href="#advanced-typographic-tables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Typographic Tables</h2>
@@ -91,13 +72,15 @@ outlines are on the development roadmap.</p>
 <p>Partial support is in place for the Advanced Typographic Tables, specifically
 the GPOS and GSUB tables. All advanced tables will be implemented in the
 ongoing development.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/dcsch">dcsch</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/dcsch/typecast">Typecast</a> is maintained by <a href="https://github.com/dcsch">dcsch</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+
+    </section>
+
+  
   </body>
 </html>
