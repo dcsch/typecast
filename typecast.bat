@@ -1,1 +1,0 @@
-java -jar typecast.jar

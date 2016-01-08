@@ -1,11 +1,9 @@
 # Typecast
 
-[Retired java.net home](https://java.net/projects/typecast)
-
-Typecast is a font development environment for OpenType font technology.
+[Typecast](http://dcsch.github.io/typecast/) is a font development environment for OpenType font technology.
 Developments include:
 
-* An outline editor for both TrueType and PostScript outlines
+* An outline editor for both TrueType and PostScript (CFF) outlines
 * TrueType hinting engine
 * PostScript hinting engine
 * Hinting debuggers
@@ -13,10 +11,9 @@ Developments include:
 * Font handling libraries for use in wider application development
 
 Parts of the Typecast libraries are used in the Apache Batik project, for
-conversion from TrueType to SVG fonts. Further contributions will be made to
-Batik - particularly in the areas of PostScript outlines and font hinting.
+conversion from TrueType to SVG fonts.
 
-## File Formats (Native)
+## File Formats
 
 OpenType fonts come in a small range of file format flavours. Typecast supports
 the following:
@@ -30,19 +27,13 @@ the following:
 * dfont - A Macintosh Font Suitcase resource file, with the resources in
   the data fork - as utilised by MacOS X
 
-## File Formats (Export)
+## Export Formats
 
 * svg - Scalable Vector Graphics font data
 
-## File Formats (Import)
-
-No import file formats are supported as yet, but traditional PostScript Type 1
-and Compact Font Format (CFF) font import are under development.
-
 ## Outlines
 
-Current outline support is for TrueType outlines. But of course, PostScript
-outlines are on the development roadmap.
+Outline support includes both TrueType and PostScript Charstring Type 2 outlines.
 
 ## Advanced Typographic Tables
 
