@@ -52,6 +52,8 @@ public class T2Interpreter {
     private final Number[] _transientArray = new Number[TRANSIENT_ARRAY_ELEMENT_COUNT];
     
     private int _stemCount = 0;
+    private ArrayList<Integer> _hstems;
+    private ArrayList<Integer> _vstems;
     
     private ArrayList<Point> _points;
     private Index _localSubrIndex;
@@ -63,6 +65,16 @@ public class T2Interpreter {
 
     /** Creates a new instance of T2Interpreter */
     public T2Interpreter() {
+    }
+    
+    public Integer[] getHStems() {
+        Integer[] array = new Integer[_hstems.size()];
+        return _hstems.toArray(array);
+    }
+    
+    public Integer[] getVStems() {
+        Integer[] array = new Integer[_vstems.size()];
+        return _vstems.toArray(array);
     }
     
     /**
@@ -637,23 +649,53 @@ public class T2Interpreter {
     }
     
     private void _hstem() {
+        if (getArgCount() % 2 == 1) {
+            
+            // This will be the width value
+            popArg();
+        }
         
-        clearArg();
+        while (getArgCount() > 0) {
+            _hstems.add(popArg().intValue());
+        }
     }
     
     private void _vstem() {
+        if (getArgCount() % 2 == 1) {
+            
+            // This will be the width value
+            popArg();
+        }
         
-        clearArg();
+        while (getArgCount() > 0) {
+            _vstems.add(popArg().intValue());
+        }
     }
     
     private void _hstemhm() {
+        if (getArgCount() % 2 == 1) {
+            
+            // This will be the width value
+            popArg();
+        }
+        
         _stemCount += getArgCount() / 2;
-        clearArg();
+        while (getArgCount() > 0) {
+            _hstems.add(popArg().intValue());
+        }
     }
     
     private void _vstemhm() {
+        if (getArgCount() % 2 == 1) {
+            
+            // This will be the width value
+            popArg();
+        }
+        
         _stemCount += getArgCount() / 2;
-        clearArg();
+        while (getArgCount() > 0) {
+            _vstems.add(popArg().intValue());
+        }
     }
     
     private void _hintmask() {
@@ -949,6 +991,9 @@ public class T2Interpreter {
                 _globalSubrIndex.getOffset(0) - 1,
                 _globalSubrIndex.getDataLength());
         _cs = cs;
+
+        _hstems = new ArrayList<>();
+        _vstems = new ArrayList<>();
 
         _points = new ArrayList<>();
         _ip = _cs.getFirstIndex();

@@ -77,43 +77,43 @@ public class GlyphPathFactory {
             Point point_plus1 = glyph.getPoint(startIndex + (offset+1)%count);
             Point point_plus2 = glyph.getPoint(startIndex + (offset+2)%count);
             if (point.onCurve && point_plus1.onCurve) {
-                s = new Line2D.Float(point.x, -point.y, point_plus1.x, -point_plus1.y);
+                s = new Line2D.Float(point.x, point.y, point_plus1.x, point_plus1.y);
                 offset++;
             } else if (point.onCurve && !point_plus1.onCurve && point_plus2.onCurve) {
                 s = new QuadCurve2D.Float(
                     point.x,
-                    -point.y,
+                    point.y,
                     point_plus1.x,
-                    -point_plus1.y,
+                    point_plus1.y,
                     point_plus2.x,
-                    -point_plus2.y);
+                    point_plus2.y);
                 offset+=2;
             } else if (point.onCurve && !point_plus1.onCurve && !point_plus2.onCurve) {
                 s = new QuadCurve2D.Float(
                     point.x,
-                    -point.y,
+                    point.y,
                     point_plus1.x,
-                    -point_plus1.y,
+                    point_plus1.y,
                     midValue(point_plus1.x, point_plus2.x),
-                    -midValue(point_plus1.y, point_plus2.y));
+                    midValue(point_plus1.y, point_plus2.y));
                 offset+=2;
             } else if (!point.onCurve && !point_plus1.onCurve) {
                 s = new QuadCurve2D.Float(
                     midValue(point_minus1.x, point.x),
-                    -midValue(point_minus1.y, point.y),
+                    midValue(point_minus1.y, point.y),
                     point.x,
-                    -point.y,
+                    point.y,
                     midValue(point.x, point_plus1.x),
-                    -midValue(point.y, point_plus1.y));
+                    midValue(point.y, point_plus1.y));
                 offset++;
             } else if (!point.onCurve && point_plus1.onCurve) {
                 s = new QuadCurve2D.Float(
                     midValue(point_minus1.x, point.x),
-                    -midValue(point_minus1.y, point.y),
+                    midValue(point_minus1.y, point.y),
                     point.x,
-                    -point.y,
+                    point.y,
                     point_plus1.x,
-                    -point_plus1.y);
+                    point_plus1.y);
                 offset++;
             } else {
                 System.out.println("addContourToPath case not catered for!!");
@@ -134,18 +134,18 @@ public class GlyphPathFactory {
             Point point_plus2 = glyph.getPoint(startIndex + (offset+2)%count);
             Point point_plus3 = glyph.getPoint(startIndex + (offset+3)%count);
             if (point.onCurve && point_plus1.onCurve) {
-                s = new Line2D.Float(point.x, -point.y, point_plus1.x, -point_plus1.y);
+                s = new Line2D.Float(point.x, point.y, point_plus1.x, point_plus1.y);
                 offset++;
             } else if (point.onCurve && !point_plus1.onCurve && !point_plus2.onCurve && point_plus3.onCurve) {
                 s = new CubicCurve2D.Float(
                     point.x,
-                    -point.y,
+                    point.y,
                     point_plus1.x,
-                    -point_plus1.y,
+                    point_plus1.y,
                     point_plus2.x,
-                    -point_plus2.y,
+                    point_plus2.y,
                     point_plus3.x,
-                    -point_plus3.y);
+                    point_plus3.y);
                 offset+=3;
             } else {
                 System.out.println("addContourToPath case not catered for!!");

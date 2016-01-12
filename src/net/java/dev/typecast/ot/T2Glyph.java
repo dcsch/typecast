@@ -1,7 +1,7 @@
 /*
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2015 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
 package net.java.dev.typecast.ot;
 
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import net.java.dev.typecast.cff.CharstringType2;
 import net.java.dev.typecast.cff.T2Interpreter;
 
@@ -27,7 +29,9 @@ import net.java.dev.typecast.cff.T2Interpreter;
 public class T2Glyph extends Glyph {
     protected short _leftSideBearing;
     protected int _advanceWidth;
-    private Point[] _points;
+    private final Point[] _points;
+    private final Integer[] _hstems;
+    private final Integer[] _vstems;
 
     /**
      * Construct a Glyph from a PostScript outline described by a Charstring.
@@ -43,6 +47,8 @@ public class T2Glyph extends Glyph {
         _advanceWidth = advance;
         T2Interpreter t2i = new T2Interpreter();
         _points = t2i.execute(cs);
+        _hstems = t2i.getHStems();
+        _vstems = t2i.getVStems();
     }
 
     @Override
@@ -63,5 +69,24 @@ public class T2Glyph extends Glyph {
     @Override
     public int getPointCount() {
         return _points.length;
+    }
+
+    public Integer[] getHStems() {
+        return _hstems;
+    }
+
+    public Integer[] getVStems() {
+        return _vstems;
+    }
+    
+    public Rectangle2D getBounds() {
+        Rectangle r = null;
+        for (Point p : _points) {
+            if (r == null) {
+                r = new Rectangle(p.x, p.y, 0, 0);
+            }
+            r.add(new java.awt.Point(p.x, p.y));
+        }
+        return r != null ? r : new Rectangle(0, 0, 0, 0);
     }
 }
