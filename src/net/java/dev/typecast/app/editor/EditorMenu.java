@@ -54,6 +54,7 @@ public class EditorMenu {
     private String _closeMenuString;
     private JCheckBoxMenuItem _previewMenuItem;
     private JCheckBoxMenuItem _showPointsMenuItem;
+    private JCheckBoxMenuItem _showHintsMenuItem;
     private boolean _macPlatform;
     private int _primaryKeystrokeMask;
     private JMenu _mruMenu;
@@ -98,6 +99,10 @@ public class EditorMenu {
     
     public boolean isShowPoints() {
         return _showPointsMenuItem.getState();
+    }
+    
+    public boolean isShowHints() {
+        return _showHintsMenuItem.getState();
     }
     
     private static void parseMenuString(String menuString, String[] tokens) {
@@ -417,6 +422,14 @@ public class EditorMenu {
         menu.add(_showPointsMenuItem = createCheckBoxMenuItem(
                 _rb.getString("Typecast.menu.view.showPoints"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, _primaryKeystrokeMask),
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        _app.changeGlyphView();
+                    }
+                }));
+        menu.add(_showHintsMenuItem = createCheckBoxMenuItem(
+                _rb.getString("Typecast.menu.view.showHints"),
+                KeyStroke.getKeyStroke(KeyEvent.VK_H, _primaryKeystrokeMask),
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         _app.changeGlyphView();

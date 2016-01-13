@@ -1,7 +1,7 @@
 /*
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2015 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,6 +357,7 @@ public class Main {
     protected void changeGlyphView() {
         _glyphPane.getGlyphEdit().setPreview(_menu.isPreview());
         _glyphPane.getGlyphEdit().setDrawControlPoints(_menu.isShowPoints());
+        _glyphPane.getGlyphEdit().setDrawHints(_menu.isShowHints());
         _glyphPane.getGlyphEdit().repaint();
     }
     

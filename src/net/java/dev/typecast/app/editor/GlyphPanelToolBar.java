@@ -1,9 +1,7 @@
 /*
- * $Id: GlyphPanelToolBar.java,v 1.1 2007-01-24 09:37:00 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +26,8 @@ import javax.swing.JToolBar;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphPanelToolBar.java,v 1.1 2007-01-24 09:37:00 davidsch Exp $
  */
-public class GlyphPanelToolBar extends javax.swing.JToolBar {
+public class GlyphPanelToolBar extends JToolBar {
 
     private static final long serialVersionUID = 1L;
 

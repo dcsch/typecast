@@ -57,6 +57,7 @@ public class GlyphEdit extends JPanel implements Scrollable {
     private double _scaleFactor = 0.25f;
 
     private boolean _drawControlPoints = true;
+    private boolean _drawHints = false;
     private boolean _preview = false;
     private final Set<Point> _selectedPoints = new HashSet<>();
 
@@ -138,57 +139,25 @@ public class GlyphEdit extends JPanel implements Scrollable {
         g2d.draw(new Line2D.Float(_glyph.getLeftSideBearing(), -unitsPerEmBy2, _glyph.getLeftSideBearing(), unitsPerEmBy2));
         g2d.draw(new Line2D.Float(_glyph.getAdvanceWidth(), -unitsPerEmBy2, _glyph.getAdvanceWidth(), unitsPerEmBy2));
         
-        if (_glyph instanceof T2Glyph) {
+        if (_drawHints && _glyph instanceof T2Glyph) {
             T2Glyph t2g = (T2Glyph) _glyph;
-            Rectangle2D bounds = t2g.getBounds();
+//            Rectangle2D bounds = t2g.getBounds();
             
 //            g2d.setPaint(Color.PINK);
 //            g2d.fill(bounds);
-//            
-//            g2d.setPaint(Color.RED);
+            
+            g2d.setPaint(Color.RED);
             
             int y = 0;
-            boolean isWidth = false;
             for (Integer horiz : t2g.getHStems()) {
-                if (isWidth) {
-                    if (horiz == -20) {
-                        
-                        // Top edge
-                        y = (int) bounds.getMaxY();
-                    } else if (horiz == -21) {
-                        
-                        // Bottom edge
-                        y = (int) bounds.getMinY();
-                    } else {
-                        y += horiz;
-                    }
-                } else {
-                    y += horiz;
-                }
-//                g2d.draw(new Line2D.Float(0, y, 1000, y));
-                isWidth = !isWidth;
+                y += horiz;
+                g2d.draw(new Line2D.Float(0, y, 1000, y));
             }
 
             int x = 0;
-            isWidth = false;
             for (Integer vert : t2g.getVStems()) {
-                if (isWidth) {
-                    if (vert == -20) {
-                        
-                        // Right edge
-                        x = (int) bounds.getMaxX();
-                    } else if (vert == -21) {
-                        
-                        // Left edge
-                        x = (int) bounds.getMinX();
-                    } else {
-                        x += vert;
-                    }
-                } else {
-                    x += vert;
-                }
-//                g2d.draw(new Line2D.Float(x, 0, x, 1000));
-                isWidth = !isWidth;
+                x += vert;
+                g2d.draw(new Line2D.Float(x, 0, x, 1000));
             }
         }
 
@@ -289,6 +258,14 @@ public class GlyphEdit extends JPanel implements Scrollable {
 
     public void setDrawControlPoints(boolean b) {
         _drawControlPoints = b;
+    }
+
+    public boolean isDrawHints() {
+        return _drawHints;
+    }
+
+    public void setDrawHints(boolean b) {
+        _drawHints = b;
     }
 
     public boolean isPreview() {

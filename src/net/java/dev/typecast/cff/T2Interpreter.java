@@ -648,62 +648,94 @@ public class T2Interpreter {
         }
     }
     
+    /**
+     * Specifies one or more horizontal stem hints. This allows multiple pairs
+     * of numbers, limited by the stack depth, to be used as arguments to a
+     * single hstem operator.
+     */
     private void _hstem() {
-        if (getArgCount() % 2 == 1) {
+        int pairCount = getArgCount() / 2;
+        for (int i = 0; i < pairCount; ++i) {
+            _hstems.add(0, popArg().intValue());
+            _hstems.add(0, popArg().intValue());
+        }
+
+        if (getArgCount() > 0) {
             
             // This will be the width value
             popArg();
         }
-        
-        while (getArgCount() > 0) {
-            _hstems.add(popArg().intValue());
-        }
     }
     
+    /**
+     * Specifies one or more vertical stem hints between the x coordinates x
+     * and x+dx, where x is relative to the origin of the coordinate axes.
+     */
     private void _vstem() {
-        if (getArgCount() % 2 == 1) {
+        int pairCount = getArgCount() / 2;
+        for (int i = 0; i < pairCount; ++i) {
+            _vstems.add(0, popArg().intValue());
+            _vstems.add(0, popArg().intValue());
+        }
+
+        if (getArgCount() > 0) {
             
             // This will be the width value
             popArg();
         }
-        
-        while (getArgCount() > 0) {
-            _vstems.add(popArg().intValue());
-        }
     }
     
+    /**
+     * Has the same meaning as hstem, except that it must be used in place
+     * of hstem if the charstring contains one or more hintmask operators.
+     */
     private void _hstemhm() {
-        if (getArgCount() % 2 == 1) {
+        _stemCount += getArgCount() / 2;
+        int pairCount = getArgCount() / 2;
+        for (int i = 0; i < pairCount; ++i) {
+            _hstems.add(0, popArg().intValue());
+            _hstems.add(0, popArg().intValue());
+        }
+
+        if (getArgCount() > 0) {
             
             // This will be the width value
             popArg();
         }
-        
-        _stemCount += getArgCount() / 2;
-        while (getArgCount() > 0) {
-            _hstems.add(popArg().intValue());
-        }
     }
     
+    /**
+     * Has the same meaning as vstem, except that it must be used in place
+     * of vstem if the charstring contains one or more hintmask operators.
+     */
     private void _vstemhm() {
-        if (getArgCount() % 2 == 1) {
+        _stemCount += getArgCount() / 2;
+        int pairCount = getArgCount() / 2;
+        for (int i = 0; i < pairCount; ++i) {
+            _vstems.add(0, popArg().intValue());
+            _vstems.add(0, popArg().intValue());
+        }
+
+        if (getArgCount() > 0) {
             
             // This will be the width value
             popArg();
         }
-        
-        _stemCount += getArgCount() / 2;
-        while (getArgCount() > 0) {
-            _vstems.add(popArg().intValue());
-        }
     }
     
+    /**
+     * Specifies which hints are active and which are not active.
+     */
     private void _hintmask() {
         _stemCount += getArgCount() / 2;
         _ip += (_stemCount - 1) / 8 + 1;
         clearArg();
     }
     
+    /**
+     * Specifies the counter spaces to be controlled, and their
+     * relative priority.
+     */
     private void _cntrmask() {
         _stemCount += getArgCount() / 2;
         _ip += (_stemCount - 1) / 8 + 1;
