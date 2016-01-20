@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,35 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * Simple Macintosh cmap table, mapping only the ASCII character set to glyphs.
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CmapFormat0 extends CmapFormat {
+public class CmapFormat12 extends CmapFormat {
 
     private final int _length;
     private final int _language;
-    private final int[] _glyphIdArray = new int[256];
+    private final int _nGroups;
+    private final int[] _startCharCode;
+    private final int[] _endCharCode;
+    private final int[] _startGlyphId;
 
-    protected CmapFormat0(DataInput di) throws IOException {
-        _length = di.readUnsignedShort();
-        _language = di.readUnsignedShort();
-        for (int i = 0; i < 256; i++) {
-            _glyphIdArray[i] = di.readUnsignedByte();
+    protected CmapFormat12(DataInput di) throws IOException {
+        di.readUnsignedShort(); // reserved
+        _length = di.readInt();
+        _language = di.readInt();
+        _nGroups = di.readInt();
+        _startCharCode = new int[_nGroups];
+        _endCharCode = new int[_nGroups];
+        _startGlyphId = new int[_nGroups];
+        for (int i = 0; i < _nGroups; ++i) {
+            _startCharCode[i] = di.readInt();
+            _endCharCode[i] = di.readInt();
+            _startGlyphId[i] = di.readInt();
         }
     }
 
     @Override
     public int getFormat() {
-        return 0;
+        return 12;
     }
 
     @Override
@@ -58,23 +65,17 @@ public class CmapFormat0 extends CmapFormat {
 
     @Override
     public int getRangeCount() {
-        return 1;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     public Range getRange(int index) throws ArrayIndexOutOfBoundsException {
-        if (index != 0) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
-        return new Range(0, 255);
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public int mapCharCode(int charCode) {
-        if (0 <= charCode && charCode < 256) {
-            return _glyphIdArray[charCode];
-        } else {
-            return 0;
-        }
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
 }

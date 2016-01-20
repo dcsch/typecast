@@ -28,16 +28,45 @@ import java.io.IOException;
  */
 public class CmapFormatUnknown extends CmapFormat {
     
+    private final int _format;
+    private final int _length;
+    private final int _language;
+    
     /** Creates a new instance of CmapFormatUnknown
      * @param format
      * @param di
      * @throws java.io.IOException */
     protected CmapFormatUnknown(int format, DataInput di) throws IOException {
-        super(di);
         _format = format;
+        if (_format < 8) {
+            _length = di.readUnsignedShort();
+            _language = di.readUnsignedShort();
         
-        // We don't know how to handle this data, so we'll just skip over it
-        di.skipBytes(_length - 6);
+            // We don't know how to handle this data, so we'll just skip over it
+            di.skipBytes(_length - 6);
+        } else {
+            di.readUnsignedShort(); // reserved
+            _length = di.readInt();
+            _language = di.readInt();
+
+            // We don't know how to handle this data, so we'll just skip over it
+            di.skipBytes(_length - 12);
+        }
+    }
+
+    @Override
+    public int getFormat() {
+        return _format;
+    }
+
+    @Override
+    public int getLength() {
+        return _length;
+    }
+
+    @Override
+    public int getLanguage() {
+        return _language;
     }
 
     @Override

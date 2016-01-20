@@ -46,15 +46,6 @@ public abstract class CmapFormat {
         }
     }
 
-    protected int _format;
-    protected int _length;
-    protected int _language;
-
-    protected CmapFormat(DataInput di) throws IOException {
-        _length = di.readUnsignedShort();
-        _language = di.readUnsignedShort();
-    }
-
     protected static CmapFormat create(int format, DataInput di)
     throws IOException {
         switch(format) {
@@ -66,22 +57,18 @@ public abstract class CmapFormat {
                 return new CmapFormat4(di);
             case 6:
                 return new CmapFormat6(di);
+            case 12:
+                return new CmapFormat12(di);
             default:
                 return new CmapFormatUnknown(format, di);
         }
     }
 
-    public int getFormat() {
-        return _format;
-    }
+    public abstract int getFormat();
 
-    public int getLength() {
-        return _length;
-    }
+    public abstract int getLength();
 
-    public int getLanguage() {
-        return _language;
-    }
+    public abstract int getLanguage();
 
     public abstract int getRangeCount();
     
@@ -92,12 +79,12 @@ public abstract class CmapFormat {
     
     @Override
     public String toString() {
-        return new StringBuffer()
+        return new StringBuilder()
         .append("format: ")
-        .append(_format)
+        .append(getFormat())
         .append(", length: ")
-        .append(_length)
+        .append(getLength())
         .append(", language: ")
-        .append(_language).toString();
+        .append(getLanguage()).toString();
     }
 }

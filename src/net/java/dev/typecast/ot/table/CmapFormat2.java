@@ -36,13 +36,15 @@ public class CmapFormat2 extends CmapFormat {
         int _arrayIndex;
     }
     
+    private final int _length;
+    private final int _language;
     private final int[] _subHeaderKeys = new int[256];
     private final SubHeader[] _subHeaders;
     private final int[] _glyphIndexArray;
 
     protected CmapFormat2(DataInput di) throws IOException {
-        super(di);
-        _format = 2;
+        _length = di.readUnsignedShort();
+        _language = di.readUnsignedShort();
         
         int pos = 6;
         
@@ -84,6 +86,21 @@ public class CmapFormat2 extends CmapFormat {
         for (int i = 0; i < _glyphIndexArray.length; ++i) {
             _glyphIndexArray[i] = di.readUnsignedShort();
         }
+    }
+
+    @Override
+    public int getFormat() {
+        return 2;
+    }
+
+    @Override
+    public int getLength() {
+        return _length;
+    }
+
+    @Override
+    public int getLanguage() {
+        return _language;
     }
 
     @Override

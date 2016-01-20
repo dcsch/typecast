@@ -27,19 +27,36 @@ import java.io.IOException;
  */
 public class CmapFormat6 extends CmapFormat {
 
+    private final int _length;
+    private final int _language;
     private final int _firstCode;
     private final int _entryCount;
     private final int[] _glyphIdArray;
 
     protected CmapFormat6(DataInput di) throws IOException {
-        super(di);
-        _format = 6;
+        _length = di.readUnsignedShort();
+        _language = di.readUnsignedShort();
         _firstCode = di.readUnsignedShort();
         _entryCount = di.readUnsignedShort();
         _glyphIdArray = new int[_entryCount];
         for (int i = 0; i < _entryCount; i++) {
             _glyphIdArray[i] = di.readUnsignedShort();
         }
+    }
+
+    @Override
+    public int getFormat() {
+        return 6;
+    }
+
+    @Override
+    public int getLength() {
+        return _length;
+    }
+
+    @Override
+    public int getLanguage() {
+        return _language;
     }
 
     @Override

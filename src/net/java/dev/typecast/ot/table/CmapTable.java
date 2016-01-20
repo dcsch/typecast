@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * @version $Id: CmapTable.java,v 1.3 2004-12-21 10:22:56 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapTable implements Table {
@@ -130,10 +129,12 @@ public class CmapTable implements Table {
         return null;
     }
 
+    @Override
     public int getType() {
         return cmap;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer().append("cmap\n");
 
@@ -155,6 +156,7 @@ public class CmapTable implements Table {
      * particular table.
      * @return A directory entry
      */
+    @Override
     public DirectoryEntry getDirectoryEntry() {
         return _de;
     }

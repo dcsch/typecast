@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 public class CmapFormat4 extends CmapFormat {
 
+    private final int _length;
+    private final int _language;
     private final int _segCountX2;
     private final int _searchRange;
     private final int _entrySelector;
@@ -39,8 +41,8 @@ public class CmapFormat4 extends CmapFormat {
     private final int _segCount;
 
     protected CmapFormat4(DataInput di) throws IOException {
-        super(di); // 6
-        _format = 4;
+        _length = di.readUnsignedShort();
+        _language = di.readUnsignedShort();
         _segCountX2 = di.readUnsignedShort(); // +2 (8)
         _segCount = _segCountX2 / 2;
         _endCode = new int[_segCount];
@@ -76,6 +78,21 @@ public class CmapFormat4 extends CmapFormat {
 //        if (leftover > 0) {
 //            di.skipBytes(leftover);
 //        }
+    }
+
+    @Override
+    public int getFormat() {
+        return 4;
+    }
+
+    @Override
+    public int getLength() {
+        return _length;
+    }
+
+    @Override
+    public int getLanguage() {
+        return _language;
     }
 
     @Override
