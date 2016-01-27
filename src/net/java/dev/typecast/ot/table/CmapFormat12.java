@@ -65,17 +65,40 @@ public class CmapFormat12 extends CmapFormat {
 
     @Override
     public int getRangeCount() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return _nGroups;
     }
 
     @Override
     public Range getRange(int index) throws ArrayIndexOutOfBoundsException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (index < 0 || index >= _nGroups) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        return new Range(_startCharCode[index], _endCharCode[index]);
     }
 
     @Override
     public int mapCharCode(int charCode) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            for (int i = 0; i < _nGroups; i++) {
+                if (_endCharCode[i] >= charCode) {
+                    if (_startCharCode[i] <= charCode) {
+                        return charCode - _startCharCode[i] + _startGlyphId[i];
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("error: Array out of bounds - " + e.getMessage());
+        }
+        return 0;
     }
-    
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+            .append(super.toString())
+            .append(", nGroups: ")
+            .append(_nGroups).toString();
+    }
 }

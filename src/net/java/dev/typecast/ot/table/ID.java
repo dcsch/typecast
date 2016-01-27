@@ -1,9 +1,7 @@
 /*
- * $Id: ID.java,v 1.1.1.1 2004-12-05 23:14:47 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +21,6 @@ package net.java.dev.typecast.ot.table;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: ID.java,v 1.1.1.1 2004-12-05 23:14:47 davidsch Exp $
  */
 public abstract class ID {
 
