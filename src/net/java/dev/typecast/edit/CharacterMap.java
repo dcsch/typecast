@@ -209,7 +209,7 @@ public class CharacterMap extends JScrollPane implements EditorView {
 
             _tx = new AffineTransform();
             _tx.translate(2, CELL_HEIGHT - 20);
-            _tx.scale(scaleFactor, scaleFactor);
+            _tx.scale(scaleFactor, -scaleFactor);
         }
     }
 }

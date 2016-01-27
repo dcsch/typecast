@@ -1,9 +1,7 @@
 /*
- * $Id: GlyphImageFactory.java,v 1.1 2004-12-21 10:18:11 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +32,6 @@ import net.java.dev.typecast.ot.Glyph;
 /**
  * A factory for generating bitmaps from glyph outlines.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphImageFactory.java,v 1.1 2004-12-21 10:18:11 davidsch Exp $
  */
 public class GlyphImageFactory {
     
@@ -45,6 +42,7 @@ public class GlyphImageFactory {
      * @param at The transformation to apply to the glyph before rendering
      * @param width The width of the image to render into
      * @param height The height of the image to render into
+     * @return 
      */
     public static BufferedImage buildImage(
             Glyph glyph,
