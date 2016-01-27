@@ -34,7 +34,10 @@ public abstract class ID {
     public static final short encodingUnicode10Semantics = 0;
     public static final short encodingUnicode11Semantics = 1;
     public static final short encodingISO10646Semantics = 2;
-    public static final short encodingUnicode20Semantics = 3;
+    public static final short encodingUnicode20SemanticsBMPOnly = 3;
+    public static final short encodingUnicode20Semantics = 4;
+    public static final short encodingUnicodeVariationSequences = 5;
+    public static final short encodingFullUnicodeCoverage = 6;
     
     // Microsoft Encoding IDs
 //    public static final short encodingUndefined = 0;
@@ -203,11 +206,14 @@ public abstract class ID {
             
             // Unicode specific encodings
             switch (encodingId) {
-                case encodingUnicode10Semantics: return "Unicode 1.0 semantics";
-                case encodingUnicode11Semantics: return "Unicode 1.1 semantics";
-                case encodingISO10646Semantics:  return "ISO 10646:1993 semantics";
-                case encodingUnicode20Semantics: return "Unicode 2.0 and onwards semantics";
-                default:                         return "";
+                case encodingUnicode10Semantics:        return "Unicode 1.0 semantics";
+                case encodingUnicode11Semantics:        return "Unicode 1.1 semantics";
+                case encodingISO10646Semantics:         return "ISO 10646:1993 semantics";
+                case encodingUnicode20SemanticsBMPOnly: return "Unicode 2.0 and onwards semantics (BMP only)";
+                case encodingUnicode20Semantics:        return "Unicode 2.0 and onwards semantics (non-BMP allowed)";
+                case encodingUnicodeVariationSequences: return "Unicode Variation Sequences";
+                case encodingFullUnicodeCoverage:       return "Full Unicode coverage";
+                default:                                return "";
             }
 
         } else if (platformId == platformMacintosh) {
