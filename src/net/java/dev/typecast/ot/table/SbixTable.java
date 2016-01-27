@@ -1,0 +1,141 @@
+/*
+ * Typecast - The Font Development Environment
+ *
+ * Copyright (c) 2004-2016 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package net.java.dev.typecast.ot.table;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * This table provides access to bitmap data in a standard graphics format
+ * (such as PNG, JPEG, TIFF).
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ */
+public class SbixTable implements Table {
+
+    private class GlyphDataRecord {
+        private final short _originOffsetX;
+        private final short _originOffsetY;
+        private final int _graphicType;
+        private final byte[] _data;
+        
+        private static final int PNG = 0x706E6720;
+        
+        protected GlyphDataRecord(DataInput di, int dataLength) throws IOException {
+            _originOffsetX = di.readShort();
+            _originOffsetY = di.readShort();
+            _graphicType = di.readInt();
+            
+            // Check the graphicType is valid
+            if (_graphicType != PNG) {
+                logger.error("Invalid graphicType: {}", _graphicType);
+                _data = null;
+                return;
+            }
+
+            _data = new byte[dataLength];
+            try {
+                di.readFully(_data);
+            } catch (IOException e) {
+                logger.error("Reading too much data");
+            }
+        }
+    }
+    
+    private class Strike {
+        private final int _ppem;
+        private final int _resolution;
+        private final long[] _glyphDataOffset;
+        private final GlyphDataRecord[] _glyphDataRecord;
+        
+        protected Strike(ByteArrayInputStream bais, int numGlyphs) throws IOException {
+            DataInput di = new DataInputStream(bais);
+            _ppem = di.readUnsignedShort();
+            _resolution = di.readUnsignedShort();
+            _glyphDataOffset = new long[numGlyphs + 1];
+            for (int i = 0; i < numGlyphs + 1; ++i) {
+                _glyphDataOffset[i] = di.readInt();
+            }
+
+            _glyphDataRecord = new GlyphDataRecord[numGlyphs];
+            for (int i = 0; i < numGlyphs; ++i) {
+                int dataLength = (int)(_glyphDataOffset[i + 1] - _glyphDataOffset[i]);
+                if (dataLength == 0)
+                    continue;
+                bais.reset();
+                logger.trace("Skip: {}", _glyphDataOffset[i]);
+                bais.skip(_glyphDataOffset[i]);
+                _glyphDataRecord[i] = new GlyphDataRecord(new DataInputStream(bais), dataLength);
+            }
+            logger.debug("Loaded Strike: ppem = {}, resolution = {}", _ppem, _resolution);
+        }
+    }
+    
+    private final DirectoryEntry _de;
+    private final int _version;
+    private final int _flags;
+    private final int _numStrikes;
+    private final int[] _strikeOffset;
+    private final Strike[] _strikes;
+
+    private final byte[] _buf;
+
+    static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
+
+    protected SbixTable(DirectoryEntry de, DataInput di, MaxpTable maxp) throws IOException {
+        _de = (DirectoryEntry) de.clone();
+
+        // Load entire table into a buffer, and create another input stream
+        _buf = new byte[de.getLength()];
+        di.readFully(_buf);
+        DataInput di2 = new DataInputStream(getByteArrayInputStreamForOffset(0));
+
+        _version = di2.readUnsignedShort();
+        _flags = di2.readUnsignedShort();
+        _numStrikes = di2.readInt();
+        _strikeOffset = new int[_numStrikes];
+        for (int i = 0; i < _numStrikes; ++i) {
+            _strikeOffset[i] = di2.readInt();
+        }
+        
+        _strikes = new Strike[_numStrikes];
+        for (int i = 0; i < _numStrikes; ++i) {
+            ByteArrayInputStream bais = getByteArrayInputStreamForOffset(_strikeOffset[i]);
+            _strikes[i] = new Strike(bais, maxp.getNumGlyphs());
+        }
+    }
+
+    private ByteArrayInputStream getByteArrayInputStreamForOffset(int offset) {
+        return new ByteArrayInputStream(
+                _buf, offset,
+                _de.getLength() - offset);
+    }
+
+    @Override
+    public int getType() {
+        return sbix;
+    }
+
+    @Override
+    public DirectoryEntry getDirectoryEntry() {
+        return _de;
+    }
+}

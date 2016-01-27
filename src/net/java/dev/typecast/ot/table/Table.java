@@ -1,11 +1,20 @@
-/*****************************************************************************
- * Copyright (C) The Apache Software Foundation. All rights reserved.        *
- * ------------------------------------------------------------------------- * 
- * This software is published under the terms of the Apache Software License * 
- * version 1.1, a copy of which has been included with this distribution in  * 
- * the LICENSE file.                                                         * 
- *****************************************************************************/
-
+/*
+ * Typecast - The Font Development Environment
+ *
+ * Copyright (c) 2004-2016 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.java.dev.typecast.ot.table;
 
 /**
@@ -46,6 +55,7 @@ public interface Table {
     public static final int name = 0x6e616d65; // naming table [r]
     public static final int prep = 0x70726570; // CVT Program
     public static final int post = 0x706f7374; // PostScript information [r]
+    public static final int sbix = 0x73626978; // Extended Bitmaps
     public static final int vhea = 0x76686561; // Vertical Metrics header
     public static final int vmtx = 0x766d7478; // Vertical Metrics
 
