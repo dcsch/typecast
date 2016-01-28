@@ -1,9 +1,7 @@
 /*
- * $Id: TableTreeNode.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +21,6 @@ package net.java.dev.typecast.app.editor;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: TableTreeNode.java,v 1.1 2007-01-24 09:36:58 davidsch Exp $
  */
 public class TableTreeNode extends javax.swing.tree.DefaultMutableTreeNode {
 

@@ -402,9 +402,18 @@ public class Main {
             _tabbedPane.add(cm);
         }
 
+        // Bitmaps
+        if (obj instanceof net.java.dev.typecast.ot.table.SbixTable.GlyphDataRecord) {
+            BitmapPanel bitmapPanel = new BitmapPanel();
+            bitmapPanel.setName("Bitmap");
+            bitmapPanel.setModel(_selectedFont, obj);
+            _tabbedPane.add(bitmapPanel);
+        }
+
         // All selections get a "dump" pane
         if (obj != null) {
             DumpPanel textPane = new DumpPanel();
+            textPane.setName("Dump");
             textPane.setModel(_selectedFont, obj);
             _tabbedPane.add(textPane);
         }

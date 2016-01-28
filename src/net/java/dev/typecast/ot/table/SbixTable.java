@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SbixTable implements Table {
 
-    private class GlyphDataRecord {
+    public class GlyphDataRecord {
         private final short _originOffsetX;
         private final short _originOffsetY;
         private final int _graphicType;
@@ -58,9 +58,17 @@ public class SbixTable implements Table {
                 logger.error("Reading too much data");
             }
         }
+        
+        public int getGraphicType() {
+            return _graphicType;
+        }
+        
+        public byte[] getData() {
+            return _data;
+        }
     }
     
-    private class Strike {
+    public class Strike {
         private final int _ppem;
         private final int _resolution;
         private final long[] _glyphDataOffset;
@@ -87,6 +95,15 @@ public class SbixTable implements Table {
             }
             logger.debug("Loaded Strike: ppem = {}, resolution = {}", _ppem, _resolution);
         }
+        
+        public GlyphDataRecord[] getGlyphDataRecords() {
+            return _glyphDataRecord;
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("ppem: %d, resolution: %d", _ppem, _resolution);
+        }
     }
     
     private final DirectoryEntry _de;
@@ -96,17 +113,15 @@ public class SbixTable implements Table {
     private final int[] _strikeOffset;
     private final Strike[] _strikes;
 
-    private final byte[] _buf;
-
     static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
 
     protected SbixTable(DirectoryEntry de, DataInput di, MaxpTable maxp) throws IOException {
         _de = (DirectoryEntry) de.clone();
 
         // Load entire table into a buffer, and create another input stream
-        _buf = new byte[de.getLength()];
-        di.readFully(_buf);
-        DataInput di2 = new DataInputStream(getByteArrayInputStreamForOffset(0));
+        byte[] buf = new byte[de.getLength()];
+        di.readFully(buf);
+        DataInput di2 = new DataInputStream(getByteArrayInputStreamForOffset(buf, 0));
 
         _version = di2.readUnsignedShort();
         _flags = di2.readUnsignedShort();
@@ -118,15 +133,19 @@ public class SbixTable implements Table {
         
         _strikes = new Strike[_numStrikes];
         for (int i = 0; i < _numStrikes; ++i) {
-            ByteArrayInputStream bais = getByteArrayInputStreamForOffset(_strikeOffset[i]);
+            ByteArrayInputStream bais = getByteArrayInputStreamForOffset(buf, _strikeOffset[i]);
             _strikes[i] = new Strike(bais, maxp.getNumGlyphs());
         }
     }
 
-    private ByteArrayInputStream getByteArrayInputStreamForOffset(int offset) {
+    private ByteArrayInputStream getByteArrayInputStreamForOffset(byte[] buf, int offset) {
         return new ByteArrayInputStream(
-                _buf, offset,
+                buf, offset,
                 _de.getLength() - offset);
+    }
+    
+    public Strike[] getStrikes() {
+        return _strikes;
     }
 
     @Override

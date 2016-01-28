@@ -1,7 +1,7 @@
 /*
  * Typecast - The Font Development Environment
  *
- * Copyright (c) 2004-2015 David Schweinsberg
+ * Copyright (c) 2004-2016 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import net.java.dev.typecast.ot.table.LookupSubtable;
 import net.java.dev.typecast.ot.table.NameRecord;
 import net.java.dev.typecast.ot.table.NameTable;
 import net.java.dev.typecast.ot.table.PostTable;
+import net.java.dev.typecast.ot.table.SbixTable;
 import net.java.dev.typecast.ot.table.Script;
 import net.java.dev.typecast.ot.table.Table;
 
@@ -246,19 +247,53 @@ public class TableTreeBuilder {
         }
     }
     
+    private static void addSbixStrike(OTFont font, TableTreeNode parent, SbixTable.Strike strike) {
+        int i = 0;
+        for (SbixTable.GlyphDataRecord gdr : strike.getGlyphDataRecords()) {
+            TableTreeNode n = new TableTreeNode(
+                String.valueOf(i),
+                gdr,
+                i++);
+            parent.add(n);
+        }
+    }
+    
+    private static void addSbixTable(OTFont font, TableTreeNode parent, SbixTable sbix) {
+        int i = 0;
+        for (SbixTable.Strike strike : sbix.getStrikes()) {
+            TableTreeNode n = new TableTreeNode(
+                strike.toString(),
+                strike,
+                i++);
+            parent.add(n);
+            addSbixStrike(font, n, strike);
+        }
+    }
+    
     private static void addTableDirectoryEntry(OTFont font, TableTreeNode parent, DirectoryEntry de) {
         TableTreeNode node = createNode(de.getTagAsString(), font.getTable(de.getTag()));
         parent.add(node);
-        if (de.getTag() == Table.name) {
-            addNameTable(node, (NameTable) font.getTable(Table.name));
-        } else if (de.getTag() == Table.cmap) {
-            addCmapTable(node, (CmapTable) font.getTable(Table.cmap));
-        } else if (de.getTag() == Table.glyf) {
-            addGlyfTable(font, node, (GlyfTable) font.getTable(Table.glyf));
-        } else if (de.getTag() == Table.CFF) {
-            addCffTable(font, node, (CffTable) font.getTable(Table.CFF));
-        } else if (de.getTag() == Table.GSUB) {
-            addGsubTable(node, (GsubTable) font.getTable(Table.GSUB));
+        switch (de.getTag()) {
+            case Table.name:
+                addNameTable(node, (NameTable) font.getTable(Table.name));
+                break;
+            case Table.cmap:
+                addCmapTable(node, (CmapTable) font.getTable(Table.cmap));
+                break;
+            case Table.glyf:
+                addGlyfTable(font, node, (GlyfTable) font.getTable(Table.glyf));
+                break;
+            case Table.CFF:
+                addCffTable(font, node, (CffTable) font.getTable(Table.CFF));
+                break;
+            case Table.GSUB:
+                addGsubTable(node, (GsubTable) font.getTable(Table.GSUB));
+                break;
+            case Table.sbix:
+                addSbixTable(font, node, (SbixTable) font.getTable(Table.sbix));
+                break;
+            default:
+                break;
         }
     }
 
