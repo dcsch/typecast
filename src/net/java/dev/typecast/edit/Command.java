@@ -1,6 +1,4 @@
 /*
- * $Id: Command.java,v 1.1.1.1 2004-12-05 23:14:18 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -23,7 +21,6 @@ package net.java.dev.typecast.edit;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Command.java,v 1.1.1.1 2004-12-05 23:14:18 davidsch Exp $
  */
 public abstract class Command {
 

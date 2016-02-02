@@ -54,7 +54,6 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfCompositeComp.java,v 1.3 2010-08-10 11:41:55 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GlyfCompositeComp {

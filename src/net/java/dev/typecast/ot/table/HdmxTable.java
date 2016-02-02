@@ -1,6 +1,4 @@
 /*
- * $Id: HdmxTable.java,v 1.2 2007-07-26 11:12:30 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -27,7 +25,6 @@ import java.io.IOException;
  * The Horizontal Device Metrics table for TrueType outlines.  This stores
  * integer advance widths scaled to specific pixel sizes.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: HdmxTable.java,v 1.2 2007-07-26 11:12:30 davidsch Exp $
  */
 public class HdmxTable implements Table {
     

@@ -54,7 +54,6 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: GlyfDescript.java,v 1.3 2007-01-24 09:47:48 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class GlyfDescript extends Program implements GlyphDescription {

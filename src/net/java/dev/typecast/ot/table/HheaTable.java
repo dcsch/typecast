@@ -13,7 +13,6 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Fixed;
 
 /**
- * @version $Id: HheaTable.java,v 1.2 2010-08-10 11:44:02 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class HheaTable implements Table {

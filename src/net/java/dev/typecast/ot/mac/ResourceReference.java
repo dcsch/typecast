@@ -1,6 +1,4 @@
 /*
- * $Id: ResourceReference.java,v 1.1.1.1 2004-12-05 23:14:32 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -26,7 +24,6 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: ResourceReference.java,v 1.1.1.1 2004-12-05 23:14:32 davidsch Exp $
  */
 public class ResourceReference {
 

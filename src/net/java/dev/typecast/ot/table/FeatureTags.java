@@ -53,7 +53,6 @@ package net.java.dev.typecast.ot.table;
 /**
  * Definition of Feature tags
  *
- * @version $Id: FeatureTags.java,v 1.2 2007-01-24 09:47:48 davidsch Exp $
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  */
 public interface FeatureTags {

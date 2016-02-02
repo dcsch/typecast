@@ -13,7 +13,6 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * @version $Id: FpgmTable.java,v 1.1.1.1 2004-12-05 23:14:38 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class FpgmTable extends Program implements Table {

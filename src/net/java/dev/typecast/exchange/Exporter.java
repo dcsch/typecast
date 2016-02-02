@@ -1,6 +1,4 @@
 /*
- * $Id: Exporter.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -27,7 +25,6 @@ import net.java.dev.typecast.ot.table.TableException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Exporter.java,v 1.1.1.1 2004-12-05 23:14:20 davidsch Exp $
  */
 public abstract class Exporter {
     

@@ -1,6 +1,4 @@
 /*
- * $Id: ResourceFile.java,v 1.2 2007-01-29 04:01:53 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -27,7 +25,6 @@ import java.io.RandomAccessFile;
  * Mac resource loading test.
  * TODO: incorporate this into the test suite.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: ResourceFile.java,v 1.2 2007-01-29 04:01:53 davidsch Exp $
  */
 public class ResourceFile {
 

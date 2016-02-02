@@ -1,6 +1,4 @@
 /*
- * $Id: EditorPrefs.java,v 1.3 2007-01-30 23:27:14 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -31,7 +29,6 @@ import java.awt.Dimension;
 /**
  * A class to handle all the various application preferences
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: EditorPrefs.java,v 1.3 2007-01-30 23:27:14 davidsch Exp $
  */
 public class EditorPrefs {
     

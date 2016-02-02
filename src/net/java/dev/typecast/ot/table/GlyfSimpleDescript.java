@@ -55,7 +55,6 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * @version $Id: GlyfSimpleDescript.java,v 1.3 2007-01-24 09:47:47 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GlyfSimpleDescript extends GlyfDescript {

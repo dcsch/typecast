@@ -55,7 +55,6 @@ package org.apache.batik.util;
  * Important: Constants must not contain uppercase characters.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id: CSSConstants.java,v 1.1.1.1 2004-12-05 23:15:10 davidsch Exp $
  */
 public interface CSSConstants {
 

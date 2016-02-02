@@ -1,6 +1,4 @@
 /*
- * $Id: Fixed.java,v 1.1.1.1 2004-12-05 23:14:26 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -23,7 +21,6 @@ package net.java.dev.typecast.ot;
 /**
  * Functions for working with signed 16.16 fixed values
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Fixed.java,v 1.1.1.1 2004-12-05 23:14:26 davidsch Exp $
  */
 public class Fixed {
 

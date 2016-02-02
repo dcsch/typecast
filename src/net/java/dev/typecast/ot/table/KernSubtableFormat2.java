@@ -14,7 +14,6 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: KernSubtableFormat2.java,v 1.1.1.1 2004-12-05 23:14:48 davidsch Exp $
  */
 public class KernSubtableFormat2 extends KernSubtable {
 

@@ -60,7 +60,6 @@ import java.util.ArrayList;
  * or more simple glyphs, usually with some sort of transformation applied to
  * each.
  *
- * @version $Id: GlyfCompositeDescript.java,v 1.5 2007-01-25 08:43:18 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GlyfCompositeDescript extends GlyfDescript {

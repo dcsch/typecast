@@ -58,7 +58,6 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GsubTable.java,v 1.3 2007-01-24 09:47:46 davidsch Exp $
  */
 public class GsubTable implements Table, LookupSubtableFactory {
 

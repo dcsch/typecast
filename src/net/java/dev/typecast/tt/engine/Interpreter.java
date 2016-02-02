@@ -1,6 +1,4 @@
 /*
- * $Id: Interpreter.java,v 1.1.1.1 2004-12-05 23:15:05 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -28,7 +26,6 @@ import net.java.dev.typecast.ot.Point;
  * data will be extracted by supporting classes, whether it be the Parser
  * or some other.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Interpreter.java,v 1.1.1.1 2004-12-05 23:15:05 davidsch Exp $
  */
 public class Interpreter {
 

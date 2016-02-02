@@ -56,7 +56,6 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: CoverageFormat1.java,v 1.2 2007-01-24 09:43:30 davidsch Exp $
  */
 public class CoverageFormat1 extends Coverage {
 

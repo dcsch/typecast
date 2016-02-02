@@ -1,6 +1,4 @@
 /*
- * $Id: GlyphPanelStatusBar.java,v 1.1 2007-01-24 09:37:00 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -42,7 +40,6 @@ import net.java.dev.typecast.ot.Point;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GlyphPanelStatusBar.java,v 1.1 2007-01-24 09:37:00 davidsch Exp $
  */
 public class GlyphPanelStatusBar extends JPanel {
 

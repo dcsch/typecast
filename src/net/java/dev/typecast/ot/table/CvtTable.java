@@ -13,7 +13,6 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: CvtTable.java,v 1.1.1.1 2004-12-05 23:14:36 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CvtTable implements Table {

@@ -1,6 +1,4 @@
 /*
- * $Id: TableTreeCellRenderer.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -32,7 +30,6 @@ import javax.swing.tree.TreeCellRenderer;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: TableTreeCellRenderer.java,v 1.1 2007-01-24 09:36:59 davidsch Exp $
  */
 public class TableTreeCellRenderer extends JLabel implements TreeCellRenderer {
     

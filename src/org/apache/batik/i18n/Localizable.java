@@ -16,7 +16,6 @@ import java.util.MissingResourceException;
  * way to override the default locale. 
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id: Localizable.java,v 1.1.1.1 2004-12-05 23:15:07 davidsch Exp $
  */
 public interface Localizable {
     /**

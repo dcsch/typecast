@@ -54,7 +54,6 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: CmapIndexEntry.java,v 1.2 2004-12-21 10:22:56 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapIndexEntry implements Comparable {

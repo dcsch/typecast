@@ -56,7 +56,6 @@ import java.io.IOException;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: SingleSubstFormat1.java,v 1.2 2007-01-24 09:47:45 davidsch Exp $
  */
 public class SingleSubstFormat1 extends SingleSubst {
 

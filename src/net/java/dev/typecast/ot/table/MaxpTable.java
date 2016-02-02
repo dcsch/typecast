@@ -13,7 +13,6 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Fixed;
 
 /**
- * @version $Id: MaxpTable.java,v 1.1.1.1 2004-12-05 23:14:52 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class MaxpTable implements Table {

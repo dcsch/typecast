@@ -59,7 +59,6 @@ import java.io.IOException;
  * The naming table allows multilingual strings to be associated with the
  * OpenType font file.  These strings can represent copyright notices, font
  * names, family names, style names, and so on.
- * @version $Id: NameTable.java,v 1.2 2004-12-09 23:47:23 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class NameTable implements Table {

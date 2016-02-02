@@ -54,7 +54,6 @@ package org.apache.batik.util;
  * Contains common XML constants.
  *
  * @author <a href="mailto:vhardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id: XMLConstants.java,v 1.1.1.1 2004-12-05 23:15:16 davidsch Exp $
  */
 public interface XMLConstants {
     /**

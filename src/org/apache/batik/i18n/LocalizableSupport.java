@@ -63,7 +63,6 @@ import java.util.ResourceBundle;
  * default group common to each instance of LocalizableSupport.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id: LocalizableSupport.java,v 1.1.1.1 2004-12-05 23:15:08 davidsch Exp $
  */
 public class LocalizableSupport implements Localizable {
     /**

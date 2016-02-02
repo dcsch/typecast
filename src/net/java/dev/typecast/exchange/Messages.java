@@ -17,7 +17,6 @@ import org.apache.batik.i18n.LocalizableSupport;
  * This class manages the message for the bridge module.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id: Messages.java,v 1.1.1.1 2004-12-05 23:14:21 davidsch Exp $
  */
 public class Messages {
 

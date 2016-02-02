@@ -52,7 +52,6 @@ package net.java.dev.typecast.ot.table;
 
 /**
  * Specifies access to glyph description classes, simple and composite.
- * @version $Id: GlyphDescription.java,v 1.3 2007-01-24 09:47:45 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public interface GlyphDescription {

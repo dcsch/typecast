@@ -16,7 +16,6 @@ import java.util.ResourceBundle;
  * than the Localizable interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id: ExtendedLocalizable.java,v 1.1.1.1 2004-12-05 23:15:06 davidsch Exp $
  */
 public interface ExtendedLocalizable extends Localizable {
     /**

@@ -1,6 +1,4 @@
 /*
- * $Id: EditorMenu.java,v 1.4 2009-05-22 02:30:27 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -42,7 +40,6 @@ import net.java.dev.typecast.ot.OTFontCollection;
 /**
  * The application menu bar
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: EditorMenu.java,v 1.4 2009-05-22 02:30:27 davidsch Exp $
  */
 public class EditorMenu {
 

@@ -1,6 +1,4 @@
 /*
- * $Id: Parser.java,v 1.1.1.1 2004-12-05 23:15:06 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -24,7 +22,6 @@ import net.java.dev.typecast.ot.Mnemonic;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Parser.java,v 1.1.1.1 2004-12-05 23:15:06 davidsch Exp $
  */
 public class Parser {
 

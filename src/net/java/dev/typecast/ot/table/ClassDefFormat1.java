@@ -14,7 +14,6 @@ import java.io.RandomAccessFile;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: ClassDefFormat1.java,v 1.1.1.1 2004-12-05 23:14:33 davidsch Exp $
  */
 public class ClassDefFormat1 extends ClassDef {
 

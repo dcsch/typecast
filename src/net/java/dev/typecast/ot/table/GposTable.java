@@ -1,6 +1,4 @@
 /*
- * $Id: GposTable.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -26,7 +24,6 @@ import java.io.IOException;
 /**
  * TODO: To be implemented
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: GposTable.java,v 1.2 2007-01-24 09:47:47 davidsch Exp $
  */
 public class GposTable implements Table {
 

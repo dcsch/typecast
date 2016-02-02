@@ -56,7 +56,6 @@ package org.apache.batik.util;
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
  * @author <a href="vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id: SVGConstants.java,v 1.1.1.1 2004-12-05 23:15:15 davidsch Exp $
  */
 public interface SVGConstants extends CSSConstants {
 

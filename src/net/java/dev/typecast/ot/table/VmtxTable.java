@@ -1,6 +1,4 @@
 /*
- * $Id: VmtxTable.java,v 1.1 2007-01-31 01:18:04 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -25,7 +23,6 @@ import java.io.IOException;
 
 /**
  * Vertical Metrics Table
- * @version $Id: VmtxTable.java,v 1.1 2007-01-31 01:18:04 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class VmtxTable implements Table {

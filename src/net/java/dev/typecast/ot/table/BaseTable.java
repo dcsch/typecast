@@ -1,6 +1,4 @@
 /*
- * $Id: BaseTable.java,v 1.3 2007-02-08 04:31:31 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -28,7 +26,6 @@ import net.java.dev.typecast.ot.Fixed;
 
 /**
  * Baseline Table
- * @version $Id: BaseTable.java,v 1.3 2007-02-08 04:31:31 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class BaseTable implements Table {

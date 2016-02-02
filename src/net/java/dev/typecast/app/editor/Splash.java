@@ -1,6 +1,4 @@
 /*
- * $Id: Splash.java,v 1.1 2007-01-24 09:36:57 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -31,7 +29,6 @@ import javax.swing.JWindow;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Splash.java,v 1.1 2007-01-24 09:36:57 davidsch Exp $
  */
 public class Splash extends JWindow {
 

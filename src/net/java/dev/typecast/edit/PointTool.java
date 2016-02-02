@@ -1,6 +1,4 @@
 /*
- * $Id: PointTool.java,v 1.3 2004-12-21 10:24:57 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -35,7 +33,6 @@ import net.java.dev.typecast.ot.Glyph;
  * point with the cursor, to move that point by dragging, and to move the point
  * on- and off-curve by selecting the point with the control key pressed.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: PointTool.java,v 1.3 2004-12-21 10:24:57 davidsch Exp $
  */
 public class PointTool extends Tool {
 

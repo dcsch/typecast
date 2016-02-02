@@ -1,6 +1,4 @@
 /*
- * $Id: Tool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004 David Schweinsberg
@@ -26,7 +24,6 @@ import java.awt.Window;
 /**
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: Tool.java,v 1.2 2004-12-09 23:43:33 davidsch Exp $
  */
 public abstract class Tool {
 

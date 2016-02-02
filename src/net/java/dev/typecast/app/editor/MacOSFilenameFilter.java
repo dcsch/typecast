@@ -1,6 +1,4 @@
 /*
- * $Id: MacOSFilenameFilter.java,v 1.2 2007-02-09 00:54:26 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -36,7 +34,6 @@ import net.java.dev.typecast.ot.mac.ResourceType;
  * A FilenameFilter implementation that includes font files based on their
  * extension and also by the presence of fonts in the resource fork.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: MacOSFilenameFilter.java,v 1.2 2007-02-09 00:54:26 davidsch Exp $
  */
 public class MacOSFilenameFilter implements FilenameFilter {
     

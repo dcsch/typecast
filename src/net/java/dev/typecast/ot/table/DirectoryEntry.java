@@ -54,7 +54,6 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * @version $Id: DirectoryEntry.java,v 1.2 2004-12-09 23:46:21 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class DirectoryEntry implements Cloneable {

@@ -1,6 +1,4 @@
 /*
- * $Id: VdmxTable.java,v 1.1 2007-01-30 05:25:35 davidsch Exp $
- *
  * Typecast - The Font Development Environment
  *
  * Copyright (c) 2004-2007 David Schweinsberg
@@ -26,7 +24,6 @@ import java.io.IOException;
 /**
  * The Vertical Device Metrics table for TrueType outlines.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- * @version $Id: VdmxTable.java,v 1.1 2007-01-30 05:25:35 davidsch Exp $
  */
 public class VdmxTable implements Table {
 

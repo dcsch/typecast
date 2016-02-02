@@ -13,7 +13,6 @@ import java.io.IOException;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * @version $Id: PrepTable.java,v 1.1.1.1 2004-12-05 23:14:57 davidsch Exp $
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class PrepTable extends Program implements Table {
