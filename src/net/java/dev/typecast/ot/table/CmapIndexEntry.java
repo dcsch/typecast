@@ -56,7 +56,7 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CmapIndexEntry implements Comparable {
+public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
 
     private int _platformId;
     private int _encodingId;
@@ -89,6 +89,7 @@ public class CmapIndexEntry implements Comparable {
         _format = format;
     }
 
+    @Override
     public String toString() {
         return new StringBuffer()
             .append("platform id: ")
@@ -103,8 +104,8 @@ public class CmapIndexEntry implements Comparable {
             .append(_offset).toString();
     }
 
-    public int compareTo(java.lang.Object obj) {
-        CmapIndexEntry entry = (CmapIndexEntry) obj;
+    @Override
+    public int compareTo(CmapIndexEntry entry) {
         if (getOffset() < entry.getOffset()) {
             return -1;
         } else if (getOffset() > entry.getOffset()) {

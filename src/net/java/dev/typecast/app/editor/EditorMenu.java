@@ -122,7 +122,7 @@ public class EditorMenu {
     }
 
     private static JMenuItem createMenuItem(
-            Class menuClass,
+            Class<? extends JMenuItem> menuClass,
             String name,
             String mnemonic,
             String description,
@@ -131,7 +131,7 @@ public class EditorMenu {
             ActionListener al) {
         JMenuItem menuItem = null;
         try {
-            menuItem = (JMenuItem) menuClass.newInstance();
+            menuItem = menuClass.newInstance();
             menuItem.setText(name);
             menuItem.setToolTipText(description);
             menuItem.setMnemonic(mnemonic.length() > 0 ? mnemonic.charAt(0) : 0);
