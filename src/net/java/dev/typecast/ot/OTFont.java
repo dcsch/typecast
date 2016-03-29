@@ -69,6 +69,8 @@ import net.java.dev.typecast.ot.table.Table;
 import net.java.dev.typecast.ot.table.TableDirectory;
 import net.java.dev.typecast.ot.table.TableFactory;
 import net.java.dev.typecast.ot.table.VheaTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The TrueType font.
@@ -91,6 +93,8 @@ public class OTFont {
     private NameTable _name;
     private PostTable _post;
     private VheaTable _vhea;
+
+    static final Logger logger = LoggerFactory.getLogger(OTFont.class);
 
     /**
      * Constructor
@@ -251,7 +255,12 @@ public class OTFont {
             }
             dis.reset();
             dis.skip(tablesOrigin + entry.getOffset());
-            _tables[index] = TableFactory.create(_fc, this, entry, dis);
+            try {
+                _tables[index] = TableFactory.create(_fc, this, entry, dis);
+            } catch (IOException e) {
+                logger.error("Exception loading Directory Entry {}", entry);
+                throw e;
+            }
             ++index;
         }
 

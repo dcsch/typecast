@@ -18,21 +18,21 @@
 
 package net.java.dev.typecast.ot;
 
-import java.io.File;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
-
 import net.java.dev.typecast.ot.mac.ResourceHeader;
 import net.java.dev.typecast.ot.mac.ResourceMap;
 import net.java.dev.typecast.ot.mac.ResourceReference;
 import net.java.dev.typecast.ot.mac.ResourceType;
 import net.java.dev.typecast.ot.table.DirectoryEntry;
-import net.java.dev.typecast.ot.table.Table;
 import net.java.dev.typecast.ot.table.TTCHeader;
+import net.java.dev.typecast.ot.table.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,6 +46,8 @@ public class OTFontCollection {
     private OTFont[] _fonts;
     private ArrayList<Table> _tables = new ArrayList<Table>();
     private boolean _resourceFork = false;
+
+    static final Logger logger = LoggerFactory.getLogger(OTFontCollection.class);
 
     /** Creates new FontCollection */
     protected OTFontCollection() {
@@ -130,6 +132,17 @@ public class OTFontCollection {
             dis.reset();
             dis.skip(resourceHeader.getMapOffset());
             ResourceMap map = new ResourceMap(dis);
+
+            // Dump some info about the font suitcase
+            for (int i = 0; i < map.getResourceTypeCount(); ++i) {
+                logger.info(map.getResourceType(i).getTypeAsString());
+            }
+
+            ResourceType type = map.getResourceType("FOND");
+            for (int i = 0; i < type.getCount(); ++i) {
+                ResourceReference reference = type.getReference(i);
+                logger.info(reference.getName());
+            }
 
             // Get the 'sfnt' resources
             ResourceType resourceType = map.getResourceType("sfnt");

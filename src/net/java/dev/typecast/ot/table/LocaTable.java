@@ -10,6 +10,8 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -19,6 +21,8 @@ public class LocaTable implements Table {
     private DirectoryEntry _de;
     private int[] _offsets = null;
     private short _factor = 0;
+
+    static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
 
     protected LocaTable(
             DirectoryEntry de,
@@ -39,6 +43,17 @@ public class LocaTable implements Table {
                 _offsets[i] = di.readInt();
             }
         }
+        
+        // Check the validity of the offsets
+        int lastOffset = 0;
+        int index = 0;
+        for (int offset : _offsets) {
+            if (offset < lastOffset) {
+                logger.error("Offset at index {} is bad ({} < {})", index, offset, lastOffset);
+            }
+            lastOffset = offset;
+            ++index;
+        }
     }
 
     public int getOffset(int i) {
@@ -48,12 +63,14 @@ public class LocaTable implements Table {
         return _offsets[i] * _factor;
     }
 
+    @Override
     public int getType() {
         return loca;
     }
 
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'loca' Table - Index To Location Table\n--------------------------------------\n")
             .append("Size = ").append(_de.getLength()).append(" bytes, ")
             .append(_offsets.length).append(" entries\n");
@@ -70,6 +87,7 @@ public class LocaTable implements Table {
      * particular table.
      * @return A directory entry
      */
+    @Override
     public DirectoryEntry getDirectoryEntry() {
         return _de;
     }
