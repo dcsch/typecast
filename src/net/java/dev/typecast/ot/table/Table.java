@@ -25,6 +25,8 @@ public interface Table {
     // Table constants
     public static final int BASE = 0x42415345; // Baseline data [OpenType]
     public static final int CFF  = 0x43464620; // PostScript font program (compact font format) [PostScript]
+    public static final int COLR = 0x434f4c52; // Color Table
+    public static final int CPAL = 0x4350414c; // Color Palette Table
     public static final int DSIG = 0x44534947; // Digital signature
     public static final int EBDT = 0x45424454; // Embedded bitmap data
     public static final int EBLC = 0x45424c43; // Embedded bitmap location data

@@ -51,6 +51,12 @@ public class TableFactory {
         case Table.CFF:
             t = new CffTable(de, dis);
             break;
+        case Table.COLR:
+            t = new ColrTable(de, dis);
+            break;
+        case Table.CPAL:
+            t = new CpalTable(de, dis);
+            break;
         case Table.DSIG:
             t = new DsigTable(de, dis);
             break;
@@ -61,6 +67,7 @@ public class TableFactory {
         case Table.EBSC:
             break;
         case Table.GDEF:
+            t = new GdefTable(de, dis);
             break;
         case Table.GPOS:
             t = new GposTable(de, dis);
