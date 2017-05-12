@@ -136,6 +136,8 @@ public class CharacterMap extends JScrollPane implements EditorView {
             _index = index;
             _isSelected = isSelected;
             setPreferredSize(new Dimension(CELL_WIDTH + 1, CELL_HEIGHT + 1));
+            setToolTipText(String.format("Glyph ID: %d",
+                    _mapping.getGlyphCode()));
             return this;
         }
     }
@@ -204,7 +206,7 @@ public class CharacterMap extends JScrollPane implements EditorView {
     //        int translateX = 2 * unitsPerEmBy2;
     //        int translateY = 2 * unitsPerEmBy2;
 
-            // How much should we scale the font to fit it into our tint bitmap?
+            // How much should we scale the font to fit it into our tiny bitmap?
             double scaleFactor = 40.0 / _font.getHeadTable().getUnitsPerEm();
 
             _tx = new AffineTransform();
