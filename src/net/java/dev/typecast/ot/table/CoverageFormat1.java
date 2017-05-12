@@ -59,8 +59,8 @@ import java.io.IOException;
  */
 public class CoverageFormat1 extends Coverage {
 
-    private int _glyphCount;
-    private int[] _glyphIds;
+    private final int _glyphCount;
+    private final int[] _glyphIds;
 
     /** Creates new CoverageFormat1 */
     protected CoverageFormat1(DataInput di) throws IOException {
@@ -71,10 +71,12 @@ public class CoverageFormat1 extends Coverage {
         }
     }
 
+    @Override
     public int getFormat() {
         return 1;
     }
 
+    @Override
     public int findGlyph(int glyphId) {
         for (int i = 0; i < _glyphCount; i++) {
             if (_glyphIds[i] == glyphId) {
@@ -84,4 +86,8 @@ public class CoverageFormat1 extends Coverage {
         return -1;
     }
 
+    @Override
+    public int[] getGlyphIds() {
+        return _glyphIds;
+    }
 }

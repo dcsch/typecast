@@ -52,6 +52,8 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -59,8 +61,8 @@ import java.io.IOException;
  */
 public class CoverageFormat2 extends Coverage {
 
-    private int _rangeCount;
-    private RangeRecord[] _rangeRecords;
+    private final int _rangeCount;
+    private final RangeRecord[] _rangeRecords;
 
     /** Creates new CoverageFormat2 */
     protected CoverageFormat2(DataInput di) throws IOException {
@@ -71,10 +73,12 @@ public class CoverageFormat2 extends Coverage {
         }
     }
 
+    @Override
     public int getFormat() {
         return 2;
     }
 
+    @Override
     public int findGlyph(int glyphId) {
         for (int i = 0; i < _rangeCount; i++) {
             int n = _rangeRecords[i].getCoverageIndex(glyphId);
@@ -85,4 +89,14 @@ public class CoverageFormat2 extends Coverage {
         return -1;
     }
 
+    @Override
+    public int[] getGlyphIds() {
+        List<Integer> ids = new ArrayList<>();
+        for (RangeRecord record : _rangeRecords) {
+            for (int i = record.getStart(); i < record.getEnd(); ++i) {
+                ids.add(i);
+            }
+        }
+        return ids.stream().mapToInt(i->i).toArray();
+    }
 }

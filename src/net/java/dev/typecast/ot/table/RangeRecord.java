@@ -60,15 +60,27 @@ import java.io.IOException;
  */
 public class RangeRecord {
 
-    private int _start;
-    private int _end;
-    private int _startCoverageIndex;
+    private final int _start;
+    private final int _end;
+    private final int _startCoverageIndex;
 
     /** Creates new RangeRecord */
     public RangeRecord(DataInput di) throws IOException {
         _start = di.readUnsignedShort();
         _end = di.readUnsignedShort();
         _startCoverageIndex = di.readUnsignedShort();
+    }
+
+    public int getStart() {
+        return _start;
+    }
+    
+    public int getEnd() {
+        return _end;
+    }
+    
+    public int getStartCoverageIndex() {
+        return _startCoverageIndex;
     }
 
     public boolean isInRange(int glyphId) {
@@ -81,6 +93,5 @@ public class RangeRecord {
         }
         return -1;
     }
-
 }
 

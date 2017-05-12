@@ -59,10 +59,10 @@ import java.io.IOException;
  */
 public class SingleSubstFormat2 extends SingleSubst {
 
-    private int _coverageOffset;
-    private int _glyphCount;
-    private int[] _substitutes;
-    private Coverage _coverage;
+    private final int _coverageOffset;
+    private final int _glyphCount;
+    private final int[] _substitutes;
+    private final Coverage _coverage;
 
     /** Creates new SingleSubstFormat2 */
     protected SingleSubstFormat2(DataInputStream dis, int offset) throws IOException {
@@ -77,10 +77,12 @@ public class SingleSubstFormat2 extends SingleSubst {
         _coverage = Coverage.read(dis);
     }
 
+    @Override
     public int getFormat() {
         return 2;
     }
 
+    @Override
     public int substitute(int glyphId) {
         int i = _coverage.findGlyph(glyphId);
         if (i > -1) {
@@ -89,8 +91,21 @@ public class SingleSubstFormat2 extends SingleSubst {
         return glyphId;
     }
 
+    @Override
     public String getTypeAsString() {
         return "SingleSubstFormat2";
     }    
-}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        int[] glyphIds = _coverage.getGlyphIds();
+        for (int glyphId : glyphIds) {
+            int i = _coverage.findGlyph(glyphId);
+            if (i > -1) {
+                sb.append(String.format("%d = %d\n", glyphId, _substitutes[i]));
+            }
+        }
+        return sb.toString();
+    }    
+}

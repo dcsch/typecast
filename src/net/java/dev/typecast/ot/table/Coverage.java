@@ -68,6 +68,8 @@ public abstract class Coverage {
      */
     public abstract int findGlyph(int glyphId);
     
+    public abstract int[] getGlyphIds();
+    
     protected static Coverage read(DataInput di) throws IOException {
         Coverage c = null;
         int format = di.readUnsignedShort();
