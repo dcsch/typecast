@@ -18,10 +18,11 @@
 
 package net.java.dev.typecast.app.editor;
 
+import java.awt.*;
+import java.awt.desktop.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.Toolkit;
 
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -617,20 +618,26 @@ public class EditorMenu {
         buildMRU();
     }
 
-    // Generic registration with the Mac OS X application menu
-    // Checks the platform, then attempts to register with the Apple EAWT
-    // See OSXAdapter.java to see how this is done without directly referencing any Apple APIs
+    // Generic registration with the macOS application menu
     public void registerForMacOSXEvents() {
-        try {
-            // Generate and register the OSXAdapter, passing it a hash of all the methods we wish to
-            // use as delegates for various com.apple.eawt.ApplicationListener methods
-            OSXAdapter.setQuitHandler(_app, _app.getClass().getDeclaredMethod("close", (Class[])null));
-            OSXAdapter.setAboutHandler(_app, _app.getClass().getDeclaredMethod("showAbout", (Class[])null));
-            OSXAdapter.setPreferencesHandler(_app, _app.getClass().getDeclaredMethod("showPreferences", (Class[])null));
-            //OSXAdapter.setFileHandler(_app, _app.getClass().getDeclaredMethod("loadImageFile", new Class[] { String.class }));
-        } catch (Exception e) {
-            System.err.println("Error while loading the OSXAdapter:");
-            e.printStackTrace();
-        }
+        Desktop desktop = Desktop.getDesktop();
+        desktop.setQuitHandler(new QuitHandler() {
+            @Override
+            public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
+                _app.close();
+            }
+        });
+        desktop.setAboutHandler(new AboutHandler() {
+            @Override
+            public void handleAbout(AboutEvent e) {
+                _app.showAbout();
+            }
+        });
+        desktop.setPreferencesHandler(new PreferencesHandler() {
+            @Override
+            public void handlePreferences(PreferencesEvent e) {
+                _app.showPreferences();
+            }
+        });
     }
 }
