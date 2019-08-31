@@ -76,6 +76,10 @@ public class Main {
      */
     public Main() {
 
+        // Before loading Swing, set macOS-specific properties
+        System.setProperty("apple.awt.application.name", "Typecast");
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
         // Show a splash screen whilst we load up
         Splash splash = new Splash();
         splash.setVisible(true);
