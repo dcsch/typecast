@@ -104,7 +104,7 @@ public class Main {
             _appPrefs.load(Preferences.userNodeForPackage(getClass()));
 
             // Load the resource bundle
-            _rb = ResourceBundle.getBundle("net/java/dev/typecast/app/editor/Main");
+            _rb = ResourceBundle.getBundle("sample/app/editor/Main");
 
             _frame = new JFrame(
                     _rb.getString("Typecast.title") +
