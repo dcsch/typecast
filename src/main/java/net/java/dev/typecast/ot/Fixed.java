@@ -815,7 +815,7 @@ public class Fixed {
 
     /**
      * 26.6 fixed number square root function.
-     * Simple (brain-dead) divide & conqure algorithm.
+     * Simple (brain-dead) divide & conquer algorithm.
      * @param num The 26.6 fixed number in question
      * @return The resulting square root
      */
