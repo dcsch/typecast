@@ -1,17 +1,6 @@
 # Typecast
 
-[Typecast](http://dcsch.github.io/typecast/) is a font development environment for OpenType font technology.
-Developments include:
-
-* An outline editor for both TrueType and PostScript (CFF) outlines
-* TrueType hinting engine
-* PostScript hinting engine
-* Hinting debuggers
-* Font conversion utilities
-* Font handling libraries for use in wider application development
-
-Parts of the Typecast libraries are used in the Apache Batik project, for
-conversion from TrueType to SVG fonts.
+[Typecast](http://dcsch.github.io/typecast/) is a Java library for the handling of OpenType fonts.
 
 ## File Formats
 
@@ -38,5 +27,5 @@ Outline support includes both TrueType and PostScript Charstring Type 2 outlines
 ## Advanced Typographic Tables
 
 Partial support is in place for the Advanced Typographic Tables, specifically
-the GPOS and GSUB tables. All advanced tables will be implemented in the
-ongoing development.
+the GPOS and GSUB tables.
+
