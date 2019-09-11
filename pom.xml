@@ -34,6 +34,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.28</version>
@@ -51,7 +57,7 @@
       <name>David Schweinsberg</name>
       <id>dcsch</id>
       <email>david.schweinsberg@gmail.com</email>
-      <url>github.com/dcsch</url>
+      <url>https://github.com/dcsch</url>
       <timezone>-8</timezone>
     </developer>
   </developers>
