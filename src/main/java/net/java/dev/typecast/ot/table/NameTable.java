@@ -63,14 +63,12 @@ import java.io.IOException;
  */
 public class NameTable implements Table {
 
-    private DirectoryEntry _de;
     private short _formatSelector;
     private short _numberOfNameRecords;
     private short _stringStorageOffset;
     private NameRecord[] _records;
 
-    protected NameTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    public NameTable(DataInput di, int length) throws IOException {
         _formatSelector = di.readShort();
         _numberOfNameRecords = di.readShort();
         _stringStorageOffset = di.readShort();
@@ -84,7 +82,7 @@ public class NameTable implements Table {
         
         // Load the string data into a buffer so the records can copy out the
         // bits they are interested in
-        byte[] buffer = new byte[_de.getLength() - _stringStorageOffset];
+        byte[] buffer = new byte[length - _stringStorageOffset];
         di.readFully(buffer);
         
         // Now let the records get their hands on them
@@ -113,18 +111,4 @@ public class NameTable implements Table {
         return "";
     }
 
-    public int getType() {
-        return name;
-    }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
-    
 }

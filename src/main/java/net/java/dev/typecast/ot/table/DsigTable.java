@@ -17,7 +17,6 @@ import java.io.DataInput;
  */
 public class DsigTable implements Table {
 
-    private DirectoryEntry de;
     private int version;
     private int numSigs;
     private int flag;
@@ -25,8 +24,7 @@ public class DsigTable implements Table {
     private SignatureBlock[] sigBlocks;
 
     /** Creates new DsigTable */
-    protected DsigTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    protected DsigTable(DataInput di) throws IOException {
         version = di.readInt();
         numSigs = di.readUnsignedShort();
         flag = di.readUnsignedShort();
@@ -40,24 +38,6 @@ public class DsigTable implements Table {
         }
     }
 
-    /**
-     * Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return DSIG;
-    }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
     public String toString() {
         StringBuffer sb = new StringBuffer().append("DSIG\n");
         for (int i = 0; i < numSigs; i++) {

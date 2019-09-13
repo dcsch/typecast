@@ -17,24 +17,18 @@ import java.io.IOException;
  */
 public class GaspTable implements Table {
 
-    private DirectoryEntry de;
     private int version;
     private int numRanges;
     private GaspRange[] gaspRange;
     
     /** Creates new GaspTable */
-    protected GaspTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    public GaspTable(DataInput di) throws IOException {
         version = di.readUnsignedShort();
         numRanges = di.readUnsignedShort();
         gaspRange = new GaspRange[numRanges];
         for (int i = 0; i < numRanges; i++) {
             gaspRange[i] = new GaspRange(di);
         }
-    }
-
-    public int getType() {
-        return gasp;
     }
 
     public String toString() {
@@ -48,15 +42,5 @@ public class GaspTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

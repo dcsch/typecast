@@ -59,7 +59,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class Os2Table implements Table {
 
-    private DirectoryEntry _de;
     private int _version;
     private short _xAvgCharWidth;
     private int _usWeightClass;
@@ -98,8 +97,7 @@ public class Os2Table implements Table {
     private int _usBreakChar;
     private int _usMaxContext;
 
-    protected Os2Table(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+    public Os2Table(DataInput di) throws IOException {
         _version = di.readUnsignedShort();
         _xAvgCharWidth = di.readShort();
         _usWeightClass = di.readUnsignedShort();
@@ -293,10 +291,6 @@ public class Os2Table implements Table {
         return _usMaxContext;
     }
 
-    public int getType() {
-        return OS_2;
-    }
-
     public String toString() {
         return new StringBuffer()
             .append("'OS/2' Table - OS/2 and Windows Metrics\n---------------------------------------")
@@ -345,13 +339,4 @@ public class Os2Table implements Table {
             .toString();
     }
     
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

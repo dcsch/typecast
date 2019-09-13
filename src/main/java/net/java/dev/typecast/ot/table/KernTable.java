@@ -17,14 +17,12 @@ import java.io.IOException;
  */
 public class KernTable implements Table {
     
-    private DirectoryEntry de;
     private int version;
     private int nTables;
     private KernSubtable[] tables;
 
     /** Creates new KernTable */
-    protected KernTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    public KernTable(DataInput di) throws IOException {
         version = di.readUnsignedShort();
         nTables = di.readUnsignedShort();
         tables = new KernSubtable[nTables];
@@ -41,21 +39,4 @@ public class KernTable implements Table {
         return tables[i];
     }
 
-    /** Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return kern;
-    }
-
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
 }

@@ -348,66 +348,66 @@ public class SVGExporter
             throw new TableException("Cannot find a suitable cmap table");
         }
 
-        // If this font includes arabic script, we want to specify substitutions
-        // for initial, medial, terminal & isolated cases.
-        GsubTable gsub = (GsubTable) font.getTable(Table.GSUB);
-        SingleSubst initialSubst = null;
-        SingleSubst medialSubst = null;
-        SingleSubst terminalSubst = null;
-        if (gsub != null && gsub.getScriptList() != null) {
-            Script s = gsub.getScriptList().findScript(SCRIPT_TAG_ARAB);
-            if (s != null) {
-                LangSys ls = s.getDefaultLangSys();
-                if (ls != null) {
-                    Feature init = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_INIT);
-                    Feature medi = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_MEDI);
-                    Feature fina = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_FINA);
-                    
-                    initialSubst = (SingleSubst)
-                        gsub.getLookupList().getLookup(init, 0).getSubtable(0);
-                    medialSubst = (SingleSubst)
-                        gsub.getLookupList().getLookup(medi, 0).getSubtable(0);
-                    terminalSubst = (SingleSubst)
-                        gsub.getLookupList().getLookup(fina, 0).getSubtable(0);
-                }
-            }
-        }
-
-        // Include the missing glyph
-        ps.println(getGlyphAsSVG(font, font.getGlyph(0), 0, horiz_advance_x,
-            initialSubst, medialSubst, terminalSubst, ""));
-
-        try {
-            // Include our requested range
-            for (int i = first; i <= last; i++) {
-                int glyphIndex = cmapFmt.mapCharCode(i);
-
-                if (glyphIndex > 0) {
-                    ps.println(getGlyphAsSVG(
-                        font,
-                        font.getGlyph(glyphIndex),
-                        glyphIndex,
-                        horiz_advance_x,
-                        initialSubst, medialSubst, terminalSubst,
-                        (32 <= i && i <= 127) ?
-                        encodeEntities("" + (char) i) :
-                        XML_CHAR_REF_PREFIX + Integer.toHexString(i) + XML_CHAR_REF_SUFFIX));
-                }
-
-            }
-            
-            // Output kerning pairs from the requested range
-            KernTable kern = (KernTable) font.getTable(Table.kern);
-            if (kern != null) {
-                KernSubtable kst = kern.getSubtable(0);
-                PostTable post = (PostTable) font.getTable(Table.post);
-                for (int i = 0; i < kst.getKerningPairCount(); i++) {
-                    ps.println(getKerningPairAsSVG(kst.getKerningPair(i), post));
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+//        // If this font includes arabic script, we want to specify substitutions
+//        // for initial, medial, terminal & isolated cases.
+//        GsubTable gsub = (GsubTable) font.getTable(Table.GSUB);
+//        SingleSubst initialSubst = null;
+//        SingleSubst medialSubst = null;
+//        SingleSubst terminalSubst = null;
+//        if (gsub != null && gsub.getScriptList() != null) {
+//            Script s = gsub.getScriptList().findScript(SCRIPT_TAG_ARAB);
+//            if (s != null) {
+//                LangSys ls = s.getDefaultLangSys();
+//                if (ls != null) {
+//                    Feature init = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_INIT);
+//                    Feature medi = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_MEDI);
+//                    Feature fina = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_FINA);
+//
+//                    initialSubst = (SingleSubst)
+//                        gsub.getLookupList().getLookup(init, 0).getSubtable(0);
+//                    medialSubst = (SingleSubst)
+//                        gsub.getLookupList().getLookup(medi, 0).getSubtable(0);
+//                    terminalSubst = (SingleSubst)
+//                        gsub.getLookupList().getLookup(fina, 0).getSubtable(0);
+//                }
+//            }
+//        }
+//
+//        // Include the missing glyph
+//        ps.println(getGlyphAsSVG(font, font.getGlyph(0), 0, horiz_advance_x,
+//            initialSubst, medialSubst, terminalSubst, ""));
+//
+//        try {
+//            // Include our requested range
+//            for (int i = first; i <= last; i++) {
+//                int glyphIndex = cmapFmt.mapCharCode(i);
+//
+//                if (glyphIndex > 0) {
+//                    ps.println(getGlyphAsSVG(
+//                        font,
+//                        font.getGlyph(glyphIndex),
+//                        glyphIndex,
+//                        horiz_advance_x,
+//                        initialSubst, medialSubst, terminalSubst,
+//                        (32 <= i && i <= 127) ?
+//                        encodeEntities("" + (char) i) :
+//                        XML_CHAR_REF_PREFIX + Integer.toHexString(i) + XML_CHAR_REF_SUFFIX));
+//                }
+//
+//            }
+//
+//            // Output kerning pairs from the requested range
+//            KernTable kern = (KernTable) font.getTable(Table.kern);
+//            if (kern != null) {
+//                KernSubtable kst = kern.getSubtable(0);
+//                PostTable post = (PostTable) font.getTable(Table.post);
+//                for (int i = 0; i < kst.getKerningPairCount(); i++) {
+//                    ps.println(getKerningPairAsSVG(kst.getKerningPair(i), post));
+//                }
+//            }
+//        } catch (Exception e) {
+//            System.err.println(e.getMessage());
+//        }
 
         ps.print(XML_CLOSE_TAG_START);
         ps.print(SVG_FONT_TAG);
@@ -486,75 +486,75 @@ public class SVGExporter
             String code) {
 
         StringBuilder sb = new StringBuilder();
-        boolean substituted = false;
-        
-        // arabic = "initial | medial | terminal | isolated"
-        int arabInitGlyphIndex = glyphIndex;
-        int arabMediGlyphIndex = glyphIndex;
-        int arabTermGlyphIndex = glyphIndex;
-        if (arabInitSubst != null) {
-            arabInitGlyphIndex = arabInitSubst.substitute(glyphIndex);
-        }
-        if (arabMediSubst != null) {
-            arabMediGlyphIndex = arabMediSubst.substitute(glyphIndex);
-        }
-        if (arabTermSubst != null) {
-            arabTermGlyphIndex = arabTermSubst.substitute(glyphIndex);
-        }
-        
-        if (arabInitGlyphIndex != glyphIndex) {
-            sb.append(getGlyphAsSVG(
-                font,
-                font.getGlyph(arabInitGlyphIndex),
-                arabInitGlyphIndex,
-                defaultHorizAdvanceX,
-                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_INITIAL_VALUE + XML_CHAR_QUOT,
-                code));
-            sb.append(EOL);
-            substituted = true;
-        }
-
-        if (arabMediGlyphIndex != glyphIndex) {
-            sb.append(getGlyphAsSVG(
-                font,
-                font.getGlyph(arabMediGlyphIndex),
-                arabMediGlyphIndex,
-                defaultHorizAdvanceX,
-                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_MEDIAL_VALUE + XML_CHAR_QUOT,
-                code));
-            sb.append(EOL);
-            substituted = true;
-        }
-
-        if (arabTermGlyphIndex != glyphIndex) {
-            sb.append(getGlyphAsSVG(
-                font,
-                font.getGlyph(arabTermGlyphIndex),
-                arabTermGlyphIndex,
-                defaultHorizAdvanceX,
-                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_TERMINAL_VALUE + XML_CHAR_QUOT,
-                code));
-            sb.append(EOL);
-            substituted = true;
-        }
-
-        if (substituted) {
-            sb.append(getGlyphAsSVG(
-                font,
-                glyph,
-                glyphIndex,
-                defaultHorizAdvanceX,
-                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_ISOLATED_VALUE + XML_CHAR_QUOT,
-                code));
-        } else {
-            sb.append(getGlyphAsSVG(
-                font,
-                glyph,
-                glyphIndex,
-                defaultHorizAdvanceX,
-                null,
-                code));
-        }
+//        boolean substituted = false;
+//
+//        // arabic = "initial | medial | terminal | isolated"
+//        int arabInitGlyphIndex = glyphIndex;
+//        int arabMediGlyphIndex = glyphIndex;
+//        int arabTermGlyphIndex = glyphIndex;
+//        if (arabInitSubst != null) {
+//            arabInitGlyphIndex = arabInitSubst.substitute(glyphIndex);
+//        }
+//        if (arabMediSubst != null) {
+//            arabMediGlyphIndex = arabMediSubst.substitute(glyphIndex);
+//        }
+//        if (arabTermSubst != null) {
+//            arabTermGlyphIndex = arabTermSubst.substitute(glyphIndex);
+//        }
+//
+//        if (arabInitGlyphIndex != glyphIndex) {
+//            sb.append(getGlyphAsSVG(
+//                font,
+//                font.getGlyph(arabInitGlyphIndex),
+//                arabInitGlyphIndex,
+//                defaultHorizAdvanceX,
+//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_INITIAL_VALUE + XML_CHAR_QUOT,
+//                code));
+//            sb.append(EOL);
+//            substituted = true;
+//        }
+//
+//        if (arabMediGlyphIndex != glyphIndex) {
+//            sb.append(getGlyphAsSVG(
+//                font,
+//                font.getGlyph(arabMediGlyphIndex),
+//                arabMediGlyphIndex,
+//                defaultHorizAdvanceX,
+//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_MEDIAL_VALUE + XML_CHAR_QUOT,
+//                code));
+//            sb.append(EOL);
+//            substituted = true;
+//        }
+//
+//        if (arabTermGlyphIndex != glyphIndex) {
+//            sb.append(getGlyphAsSVG(
+//                font,
+//                font.getGlyph(arabTermGlyphIndex),
+//                arabTermGlyphIndex,
+//                defaultHorizAdvanceX,
+//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_TERMINAL_VALUE + XML_CHAR_QUOT,
+//                code));
+//            sb.append(EOL);
+//            substituted = true;
+//        }
+//
+//        if (substituted) {
+//            sb.append(getGlyphAsSVG(
+//                font,
+//                glyph,
+//                glyphIndex,
+//                defaultHorizAdvanceX,
+//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_ISOLATED_VALUE + XML_CHAR_QUOT,
+//                code));
+//        } else {
+//            sb.append(getGlyphAsSVG(
+//                font,
+//                glyph,
+//                glyphIndex,
+//                defaultHorizAdvanceX,
+//                null,
+//                code));
+//        }
 
         return sb.toString();
     }

@@ -56,16 +56,15 @@ public class HdmxTable implements Table {
         }
     }
     
-    private DirectoryEntry _de;
     private int _version;
     private short _numRecords;
     private int _sizeDeviceRecords;
     private DeviceRecord[] _records;
+    private int _length;
 
     /** Creates a new instance of HdmxTable */
-    protected HdmxTable(DirectoryEntry de, DataInput di, MaxpTable maxp)
+    public HdmxTable(DataInput di, int length, MaxpTable maxp)
     throws IOException {
-        _de = (DirectoryEntry) de.clone();
         _version = di.readUnsignedShort();
         _numRecords = di.readShort();
         _sizeDeviceRecords = di.readInt();
@@ -75,16 +74,13 @@ public class HdmxTable implements Table {
         for (int i = 0; i < _numRecords; ++i) {
             _records[i] = new DeviceRecord(maxp.getNumGlyphs(), di);
         }
+        _length = length;
     }
 
-    public int getType() {
-        return hdmx;
-    }
-    
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'hdmx' Table - Horizontal Device Metrics\n----------------------------------------\n");
-        sb.append("Size = ").append(_de.getLength()).append(" bytes\n")
+        sb.append("Size = ").append(_length).append(" bytes\n")
             .append("\t'hdmx' version:         ").append(_version).append("\n")
             .append("\t# device records:       ").append(_numRecords).append("\n")
             .append("\tRecord length:          ").append(_sizeDeviceRecords).append("\n");
@@ -102,13 +98,4 @@ public class HdmxTable implements Table {
         return sb.toString();
     }
 
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

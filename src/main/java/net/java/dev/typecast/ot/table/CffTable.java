@@ -34,7 +34,6 @@ import net.java.dev.typecast.cff.TopDictIndex;
  */
 public class CffTable implements Table {
     
-    private final DirectoryEntry _de;
     private final int _major;
     private final int _minor;
     private final int _hdrSize;
@@ -48,14 +47,13 @@ public class CffTable implements Table {
     private final byte[] _buf;
 
     /** Creates a new instance of CffTable
-     * @param de
      * @param di
+     * @param length
      * @throws java.io.IOException */
-    protected CffTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    protected CffTable(DataInput di, int length) throws IOException {
 
         // Load entire table into a buffer, and create another input stream
-        _buf = new byte[de.getLength()];
+        _buf = new byte[length];
         di.readFully(_buf);
         DataInput di2 = getDataInputForOffset(0);
 
@@ -102,7 +100,7 @@ public class CffTable implements Table {
     public final DataInput getDataInputForOffset(int offset) {
         return new DataInputStream(new ByteArrayInputStream(
                 _buf, offset,
-                _de.getLength() - offset));
+                _buf.length - offset));
     }
 
     public NameIndex getNameIndex() {
@@ -119,11 +117,6 @@ public class CffTable implements Table {
 
     public CffFont getFont(int fontIndex) {
         return _fonts[fontIndex];
-    }
-
-    @Override
-    public int getType() {
-        return CFF;
     }
 
     @Override
@@ -144,15 +137,5 @@ public class CffTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
+
 }

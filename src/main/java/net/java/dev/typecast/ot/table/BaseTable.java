@@ -347,7 +347,6 @@ public class BaseTable implements Table {
         }
     }
     
-    private DirectoryEntry _de;
     private int _version;
     private int _horizAxisOffset;
     private int _vertAxisOffset;
@@ -356,11 +355,10 @@ public class BaseTable implements Table {
     private byte[] _buf;
 
     /** Creates a new instance of BaseTable */
-    protected BaseTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    protected BaseTable(DataInput di, int length) throws IOException {
 
         // Load entire table into a buffer, and create another input stream
-        _buf = new byte[de.getLength()];
+        _buf = new byte[length];
         di.readFully(_buf);
         DataInput di2 = getDataInputForOffset(0);
 
@@ -381,7 +379,7 @@ public class BaseTable implements Table {
     private DataInput getDataInputForOffset(int offset) {
         return new DataInputStream(new ByteArrayInputStream(
                 _buf, offset,
-                _de.getLength() - offset));
+                _buf.length - offset));
     }
     
 //    private String valueAsShortHex(int value) {
@@ -401,10 +399,6 @@ public class BaseTable implements Table {
         return String.valueOf(c);
     }
     
-    public int getType() {
-        return BASE;
-    }
-
     public String toString() {
         StringBuffer sb = new StringBuffer()
             .append("; 'BASE' Table - Baseline\n;-------------------------------------\n\n")
@@ -420,14 +414,5 @@ public class BaseTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
+
 }

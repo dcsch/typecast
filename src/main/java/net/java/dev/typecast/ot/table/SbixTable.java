@@ -106,7 +106,6 @@ public class SbixTable implements Table {
         }
     }
     
-    private final DirectoryEntry _de;
     private final int _version;
     private final int _flags;
     private final int _numStrikes;
@@ -115,11 +114,10 @@ public class SbixTable implements Table {
 
     static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
 
-    protected SbixTable(DirectoryEntry de, DataInput di, MaxpTable maxp) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    public SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
 
         // Load entire table into a buffer, and create another input stream
-        byte[] buf = new byte[de.getLength()];
+        byte[] buf = new byte[length];
         di.readFully(buf);
         DataInput di2 = new DataInputStream(getByteArrayInputStreamForOffset(buf, 0));
 
@@ -141,20 +139,11 @@ public class SbixTable implements Table {
     private ByteArrayInputStream getByteArrayInputStreamForOffset(byte[] buf, int offset) {
         return new ByteArrayInputStream(
                 buf, offset,
-                _de.getLength() - offset);
+                buf.length - offset);
     }
     
     public Strike[] getStrikes() {
         return _strikes;
     }
 
-    @Override
-    public int getType() {
-        return sbix;
-    }
-
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

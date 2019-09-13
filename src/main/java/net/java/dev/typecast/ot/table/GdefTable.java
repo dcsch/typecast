@@ -9,19 +9,7 @@ import java.io.IOException;
  */
 public class GdefTable implements Table {
 
-    private DirectoryEntry _de;
-
-    protected GdefTable(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+    protected GdefTable(DataInput di) throws IOException {
     }
 
-    @Override
-    public int getType() {
-        return GDEF;
-    }
-
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

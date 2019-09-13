@@ -17,7 +17,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class MaxpTable implements Table {
 
-    private DirectoryEntry de;
     private int versionNumber;
     private int numGlyphs;
     private int maxPoints;
@@ -34,8 +33,7 @@ public class MaxpTable implements Table {
     private int maxComponentElements;
     private int maxComponentDepth;
 
-    protected MaxpTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    public MaxpTable(DataInput di) throws IOException {
         versionNumber = di.readInt();
         
         // CFF fonts use version 0.5, TrueType fonts use version 1.0
@@ -119,10 +117,6 @@ public class MaxpTable implements Table {
         return numGlyphs;
     }
 
-    public int getType() {
-        return maxp;
-    }
-
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'maxp' Table - Maximum Profile\n------------------------------")
@@ -147,15 +141,5 @@ public class MaxpTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

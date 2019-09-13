@@ -18,18 +18,17 @@ import org.slf4j.LoggerFactory;
  */
 public class LocaTable implements Table {
 
-    private DirectoryEntry _de;
     private int[] _offsets = null;
     private short _factor = 0;
+    private int _length;
 
     static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
 
-    protected LocaTable(
-            DirectoryEntry de,
+    public LocaTable(
             DataInput di,
+            int length,
             HeadTable head,
             MaxpTable maxp) throws IOException {
-        _de = (DirectoryEntry) de.clone();
         _offsets = new int[maxp.getNumGlyphs() + 1];
         boolean shortEntries = head.getIndexToLocFormat() == 0;
         if (shortEntries) {
@@ -54,6 +53,7 @@ public class LocaTable implements Table {
             lastOffset = offset;
             ++index;
         }
+        _length = length;
     }
 
     public int getOffset(int i) {
@@ -64,15 +64,10 @@ public class LocaTable implements Table {
     }
 
     @Override
-    public int getType() {
-        return loca;
-    }
-
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'loca' Table - Index To Location Table\n--------------------------------------\n")
-            .append("Size = ").append(_de.getLength()).append(" bytes, ")
+            .append("Size = ").append(_length).append(" bytes, ")
             .append(_offsets.length).append(" entries\n");
         for (int i = 0; i < _offsets.length; i++) {
             sb.append("        Idx ").append(i)
@@ -81,14 +76,4 @@ public class LocaTable implements Table {
         return sb.toString();
     }
     
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

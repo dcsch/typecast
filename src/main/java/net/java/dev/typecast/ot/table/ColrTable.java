@@ -67,7 +67,6 @@ public class ColrTable implements Table {
         }
     }
 
-    private final DirectoryEntry _de;
     private final int _version;
     private final int _numBaseGlyphRecords;
     private final int _offsetBaseGlyphRecord;
@@ -76,8 +75,7 @@ public class ColrTable implements Table {
     private final BaseGlyphRecord[] _baseGlyphRecords;
     private final LayerRecord[] _layerRecords;
 
-    protected ColrTable(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+    protected ColrTable(DataInput di) throws IOException {
         _version = di.readUnsignedShort();
         _numBaseGlyphRecords = di.readUnsignedShort();
         _offsetBaseGlyphRecord = di.readInt();
@@ -121,13 +119,4 @@ public class ColrTable implements Table {
         return sb.toString();
     }
 
-    @Override
-    public int getType() {
-        return COLR;
-    }
-
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

@@ -58,16 +58,15 @@ import java.io.IOException;
  */
 public class HmtxTable implements Table {
 
-    private DirectoryEntry _de;
     private int[] _hMetrics = null;
     private short[] _leftSideBearing = null;
+    private int _length;
 
-    protected HmtxTable(
-            DirectoryEntry de,
+    public HmtxTable(
             DataInput di,
+            int length,
             HheaTable hhea,
             MaxpTable maxp) throws IOException {
-        _de = (DirectoryEntry) de.clone();
         _hMetrics = new int[hhea.getNumberOfHMetrics()];
         for (int i = 0; i < hhea.getNumberOfHMetrics(); ++i) {
             _hMetrics[i] =
@@ -81,6 +80,7 @@ public class HmtxTable implements Table {
         for (int i = 0; i < lsbCount; ++i) {
             _leftSideBearing[i] = di.readShort();
         }
+        _length = length;
     }
 
     public int getAdvanceWidth(int i) {
@@ -105,14 +105,10 @@ public class HmtxTable implements Table {
         }
     }
 
-    public int getType() {
-        return hmtx;
-    }
-
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'hmtx' Table - Horizontal Metrics\n---------------------------------\n");
-        sb.append("Size = ").append(_de.getLength()).append(" bytes, ")
+        sb.append("Size = ").append(_length).append(" bytes, ")
             .append(_hMetrics.length).append(" entries\n");
         for (int i = 0; i < _hMetrics.length; i++) {
             sb.append("        ").append(i)
@@ -128,13 +124,4 @@ public class HmtxTable implements Table {
         return sb.toString();
     }
 
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

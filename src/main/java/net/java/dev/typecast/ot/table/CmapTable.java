@@ -60,13 +60,11 @@ import java.util.Arrays;
  */
 public class CmapTable implements Table {
 
-    private DirectoryEntry _de;
     private int _version;
     private int _numTables;
     private CmapIndexEntry[] _entries;
 
-    protected CmapTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    public CmapTable(DataInput di) throws IOException {
         _version = di.readUnsignedShort();
         _numTables = di.readUnsignedShort();
         long bytesRead = 4;
@@ -130,11 +128,6 @@ public class CmapTable implements Table {
     }
 
     @Override
-    public int getType() {
-        return cmap;
-    }
-
-    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer().append("cmap\n");
 
@@ -149,15 +142,5 @@ public class CmapTable implements Table {
 //        }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
+
 }

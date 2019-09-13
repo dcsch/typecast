@@ -52,22 +52,18 @@ package net.java.dev.typecast.ot;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import net.java.dev.typecast.cff.CharstringType2;
-import net.java.dev.typecast.ot.table.CffTable;
+
 import net.java.dev.typecast.ot.table.CmapTable;
 import net.java.dev.typecast.ot.table.DirectoryEntry;
-import net.java.dev.typecast.ot.table.GlyfTable;
 import net.java.dev.typecast.ot.table.HeadTable;
 import net.java.dev.typecast.ot.table.HheaTable;
 import net.java.dev.typecast.ot.table.HmtxTable;
-import net.java.dev.typecast.ot.table.LocaTable;
 import net.java.dev.typecast.ot.table.MaxpTable;
 import net.java.dev.typecast.ot.table.NameTable;
 import net.java.dev.typecast.ot.table.Os2Table;
 import net.java.dev.typecast.ot.table.PostTable;
 import net.java.dev.typecast.ot.table.Table;
 import net.java.dev.typecast.ot.table.TableDirectory;
-import net.java.dev.typecast.ot.table.TableFactory;
 import net.java.dev.typecast.ot.table.VheaTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,17 +74,12 @@ import org.slf4j.LoggerFactory;
  */
 public class OTFont {
 
-    private final OTFontCollection _fc;
-    private TableDirectory _tableDirectory = null;
-    private Table[] _tables;
     private Os2Table _os2;
-    private CffTable _cff;
+//    private CffTable _cff;
     private CmapTable _cmap;
-    private GlyfTable _glyf;
     private HeadTable _head;
     private HheaTable _hhea;
     private HmtxTable _hmtx;
-    private LocaTable _loca;
     private MaxpTable _maxp;
     private NameTable _name;
     private PostTable _post;
@@ -97,28 +88,79 @@ public class OTFont {
     static final Logger logger = LoggerFactory.getLogger(OTFont.class);
 
     /**
-     * Constructor
+     * @param dis OpenType/TrueType font file data.
+     * @param directoryOffset The Table Directory offset within the file.  For a
+     * regular TTF/OTF file this will be zero, but for a TTC (Font Collection)
+     * the offset is retrieved from the TTC header.  For a Mac font resource,
+     * offset is retrieved from the resource headers.
+     * @param tablesOrigin The point the table offsets are calculated from.
+     * Once again, in a regular TTF file, this will be zero.  In a TTC is is
+     * also zero, but within a Mac resource, it is the beginning of the
+     * individual font resource data.
+     * @throws java.io.IOException
      */
-    public OTFont(OTFontCollection fc) {
-        _fc = fc;
+    public OTFont(DataInputStream dis, int tablesOrigin) throws IOException {
+
+        // Load the table directory
+        dis.reset();
+//        dis.skip(directoryOffset);
+        TableDirectory tableDirectory = new TableDirectory(dis);
+
+        // Load some prerequisite tables
+        // (These are tables that are referenced by other tables, so we need to load
+        // them first)
+        seekTable(tableDirectory, dis, tablesOrigin, Table.head);
+        _head = new HeadTable(dis);
+
+        // 'hhea' is required by 'hmtx'
+        seekTable(tableDirectory, dis, tablesOrigin, Table.hhea);
+        _hhea = new HheaTable(dis);
+
+        // 'maxp' is required by 'glyf', 'hmtx', 'loca', and 'vmtx'
+        seekTable(tableDirectory, dis, tablesOrigin, Table.maxp);
+        _maxp = new MaxpTable(dis);
+
+        // 'vhea' is required by 'vmtx'
+        int length = seekTable(tableDirectory, dis, tablesOrigin, Table.vhea);
+        if (length > 0) {
+            _vhea = new VheaTable(dis);
+        }
+
+        // 'post' is required by 'glyf'
+        seekTable(tableDirectory, dis, tablesOrigin, Table.post);
+        _post = new PostTable(dis);
+
+        // Load all the other required tables
+        seekTable(tableDirectory, dis, tablesOrigin, Table.cmap);
+        _cmap = new CmapTable(dis);
+        length = seekTable(tableDirectory, dis, tablesOrigin, Table.hmtx);
+        _hmtx = new HmtxTable(dis, length, _hhea, _maxp);
+        length = seekTable(tableDirectory, dis, tablesOrigin, Table.name);
+        _name = new NameTable(dis, length);
+        seekTable(tableDirectory, dis, tablesOrigin, Table.OS_2);
+        _os2 = new Os2Table(dis);
+
+        // If this is a TrueType outline, then we'll have at least the
+        // 'glyf' table (along with the 'loca' table)
+//        _glyf = (GlyfTable) getTable(Table.glyf);
     }
 
-    public Table getTable(int tableType) {
-        for (Table _table : _tables) {
-            if ((_table != null) && (_table.getType() == tableType)) {
-                return _table;
-            }
-        }
-        return null;
-    }
+//    public Table getTable(int tableType) {
+//        for (Table _table : _tables) {
+//            if ((_table != null) && (_table.getType() == tableType)) {
+//                return _table;
+//            }
+//        }
+//        return null;
+//    }
 
     public Os2Table getOS2Table() {
         return _os2;
     }
     
-    public CffTable getCffTable() {
-        return _cff;
-    }
+//    public CffTable getCffTable() {
+//        return _cff;
+//    }
     
     public CmapTable getCmapTable() {
         return _cmap;
@@ -136,9 +178,9 @@ public class OTFont {
         return _hmtx;
     }
     
-    public LocaTable getLocaTable() {
-        return _loca;
-    }
+//    public LocaTable getLocaTable() {
+//        return _loca;
+//    }
     
     public MaxpTable getMaxpTable() {
         return _maxp;
@@ -168,121 +210,44 @@ public class OTFont {
         return _maxp.getNumGlyphs();
     }
 
-    // TODO What happens with the following when dealing with PostScript?
-    public Glyph getGlyph(int i) {
-        if (_glyf != null && _glyf.getDescription(i) != null) {
-            return new TTGlyph(
-                    _glyf.getDescription(i),
-                    _hmtx.getLeftSideBearing(i),
-                    _hmtx.getAdvanceWidth(i));
-        } else if (_cff != null && _cff.getFont(0).getCharstring(i) != null) {
-            return new T2Glyph(
-                    (CharstringType2) _cff.getFont(0).getCharstring(i),
-                    _hmtx.getLeftSideBearing(i),
-                    _hmtx.getAdvanceWidth(i));
-        } else {
-            return null;
-        }
-    }
+//    // TODO What happens with the following when dealing with PostScript?
+//    public Glyph getGlyph(int i) {
+//        if (_glyf != null && _glyf.getDescription(i) != null) {
+//            return new TTGlyph(
+//                    _glyf.getDescription(i),
+//                    _hmtx.getLeftSideBearing(i),
+//                    _hmtx.getAdvanceWidth(i));
+//        } else if (_cff != null && _cff.getFont(0).getCharstring(i) != null) {
+//            return new T2Glyph(
+//                    (CharstringType2) _cff.getFont(0).getCharstring(i),
+//                    _hmtx.getLeftSideBearing(i),
+//                    _hmtx.getAdvanceWidth(i));
+//        } else {
+//            return null;
+//        }
+//    }
 
-    public TableDirectory getTableDirectory() {
-        return _tableDirectory;
-    }
-    
-    private Table readTable(
+    protected int seekTable(
+            TableDirectory tableDirectory,
             DataInputStream dis,
             int tablesOrigin,
             int tag) throws IOException {
         dis.reset();
-        DirectoryEntry entry = _tableDirectory.getEntryByTag(tag);
+        DirectoryEntry entry = tableDirectory.getEntryByTag(tag);
         if (entry == null) {
-            return null;
+            return 0;
         }
         dis.skip(tablesOrigin + entry.getOffset());
-        return TableFactory.create(_fc, this, entry, dis);
+        return entry.getLength();
     }
 
-    /**
-     * @param dis OpenType/TrueType font file data.
-     * @param directoryOffset The Table Directory offset within the file.  For a
-     * regular TTF/OTF file this will be zero, but for a TTC (Font Collection)
-     * the offset is retrieved from the TTC header.  For a Mac font resource,
-     * offset is retrieved from the resource headers.
-     * @param tablesOrigin The point the table offsets are calculated from.
-     * Once again, in a regular TTF file, this will be zero.  In a TTC is is
-     * also zero, but within a Mac resource, it is the beginning of the
-     * individual font resource data.
-     * @throws java.io.IOException
-     */
-    protected void read(
-            DataInputStream dis,
-            int directoryOffset,
-            int tablesOrigin) throws IOException {
-        
-        // Load the table directory
-        dis.reset();
-        dis.skip(directoryOffset);
-        _tableDirectory = new TableDirectory(dis);
-        _tables = new Table[_tableDirectory.getNumTables()];
-        
-        // Load some prerequisite tables
-        _head = (HeadTable) readTable(dis, tablesOrigin, Table.head);
-        _hhea = (HheaTable) readTable(dis, tablesOrigin, Table.hhea);
-        _maxp = (MaxpTable) readTable(dis, tablesOrigin, Table.maxp);
-        _loca = (LocaTable) readTable(dis, tablesOrigin, Table.loca);
-        _vhea = (VheaTable) readTable(dis, tablesOrigin, Table.vhea);
-
-        int index = 0;
-        _tables[index++] = _head;
-        _tables[index++] = _hhea;
-        _tables[index++] = _maxp;
-        if (_loca != null) {
-            _tables[index++] = _loca;
-        }
-        if (_vhea != null) {
-            _tables[index++] = _vhea;
-        }
-        
-        // Load all other tables
-        for (int i = 0; i < _tableDirectory.getNumTables(); i++) {
-            DirectoryEntry entry = _tableDirectory.getEntry(i);
-            if (entry.getTag() == Table.head
-                    || entry.getTag() == Table.hhea
-                    || entry.getTag() == Table.maxp
-                    || entry.getTag() == Table.loca
-                    || entry.getTag() == Table.vhea) {
-                continue;
-            }
-            dis.reset();
-            dis.skip(tablesOrigin + entry.getOffset());
-            try {
-                _tables[index] = TableFactory.create(_fc, this, entry, dis);
-            } catch (IOException e) {
-                logger.error("Exception loading Directory Entry {}", entry);
-                throw e;
-            }
-            ++index;
-        }
-
-        // Get references to commonly used tables (these happen to be all the
-        // required tables)
-        _cff = (CffTable) getTable(Table.CFF);
-        _cmap = (CmapTable) getTable(Table.cmap);
-        _hmtx = (HmtxTable) getTable(Table.hmtx);
-        _name = (NameTable) getTable(Table.name);
-        _os2 = (Os2Table) getTable(Table.OS_2);
-        _post = (PostTable) getTable(Table.post);
-
-        // If this is a TrueType outline, then we'll have at least the
-        // 'glyf' table (along with the 'loca' table)
-        _glyf = (GlyfTable) getTable(Table.glyf);
-    }
+//    protected void read(
+//            DataInputStream dis,
+//            int directoryOffset,
+//            int tablesOrigin) throws IOException {
+//    }
 
     public String toString() {
-        if (_tableDirectory != null) {
-            return _tableDirectory.toString();
-        } else {
-            return "Empty font";
-        }
+        return _head.toString();
     }
 }

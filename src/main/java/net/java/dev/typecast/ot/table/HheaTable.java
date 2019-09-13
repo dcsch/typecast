@@ -17,7 +17,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class HheaTable implements Table {
 
-    private DirectoryEntry de;
     private int version;
     private short ascender;
     private short descender;
@@ -31,8 +30,7 @@ public class HheaTable implements Table {
     private short metricDataFormat;
     private int numberOfHMetrics;
 
-    protected HheaTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    public HheaTable(DataInput di) throws IOException {
         version = di.readInt();
         ascender = di.readShort();
         descender = di.readShort();
@@ -90,10 +88,6 @@ public class HheaTable implements Table {
         return numberOfHMetrics;
     }
 
-    public int getType() {
-        return hhea;
-    }
-
     public short getXMaxExtent() {
         return xMaxExtent;
     }
@@ -120,15 +114,5 @@ public class HheaTable implements Table {
             .append("\n        numOf_LongHorMetrics: ").append(numberOfHMetrics)
             .toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

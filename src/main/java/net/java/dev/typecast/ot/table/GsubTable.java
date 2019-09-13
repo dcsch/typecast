@@ -61,16 +61,14 @@ import java.io.IOException;
  */
 public class GsubTable implements Table, LookupSubtableFactory {
 
-    private DirectoryEntry _de;
     private ScriptList _scriptList;
     private FeatureList _featureList;
     private LookupList _lookupList;
     
-    protected GsubTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
-        
+    protected GsubTable(DataInput di, int length) throws IOException {
+
         // Load into a temporary buffer, and create another input stream
-        byte[] buf = new byte[de.getLength()];
+        byte[] buf = new byte[length];
         di.readFully(buf);
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(buf));
 
@@ -126,13 +124,6 @@ public class GsubTable implements Table, LookupSubtableFactory {
         return s;
     }
 
-    /** Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return GSUB;
-    }
-
     public ScriptList getScriptList() {
         return _scriptList;
     }
@@ -166,15 +157,5 @@ public class GsubTable implements Table, LookupSubtableFactory {
         }
         return "Unknown";
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
-    
+
 }

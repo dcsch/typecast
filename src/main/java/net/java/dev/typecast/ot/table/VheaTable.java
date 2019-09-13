@@ -28,7 +28,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class VheaTable implements Table {
 
-    private DirectoryEntry _de;
     private int _version;
     private short _ascent;
     private short _descent;
@@ -42,8 +41,7 @@ public class VheaTable implements Table {
     private short _metricDataFormat;
     private int _numberOfLongVerMetrics;
 
-    protected VheaTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    public VheaTable(DataInput di) throws IOException {
         _version = di.readInt();
         _ascent = di.readShort();
         _descent = di.readShort();
@@ -101,10 +99,6 @@ public class VheaTable implements Table {
         return _numberOfLongVerMetrics;
     }
 
-    public int getType() {
-        return vhea;
-    }
-
     public short getYMaxExtent() {
         return _yMaxExtent;
     }
@@ -132,13 +126,4 @@ public class VheaTable implements Table {
             .toString();
     }
     
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

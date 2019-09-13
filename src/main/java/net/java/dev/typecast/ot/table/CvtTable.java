@@ -17,20 +17,14 @@ import java.io.IOException;
  */
 public class CvtTable implements Table {
 
-    private DirectoryEntry de;
     private short[] values;
 
-    protected CvtTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
-        int len = de.getLength() / 2;
+    protected CvtTable(DataInput di, int length) throws IOException {
+        int len = length / 2;
         values = new short[len];
         for (int i = 0; i < len; i++) {
             values[i] = di.readShort();
         }
-    }
-
-    public int getType() {
-        return cvt;
     }
 
     public short[] getValues() {
@@ -47,15 +41,5 @@ public class CvtTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

@@ -61,18 +61,4 @@ public interface Table {
     public static final int vhea = 0x76686561; // Vertical Metrics header
     public static final int vmtx = 0x766d7478; // Vertical Metrics
 
-    /**
-     * Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType();
-
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry();
-    
 }

@@ -27,10 +27,7 @@ import java.io.IOException;
  */
 public class GposTable implements Table {
 
-    private DirectoryEntry _de;
-
-    protected GposTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    protected GposTable(DataInput di) throws IOException {
 
         // GPOS Header
         int version = di.readInt();
@@ -39,25 +36,8 @@ public class GposTable implements Table {
         int lookupList = di.readInt();
     }
 
-    /** Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return GPOS;
-    }
-    
     public String toString() {
         return "GPOS";
     }
 
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
-    
 }

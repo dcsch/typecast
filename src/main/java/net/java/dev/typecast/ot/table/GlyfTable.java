@@ -60,19 +60,17 @@ import java.io.IOException;
  */
 public class GlyfTable implements Table {
 
-    private DirectoryEntry _de;
     private GlyfDescript[] _descript;
 
-    protected GlyfTable(
-            DirectoryEntry de,
+    public GlyfTable(
             DataInput di,
+            int length,
             MaxpTable maxp,
             LocaTable loca) throws IOException {
-        _de = (DirectoryEntry) de.clone();
         _descript = new GlyfDescript[maxp.getNumGlyphs()];
         
         // Buffer the whole table so we can randomly access it
-        byte[] buf = new byte[de.getLength()];
+        byte[] buf = new byte[length];
         di.readFully(buf);
         ByteArrayInputStream bais = new ByteArrayInputStream(buf);
         
@@ -115,17 +113,4 @@ public class GlyfTable implements Table {
         }
     }
 
-    public int getType() {
-        return glyf;
-    }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

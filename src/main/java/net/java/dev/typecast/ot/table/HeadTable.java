@@ -60,7 +60,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class HeadTable implements Table {
 
-    private DirectoryEntry _de;
     private int _versionNumber;
     private int _fontRevision;
     private int _checkSumAdjustment;
@@ -79,8 +78,7 @@ public class HeadTable implements Table {
     private short _indexToLocFormat;
     private short _glyphDataFormat;
 
-    protected HeadTable(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+    public HeadTable(DataInput di) throws IOException {
         _versionNumber = di.readInt();
         _fontRevision = di.readInt();
         _checkSumAdjustment = di.readInt();
@@ -190,15 +188,5 @@ public class HeadTable implements Table {
             .append("\n  glyphDataFormat:     ").append(_glyphDataFormat)
             .toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
-    
+
 }

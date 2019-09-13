@@ -54,7 +54,6 @@ public class CpalTable implements Table {
         }
     }
 
-    private final DirectoryEntry _de;
     private final int _version;
     private final int _numPalettesEntries;
     private final int _numPalette;
@@ -66,8 +65,7 @@ public class CpalTable implements Table {
     private final int _offsetPaletteEntryLabelArray;
     private final ColorRecord[] _colorRecords;
 
-    protected CpalTable(DirectoryEntry de, DataInput di) throws IOException {
-        this._de = (DirectoryEntry) de.clone();
+    protected CpalTable(DataInput di) throws IOException {
         _version = di.readUnsignedShort();
         _numPalettesEntries = di.readUnsignedShort();
         _numPalette = di.readUnsignedShort();
@@ -127,13 +125,4 @@ public class CpalTable implements Table {
         return sb.toString();
     }
 
-    @Override
-    public int getType() {
-        return CPAL;
-    }
-
-    @Override
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

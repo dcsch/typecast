@@ -117,7 +117,6 @@ public class VdmxTable implements Table {
         }
     }
     
-    private DirectoryEntry _de;
     private int _version;
     private int _numRecs;
     private int _numRatios;
@@ -126,8 +125,7 @@ public class VdmxTable implements Table {
     private Group[] _groups;
     
     /** Creates a new instance of VdmxTable */
-    protected VdmxTable(DirectoryEntry de, DataInput di) throws IOException {
-        _de = (DirectoryEntry) de.clone();
+    public VdmxTable(DataInput di) throws IOException {
         _version = di.readUnsignedShort();
         _numRecs = di.readUnsignedShort();
         _numRatios = di.readUnsignedShort();
@@ -143,10 +141,6 @@ public class VdmxTable implements Table {
         for (int i = 0; i < _numRecs; ++i) {
             _groups[i] = new Group(di);
         }
-    }
-    
-    public int getType() {
-        return VDMX;
     }
     
     public String toString() {
@@ -182,13 +176,4 @@ public class VdmxTable implements Table {
         return sb.toString();
     }
 
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

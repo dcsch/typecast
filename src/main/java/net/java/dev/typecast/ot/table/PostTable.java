@@ -18,9 +18,6 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class PostTable implements Table {
 
-    /**
-     * TODO: Mac Glyph names for 210 & 257
-     */
     private static final String[] macGlyphName = {
         ".notdef",      // 0
         "null",         // 1
@@ -173,15 +170,15 @@ public class PostTable implements Table {
         "lessequal",    // 148
         "greaterequal", // 149
         "yen",          // 150
-	"mu",           // 151
+        "mu",           // 151
         "partialdiff",  // 152
         "summation",    // 153
         "product",      // 154
-	"pi",           // 155
+        "pi",           // 155
         "integral'",    // 156
         "ordfeminine",  // 157
         "ordmasculine", // 158
-	"Omega",        // 159
+        "Omega",        // 159
         "ae",           // 160
         "oslash",       // 161
         "questiondown", // 162
@@ -232,7 +229,7 @@ public class PostTable implements Table {
         "Igrave",       // 207
         "Oacute",       // 208
         "Ocircumflex",  // 209
-        "",             // 210
+        "apple",        // 210
         "Ograve",       // 211
         "Uacute",       // 212
         "Ucircumflex",  // 213
@@ -279,10 +276,9 @@ public class PostTable implements Table {
         "cacute",       // 254
         "Ccaron",       // 255
         "ccaron",       // 256
-        ""              // 257
+        "dcroat"        // 257
     };
 
-    private DirectoryEntry de;
     private int version;
     private int italicAngle;
     private short underlinePosition;
@@ -299,8 +295,7 @@ public class PostTable implements Table {
     private String[] psGlyphName;
 
     /** Creates new PostTable */
-    protected PostTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    public PostTable(DataInput di) throws IOException {
         version = di.readInt();
         italicAngle = di.readInt();
         underlinePosition = di.readShort();
@@ -365,13 +360,6 @@ public class PostTable implements Table {
         }
     }
     
-    /** Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return post;
-    }
-
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'post' Table - PostScript Metrics\n---------------------------------\n")
@@ -406,16 +394,6 @@ public class PostTable implements Table {
             }
         }
         return sb.toString();
-    }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
     }
     
 }

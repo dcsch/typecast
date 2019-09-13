@@ -44,7 +44,6 @@ public class OTFontCollection {
     private String _fileName;
     private TTCHeader _ttcHeader;
     private OTFont[] _fonts;
-    private ArrayList<Table> _tables = new ArrayList<Table>();
     private boolean _resourceFork = false;
 
     static final Logger logger = LoggerFactory.getLogger(OTFontCollection.class);
@@ -80,21 +79,6 @@ public class OTFontCollection {
     
     public TTCHeader getTtcHeader() {
         return _ttcHeader;
-    }
-
-    public Table getTable(DirectoryEntry de) {
-        for (int i = 0; i < _tables.size(); i++) {
-            Table table = _tables.get(i);
-            if ((table.getDirectoryEntry().getTag() == de.getTag()) &&
-                (table.getDirectoryEntry().getOffset() == de.getOffset())) {
-                return table;
-            }
-        }
-        return null;
-    }
-
-    public void addTable(Table table) {
-        _tables.add(table);
     }
 
     /**
@@ -151,10 +135,9 @@ public class OTFontCollection {
             _fonts = new OTFont[resourceType.getCount()];
             for (int i = 0; i < resourceType.getCount(); i++) {
                 ResourceReference resourceReference = resourceType.getReference(i);
-                _fonts[i] = new OTFont(this);
                 int offset = resourceHeader.getDataOffset() +
                         resourceReference.getDataOffset() + 4;
-                _fonts[i].read(dis, offset, offset);
+                _fonts[i] = new TTFont(dis, offset /*, offset*/);
             }
 
         } else if (TTCHeader.isTTC(dis)) {
@@ -164,15 +147,15 @@ public class OTFontCollection {
             _ttcHeader = new TTCHeader(dis);
             _fonts = new OTFont[_ttcHeader.getDirectoryCount()];
             for (int i = 0; i < _ttcHeader.getDirectoryCount(); i++) {
-                _fonts[i] = new OTFont(this);
-                _fonts[i].read(dis, _ttcHeader.getTableDirectory(i), 0);
+                _fonts[i] = new TTFont(dis, _ttcHeader.getTableDirectory(i));
             }
         } else {
 
             // This is a standalone font file
             _fonts = new OTFont[1];
-            _fonts[0] = new OTFont(this);
-            _fonts[0].read(dis, 0, 0);
+            _fonts[0] = new TTFont(dis, 0);
+
+            // TODO T2Fonts
         }
         dis.close();
     }
