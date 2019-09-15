@@ -1,72 +1,28 @@
 /*
-
- ============================================================================
-                   The Apache Software License, Version 1.1
- ============================================================================
-
- Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modifica-
- tion, are permitted provided that the following conditions are met:
-
- 1. Redistributions of  source code must  retain the above copyright  notice,
-    this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. The end-user documentation included with the redistribution, if any, must
-    include  the following  acknowledgment:  "This product includes  software
-    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
-    Alternately, this  acknowledgment may  appear in the software itself,  if
-    and wherever such third-party acknowledgments normally appear.
-
- 4. The names "Batik" and  "Apache Software Foundation" must  not  be
-    used to  endorse or promote  products derived from  this software without
-    prior written permission. For written permission, please contact
-    apache@apache.org.
-
- 5. Products  derived from this software may not  be called "Apache", nor may
-    "Apache" appear  in their name,  without prior written permission  of the
-    Apache Software Foundation.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
- APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
- DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
- OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
- ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
- (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
- This software  consists of voluntary contributions made  by many individuals
- on  behalf of the Apache Software  Foundation. For more  information on the
- Apache Software Foundation, please see <http://www.apache.org/>.
-
-*/
+ * Typecast
+ *
+ * Copyright © 2004-2019 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.java.dev.typecast.ot;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import net.java.dev.typecast.ot.table.CmapTable;
-import net.java.dev.typecast.ot.table.DirectoryEntry;
-import net.java.dev.typecast.ot.table.HeadTable;
-import net.java.dev.typecast.ot.table.HheaTable;
-import net.java.dev.typecast.ot.table.HmtxTable;
-import net.java.dev.typecast.ot.table.MaxpTable;
-import net.java.dev.typecast.ot.table.NameTable;
-import net.java.dev.typecast.ot.table.Os2Table;
-import net.java.dev.typecast.ot.table.PostTable;
-import net.java.dev.typecast.ot.table.Table;
-import net.java.dev.typecast.ot.table.TableDirectory;
-import net.java.dev.typecast.ot.table.VheaTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.java.dev.typecast.ot.table.*;
 
 /**
  * The TrueType font.
@@ -75,7 +31,6 @@ import org.slf4j.LoggerFactory;
 public class OTFont {
 
     private Os2Table _os2;
-//    private CffTable _cff;
     private CmapTable _cmap;
     private HeadTable _head;
     private HheaTable _hhea;
@@ -84,11 +39,10 @@ public class OTFont {
     private NameTable _name;
     private PostTable _post;
     private VheaTable _vhea;
-
-    static final Logger logger = LoggerFactory.getLogger(OTFont.class);
+    private GsubTable _gsub;
 
     /**
-     * @param dis OpenType/TrueType font file data.
+     * @param fontData OpenType/TrueType font file data.
      * @param directoryOffset The Table Directory offset within the file.  For a
      * regular TTF/OTF file this will be zero, but for a TTC (Font Collection)
      * the offset is retrieved from the TTC header.  For a Mac font resource,
@@ -99,12 +53,15 @@ public class OTFont {
      * individual font resource data.
      * @throws java.io.IOException
      */
-    public OTFont(DataInputStream dis, int tablesOrigin) throws IOException {
+    OTFont(byte[] fontData, int tablesOrigin) throws IOException {
 
         // Load the table directory
-        dis.reset();
 //        dis.skip(directoryOffset);
-        TableDirectory tableDirectory = new TableDirectory(dis);
+        TableDirectory tableDirectory = new TableDirectory(fontData);
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
+        dis.mark(fontData.length);
+        dis.reset();
 
         // Load some prerequisite tables
         // (These are tables that are referenced by other tables, so we need to load
@@ -139,28 +96,11 @@ public class OTFont {
         _name = new NameTable(dis, length);
         seekTable(tableDirectory, dis, tablesOrigin, Table.OS_2);
         _os2 = new Os2Table(dis);
-
-        // If this is a TrueType outline, then we'll have at least the
-        // 'glyf' table (along with the 'loca' table)
-//        _glyf = (GlyfTable) getTable(Table.glyf);
     }
-
-//    public Table getTable(int tableType) {
-//        for (Table _table : _tables) {
-//            if ((_table != null) && (_table.getType() == tableType)) {
-//                return _table;
-//            }
-//        }
-//        return null;
-//    }
 
     public Os2Table getOS2Table() {
         return _os2;
     }
-    
-//    public CffTable getCffTable() {
-//        return _cff;
-//    }
     
     public CmapTable getCmapTable() {
         return _cmap;
@@ -178,10 +118,6 @@ public class OTFont {
         return _hmtx;
     }
     
-//    public LocaTable getLocaTable() {
-//        return _loca;
-//    }
-    
     public MaxpTable getMaxpTable() {
         return _maxp;
     }
@@ -196,6 +132,10 @@ public class OTFont {
 
     public VheaTable getVheaTable() {
         return _vhea;
+    }
+
+    public GsubTable getGsubTable() {
+        return _gsub;
     }
 
     public int getAscent() {
@@ -227,25 +167,19 @@ public class OTFont {
 //        }
 //    }
 
-    protected int seekTable(
+    int seekTable(
             TableDirectory tableDirectory,
             DataInputStream dis,
             int tablesOrigin,
             int tag) throws IOException {
         dis.reset();
-        DirectoryEntry entry = tableDirectory.getEntryByTag(tag);
+        TableDirectory.Entry entry = tableDirectory.getEntryByTag(tag);
         if (entry == null) {
             return 0;
         }
         dis.skip(tablesOrigin + entry.getOffset());
         return entry.getLength();
     }
-
-//    protected void read(
-//            DataInputStream dis,
-//            int directoryOffset,
-//            int tablesOrigin) throws IOException {
-//    }
 
     public String toString() {
         return _head.toString();

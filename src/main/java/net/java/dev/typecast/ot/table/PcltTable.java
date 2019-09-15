@@ -17,7 +17,6 @@ import java.io.IOException;
  */
 public class PcltTable implements Table {
 
-    private DirectoryEntry de;
     private int version;
     private long fontNumber;
     private int pitch;
@@ -35,8 +34,7 @@ public class PcltTable implements Table {
     private byte reserved;
 
     /** Creates new PcltTable */
-    protected PcltTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    protected PcltTable(DataInput di) throws IOException {
         version = di.readInt();
         fontNumber = di.readInt();
         pitch = di.readUnsignedShort();
@@ -60,14 +58,6 @@ public class PcltTable implements Table {
         reserved = di.readByte();
     }
 
-    /**
-     * Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return PCLT;
-    }
-    
     public String toString() {
         return new StringBuffer()
             .append("'PCLT' Table - Printer Command Language Table\n---------------------------------------------")
@@ -90,15 +80,5 @@ public class PcltTable implements Table {
             .append("\n        reserved:            ").append(reserved)
             .toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

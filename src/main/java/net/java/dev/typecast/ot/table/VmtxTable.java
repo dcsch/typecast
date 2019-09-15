@@ -27,16 +27,13 @@ import java.io.IOException;
  */
 public class VmtxTable implements Table {
 
-    private DirectoryEntry _de;
     private int[] _vMetrics = null;
     private short[] _topSideBearing = null;
 
     protected VmtxTable(
-            DirectoryEntry de,
             DataInput di,
             VheaTable vhea,
             MaxpTable maxp) throws IOException {
-        _de = (DirectoryEntry) de.clone();
         _vMetrics = new int[vhea.getNumberOfLongVerMetrics()];
         for (int i = 0; i < vhea.getNumberOfLongVerMetrics(); ++i) {
             _vMetrics[i] =
@@ -74,15 +71,11 @@ public class VmtxTable implements Table {
         }
     }
 
-    public int getType() {
-        return vmtx;
-    }
-
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'vmtx' Table - Vertical Metrics\n-------------------------------\n");
-        sb.append("Size = ").append(_de.getLength()).append(" bytes, ")
-            .append(_vMetrics.length).append(" entries\n");
+//        sb.append("Size = ").append(_de.getLength()).append(" bytes, ")
+            sb.append(_vMetrics.length).append(" entries\n");
         for (int i = 0; i < _vMetrics.length; i++) {
             sb.append("        ").append(i)
                 .append(". advHeight: ").append(getAdvanceHeight(i))
@@ -97,13 +90,4 @@ public class VmtxTable implements Table {
         return sb.toString();
     }
 
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return _de;
-    }
 }

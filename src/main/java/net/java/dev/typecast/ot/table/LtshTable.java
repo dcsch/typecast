@@ -17,14 +17,12 @@ import java.io.IOException;
  */
 public class LtshTable implements Table {
 
-    private DirectoryEntry de;
     private int version;
     private int numGlyphs;
     private int[] yPels;
     
     /** Creates new LtshTable */
-    protected LtshTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
+    protected LtshTable(DataInput di) throws IOException {
         version = di.readUnsignedShort();
         numGlyphs = di.readUnsignedShort();
         yPels = new int[numGlyphs];
@@ -33,14 +31,6 @@ public class LtshTable implements Table {
         }
     }
 
-    /**
-     * Get the table type, as a table directory value.
-     * @return The table type
-     */
-    public int getType() {
-        return LTSH;
-    }
-    
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("'LTSH' Table - Linear Threshold Table\n-------------------------------------")
@@ -53,15 +43,5 @@ public class LtshTable implements Table {
         }
         return sb.toString();
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }

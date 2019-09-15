@@ -1,8 +1,28 @@
+/*
+ * Typecast
+ *
+ * Copyright © 2004-2019 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.java.dev.typecast.ot;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -25,12 +45,11 @@ public class TTFontTest extends TestCase {
         return new TestSuite(TTFontTest.class);
     }
 
-    public void testLoadSingleFont() throws URISyntaxException, IOException {
+    public void testLoadFont() throws URISyntaxException, IOException {
         URL url = ClassLoader.getSystemResource("Lato-Regular.ttf");
         File file = new File(url.toURI());
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file), (int)file.length()));
-        dis.mark((int)file.length());
-        TTFont font = new TTFont(dis, 0);
+        byte[] fontData = Files.readAllBytes(file.toPath());
+        TTFont font = new TTFont(fontData, 0);
         assertEquals(HeadTable.class, font.getHeadTable().getClass());
     }
 }

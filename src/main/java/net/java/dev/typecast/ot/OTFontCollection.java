@@ -1,7 +1,7 @@
 /*
- * Typecast - The Font Development Environment
+ * Typecast
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright © 2004-2019 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,12 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import net.java.dev.typecast.ot.mac.ResourceHeader;
 import net.java.dev.typecast.ot.mac.ResourceMap;
 import net.java.dev.typecast.ot.mac.ResourceReference;
 import net.java.dev.typecast.ot.mac.ResourceType;
-import net.java.dev.typecast.ot.table.DirectoryEntry;
 import net.java.dev.typecast.ot.table.TTCHeader;
-import net.java.dev.typecast.ot.table.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,34 +38,10 @@ import org.slf4j.LoggerFactory;
  */
 public class OTFontCollection {
 
-    private String _pathName;
-    private String _fileName;
     private TTCHeader _ttcHeader;
     private OTFont[] _fonts;
-    private boolean _resourceFork = false;
 
-    static final Logger logger = LoggerFactory.getLogger(OTFontCollection.class);
-
-    /** Creates new FontCollection */
-    protected OTFontCollection() {
-    }
-
-    /**
-     * @param file The OpenType font file
-     */
-    public static OTFontCollection create(File file) throws IOException {
-        OTFontCollection fc = new OTFontCollection();
-        fc.read(file);
-        return fc;
-    }
-
-    public String getPathName() {
-        return _pathName;
-    }
-
-    public String getFileName() {
-        return _fileName;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(OTFontCollection.class);
 
     public OTFont getFont(int i) {
         return _fonts[i];
@@ -84,22 +58,20 @@ public class OTFontCollection {
     /**
      * @param file The OpenType font file
      */
-    protected void read(File file) throws IOException {
-        _pathName = file.getPath();
-        _fileName = file.getName();
-
+    public OTFontCollection(File file) throws IOException {
         if (!file.exists()) {
             throw new IOException();
         }
 
         // Do we need to modify the path name to deal with font resources
         // in a Mac resource fork?
+        boolean resourceFork = false;
         if (file.length() == 0) {
             file = new File(file, "..namedfork/rsrc");
             if (!file.exists()) {
                 throw new IOException();
             }
-            _resourceFork = true;
+            resourceFork = true;
         }
 
         DataInputStream dis = new DataInputStream(
@@ -107,7 +79,7 @@ public class OTFontCollection {
                 new FileInputStream(file), (int) file.length()));
         dis.mark((int) file.length());
 
-        if (_resourceFork || _pathName.endsWith(".dfont")) {
+        if (resourceFork || file.getPath().endsWith(".dfont")) {
 
             // This is a Macintosh font suitcase resource
             ResourceHeader resourceHeader = new ResourceHeader(dis);
@@ -137,7 +109,8 @@ public class OTFontCollection {
                 ResourceReference resourceReference = resourceType.getReference(i);
                 int offset = resourceHeader.getDataOffset() +
                         resourceReference.getDataOffset() + 4;
-                _fonts[i] = new TTFont(dis, offset /*, offset*/);
+                byte[] fontData = Files.readAllBytes(file.toPath());
+                _fonts[i] = new TTFont(fontData, offset /*, offset*/);
             }
 
         } else if (TTCHeader.isTTC(dis)) {
@@ -147,13 +120,15 @@ public class OTFontCollection {
             _ttcHeader = new TTCHeader(dis);
             _fonts = new OTFont[_ttcHeader.getDirectoryCount()];
             for (int i = 0; i < _ttcHeader.getDirectoryCount(); i++) {
-                _fonts[i] = new TTFont(dis, _ttcHeader.getTableDirectory(i));
+                byte[] fontData = Files.readAllBytes(file.toPath());
+                _fonts[i] = new TTFont(fontData, _ttcHeader.getTableDirectory(i));
             }
         } else {
 
             // This is a standalone font file
             _fonts = new OTFont[1];
-            _fonts[0] = new TTFont(dis, 0);
+            byte[] fontData = Files.readAllBytes(file.toPath());
+            _fonts[0] = new TTFont(fontData, 0);
 
             // TODO T2Fonts
         }

@@ -50,7 +50,9 @@
 
 package net.java.dev.typecast.ot.table;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import net.java.dev.typecast.ot.Fixed;
 
@@ -59,30 +61,76 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class TableDirectory {
 
-    private int _version = 0;
-    private short _numTables = 0;
-    private short _searchRange = 0;
-    private short _entrySelector = 0;
-    private short _rangeShift = 0;
-    private DirectoryEntry[] _entries;
+    public static class Entry {
 
-    public TableDirectory(DataInput di) throws IOException {
-        _version = di.readInt();
-        _numTables = di.readShort();
-        _searchRange = di.readShort();
-        _entrySelector = di.readShort();
-        _rangeShift = di.readShort();
-        _entries = new DirectoryEntry[_numTables];
-        for (int i = 0; i < _numTables; i++) {
-            _entries[i] = new DirectoryEntry(di);
+        private int _tag;
+        private int _checksum;
+        private int _offset;
+        private int _length;
+
+        Entry(DataInput di) throws IOException {
+            _tag = di.readInt();
+            _checksum = di.readInt();
+            _offset = di.readInt();
+            _length = di.readInt();
+        }
+
+        public int getChecksum() {
+            return _checksum;
+        }
+
+        public int getLength() {
+            return _length;
+        }
+
+        public int getOffset() {
+            return _offset;
+        }
+
+        int getTag() {
+            return _tag;
+        }
+
+        String getTagAsString() {
+            return String.valueOf((char) ((_tag >> 24) & 0xff)) +
+                    (char) ((_tag >> 16) & 0xff) +
+                    (char) ((_tag >> 8) & 0xff) +
+                    (char) ((_tag) & 0xff);
+        }
+
+        public String toString() {
+            return "'" + getTagAsString() +
+                    "' - chksm = 0x" + Integer.toHexString(_checksum) +
+                    ", off = 0x" + Integer.toHexString(_offset) +
+                    ", len = " + _length;
         }
     }
 
-    public DirectoryEntry getEntry(int index) {
+    private int _version;
+    private short _numTables;
+    private short _searchRange;
+    private short _entrySelector;
+    private short _rangeShift;
+    private Entry[] _entries;
+
+    public TableDirectory(byte[] fontData) throws IOException {
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
+        _version = dis.readInt();
+        _numTables = dis.readShort();
+        _searchRange = dis.readShort();
+        _entrySelector = dis.readShort();
+        _rangeShift = dis.readShort();
+        _entries = new Entry[_numTables];
+        for (int i = 0; i < _numTables; i++) {
+            _entries[i] = new Entry(dis);
+        }
+    }
+
+    public Entry getEntry(int index) {
         return _entries[index];
     }
 
-    public DirectoryEntry getEntryByTag(int tag) {
+    public Entry getEntryByTag(int tag) {
         for (int i = 0; i < _numTables; i++) {
             if (_entries[i].getTag() == tag) {
                 return _entries[i];
@@ -112,7 +160,7 @@ public class TableDirectory {
     }
     
     public String toString() {
-        StringBuffer sb = new StringBuffer()
+        StringBuilder sb = new StringBuilder()
             .append("Offset Table\n------ -----")
             .append("\n  sfnt version:     ").append(Fixed.floatValue(_version))
             .append("\n  numTables =       ").append(_numTables)

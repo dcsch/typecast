@@ -17,29 +17,12 @@ import net.java.dev.typecast.ot.Disassembler;
  */
 public class PrepTable extends Program implements Table {
 
-    private DirectoryEntry de;
-
-    public PrepTable(DirectoryEntry de, DataInput di) throws IOException {
-        this.de = (DirectoryEntry) de.clone();
-        readInstructions(di, de.getLength());
-    }
-
-    public int getType() {
-        return prep;
+    public PrepTable(DataInput di, int length) throws IOException {
+        readInstructions(di, length);
     }
 
     public String toString() {
         return Disassembler.disassemble(getInstructions(), 0);
     }
-    
-    /**
-     * Get a directory entry for this table.  This uniquely identifies the
-     * table in collections where there may be more than one instance of a
-     * particular table.
-     * @return A directory entry
-     */
-    public DirectoryEntry getDirectoryEntry() {
-        return de;
-    }
-    
+
 }
