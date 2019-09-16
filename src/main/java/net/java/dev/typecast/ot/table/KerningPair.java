@@ -22,7 +22,7 @@ public class KerningPair {
     private short value;
 
     /** Creates new KerningPair */
-    protected KerningPair(DataInput di) throws IOException {
+    KerningPair(DataInput di) throws IOException {
         left = di.readUnsignedShort();
         right = di.readUnsignedShort();
         value = di.readShort();

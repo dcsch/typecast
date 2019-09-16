@@ -22,7 +22,7 @@ package net.java.dev.typecast.cff;
  * The Mnemonic representations of the Type 2 charstring instruction set.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class T2Mnemonic {
+class T2Mnemonic {
 
     /**
      * One byte operators

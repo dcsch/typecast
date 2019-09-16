@@ -65,7 +65,7 @@ public class LangSys {
     private int[] _featureIndex;
     
     /** Creates new LangSys */
-    protected LangSys(DataInput di) throws IOException {
+    LangSys(DataInput di) throws IOException {
         _lookupOrder = di.readUnsignedShort();
         _reqFeatureIndex = di.readUnsignedShort();
         _featureCount = di.readUnsignedShort();
@@ -91,7 +91,7 @@ public class LangSys {
         return _featureIndex[i];
     }
 
-    protected boolean isFeatureIndexed(int n) {
+    boolean isFeatureIndexed(int n) {
         for (int i = 0; i < _featureCount; i++) {
             if (_featureIndex[i] == n) {
                 return true;

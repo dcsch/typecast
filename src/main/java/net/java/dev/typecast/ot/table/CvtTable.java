@@ -8,16 +8,15 @@
 
 package net.java.dev.typecast.ot.table;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.IOException;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CvtTable implements Table {
+class CvtTable implements Table {
 
-    private short[] values;
+    private final short[] values;
 
     protected CvtTable(DataInput di, int length) throws IOException {
         int len = length / 2;
@@ -32,7 +31,7 @@ public class CvtTable implements Table {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'cvt ' Table - Control Value Table\n----------------------------------\n");
         sb.append("Size = ").append(0).append(" bytes, ").append(values.length).append(" entries\n");
         sb.append("        Values\n        ------\n");

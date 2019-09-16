@@ -60,21 +60,21 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
 
     // flags
     public static final byte onCurve = 0x01;
-    public static final byte xShortVector = 0x02;
-    public static final byte yShortVector = 0x04;
-    public static final byte repeat = 0x08;
-    public static final byte xDual = 0x10;
-    public static final byte yDual = 0x20;
+    static final byte xShortVector = 0x02;
+    static final byte yShortVector = 0x04;
+    static final byte repeat = 0x08;
+    static final byte xDual = 0x10;
+    static final byte yDual = 0x20;
 
-    protected GlyfTable _parentTable;
+    final GlyfTable _parentTable;
     private int _glyphIndex;
-    private int _numberOfContours;
+    private final int _numberOfContours;
     private short _xMin;
     private short _yMin;
     private short _xMax;
     private short _yMax;
 
-    protected GlyfDescript(
+    GlyfDescript(
             GlyfTable parentTable,
             int glyphIndex,
             short numberOfContours,
@@ -87,7 +87,7 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
         _yMax = di.readShort();
     }
 
-    public int getNumberOfContours() {
+    int getNumberOfContours() {
         return _numberOfContours;
     }
 
@@ -112,12 +112,10 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
     }
     
     public String toString() {
-        return new StringBuffer()
-            .append("          numberOfContours: ").append(_numberOfContours)
-            .append("\n          xMin:             ").append(_xMin)
-            .append("\n          yMin:             ").append(_yMin)
-            .append("\n          xMax:             ").append(_xMax)
-            .append("\n          yMax:             ").append(_yMax)
-            .toString();
+        return "          numberOfContours: " + _numberOfContours +
+                "\n          xMin:             " + _xMin +
+                "\n          yMin:             " + _yMin +
+                "\n          xMax:             " + _xMax +
+                "\n          yMax:             " + _yMax;
     }
 }

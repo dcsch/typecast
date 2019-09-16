@@ -104,26 +104,24 @@ public class VheaTable implements Table {
     }
 
     public String toString() {
-        return new StringBuffer()
-            .append("'vhea' Table - Vertical Header\n------------------------------")
-            .append("\n        'vhea' version:       ").append(Fixed.floatValue(_version))
-            .append("\n        xAscender:            ").append(_ascent)
-            .append("\n        xDescender:           ").append(_descent)
-            .append("\n        xLineGap:             ").append(_lineGap)
-            .append("\n        advanceHeightMax:     ").append(_advanceHeightMax)
-            .append("\n        minTopSideBearing:    ").append(_minTopSideBearing)
-            .append("\n        minBottomSideBearing: ").append(_minBottomSideBearing)
-            .append("\n        yMaxExtent:           ").append(_yMaxExtent)
-            .append("\n        horizCaretSlopeNum:   ").append(_caretSlopeRise)
-            .append("\n        horizCaretSlopeDenom: ").append(_caretSlopeRun)
-            .append("\n        reserved0:            0")
-            .append("\n        reserved1:            0")
-            .append("\n        reserved2:            0")
-            .append("\n        reserved3:            0")
-            .append("\n        reserved4:            0")
-            .append("\n        metricDataFormat:     ").append(_metricDataFormat)
-            .append("\n        numOf_LongVerMetrics: ").append(_numberOfLongVerMetrics)
-            .toString();
+        return "'vhea' Table - Vertical Header\n------------------------------" +
+                "\n        'vhea' version:       " + Fixed.floatValue(_version) +
+                "\n        xAscender:            " + _ascent +
+                "\n        xDescender:           " + _descent +
+                "\n        xLineGap:             " + _lineGap +
+                "\n        advanceHeightMax:     " + _advanceHeightMax +
+                "\n        minTopSideBearing:    " + _minTopSideBearing +
+                "\n        minBottomSideBearing: " + _minBottomSideBearing +
+                "\n        yMaxExtent:           " + _yMaxExtent +
+                "\n        horizCaretSlopeNum:   " + _caretSlopeRise +
+                "\n        horizCaretSlopeDenom: " + _caretSlopeRun +
+                "\n        reserved0:            0" +
+                "\n        reserved1:            0" +
+                "\n        reserved2:            0" +
+                "\n        reserved3:            0" +
+                "\n        reserved4:            0" +
+                "\n        metricDataFormat:     " + _metricDataFormat +
+                "\n        numOf_LongVerMetrics: " + _numberOfLongVerMetrics;
     }
     
 }

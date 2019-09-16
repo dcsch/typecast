@@ -21,7 +21,6 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -57,7 +56,7 @@ public class Dict {
         return _entries.get(key);
     }
 
-    private boolean addKeyAndValueEntry() {
+    private void addKeyAndValueEntry() {
         ArrayList<Object> operands = new ArrayList<>();
         Object operand = null;
         while (isOperandAtIndex()) {
@@ -74,7 +73,6 @@ public class Dict {
         } else {
             _entries.put(operator, operands);
         }
-        return true;
     }
 
     private boolean isOperandAtIndex() {
@@ -153,9 +151,7 @@ public class Dict {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        Iterator<Integer> keys = _entries.keySet().iterator();
-        while (keys.hasNext()) {
-            Integer key = keys.next();
+        for (Integer key : _entries.keySet()) {
             if ((key & 0xc00) == 0xc00) {
                 sb.append("12 ").append(key & 0xff).append(": ");
             } else {

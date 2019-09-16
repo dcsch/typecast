@@ -26,13 +26,13 @@ import java.io.RandomAccessFile;
  * TODO: incorporate this into the test suite.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class ResourceFile {
+class ResourceFile {
 
     private ResourceHeader header;
     private ResourceMap map;
     
     /** Creates new Resource */
-    public ResourceFile(RandomAccessFile raf) throws IOException {
+    private ResourceFile(RandomAccessFile raf) throws IOException {
 
         // Read header at the beginning of the file
         raf.seek(0);
@@ -43,7 +43,7 @@ public class ResourceFile {
         map = new ResourceMap(raf);
     }
 
-    public ResourceMap getResourceMap() {
+    private ResourceMap getResourceMap() {
         return map;
     }
 

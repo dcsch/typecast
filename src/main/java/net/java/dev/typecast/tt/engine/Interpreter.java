@@ -27,15 +27,15 @@ import net.java.dev.typecast.ot.Point;
  * or some other.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Interpreter {
+class Interpreter {
 
     private Parser parser = null;
-    private GraphicsState gs = new GraphicsState();
-    private Point[][] zone = new Point[2][];
-    private int[] stack = null;
-    private int[] store = null;
-    private int[] cvt = new int[256];
-    private int[] functionMap = null;
+    private final GraphicsState gs = new GraphicsState();
+    private final Point[][] zone = new Point[2][];
+    private int[] stack;
+    private int[] store;
+    private final int[] cvt = new int[256];
+    private int[] functionMap;
     private int stackIndex = 0;
     private boolean inFuncDef = false;
 
@@ -450,7 +450,8 @@ public class Interpreter {
      * JuMP Relative
      */
     private int _jmpr(int instructionIndex) {
-        return instructionIndex += pop() - 1;
+        instructionIndex += pop() - 1;
+        return instructionIndex;
     }
 
     /**
@@ -512,7 +513,7 @@ public class Interpreter {
     private void _max() {
         int n1 = pop();
         int n2 = pop();
-        push((n1 > n2) ? n1 : n2);
+        push(Math.max(n1, n2));
     }
 
     private void _md(short param) {
@@ -539,7 +540,7 @@ public class Interpreter {
     private void _min() {
         int n1 = pop();
         int n2 = pop();
-        push((n1 < n2) ? n1 : n2);
+        push(Math.min(n1, n2));
     }
 
     /**
@@ -631,8 +632,8 @@ public class Interpreter {
      * PUSH Words
      */
     private void _push(int[] data) {
-        for (int j = 0; j < data.length; j++) {
-            push(data[j]);
+        for (int datum : data) {
+            push(datum);
         }
     }
 
@@ -1183,7 +1184,7 @@ public class Interpreter {
         store[pop()] = pop();
     }
 
-    public void execute(int ip) {
+    private void execute(int ip) {
         while (ip < ((ip & 0xffff0000) | parser.getISLength(ip >> 16))) {
             short opcode = parser.getOpcode(ip);
             if (inFuncDef) {

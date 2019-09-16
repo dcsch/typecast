@@ -63,7 +63,7 @@ public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
     private int _offset;
     private CmapFormat _format;
 
-    protected CmapIndexEntry(DataInput di) throws IOException {
+    CmapIndexEntry(DataInput di) throws IOException {
         _platformId = di.readUnsignedShort();
         _encodingId = di.readUnsignedShort();
         _offset = di.readInt();
@@ -91,27 +91,20 @@ public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
 
     @Override
     public String toString() {
-        return new StringBuffer()
-            .append("platform id: ")
-            .append(_platformId)
-            .append(" (")
-            .append(ID.getPlatformName((short) _platformId))
-            .append("), encoding id: ")
-            .append(_encodingId)
-            .append(" (")
-            .append(ID.getEncodingName((short) _platformId, (short) _encodingId))
-            .append("), offset: ")
-            .append(_offset).toString();
+        return "platform id: " +
+                _platformId +
+                " (" +
+                ID.getPlatformName((short) _platformId) +
+                "), encoding id: " +
+                _encodingId +
+                " (" +
+                ID.getEncodingName((short) _platformId, (short) _encodingId) +
+                "), offset: " +
+                _offset;
     }
 
     @Override
     public int compareTo(CmapIndexEntry entry) {
-        if (getOffset() < entry.getOffset()) {
-            return -1;
-        } else if (getOffset() > entry.getOffset()) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return Integer.compare(getOffset(), entry.getOffset());
     }
 }

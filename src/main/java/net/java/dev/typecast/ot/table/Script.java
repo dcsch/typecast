@@ -66,7 +66,7 @@ public class Script {
     private LangSys[] _langSys;
     
     /** Creates new ScriptTable */
-    protected Script(DataInputStream dis, int offset) throws IOException {
+    Script(DataInputStream dis, int offset) throws IOException {
 
         // Ensure we're in the right place
         dis.reset();

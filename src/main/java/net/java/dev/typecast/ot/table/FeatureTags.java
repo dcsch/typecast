@@ -56,7 +56,7 @@ package net.java.dev.typecast.ot.table;
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  */
 public interface FeatureTags {
-    public static final String FEATURE_TAG_INIT = "init";
-    public static final String FEATURE_TAG_MEDI = "medi";
-    public static final String FEATURE_TAG_FINA = "fina";
+    String FEATURE_TAG_INIT = "init";
+    String FEATURE_TAG_MEDI = "medi";
+    String FEATURE_TAG_FINA = "fina";
 }

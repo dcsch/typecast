@@ -21,35 +21,35 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CpalTable implements Table {
+class CpalTable implements Table {
 
-    public class ColorRecord {
+    static class ColorRecord {
 
         private final short _blue;
         private final short _green;
         private final short _red;
         private final short _alpha;
 
-        protected ColorRecord(DataInput di) throws IOException {
+        ColorRecord(DataInput di) throws IOException {
             _blue = (short) di.readUnsignedByte();
             _green = (short) di.readUnsignedByte();
             _red = (short) di.readUnsignedByte();
             _alpha = (short) di.readUnsignedByte();
         }
 
-        public short getBlue() {
+        short getBlue() {
             return _blue;
         }
 
-        public short getGreen() {
+        short getGreen() {
             return _green;
         }
 
-        public short getRed() {
+        short getRed() {
             return _red;
         }
 
-        public short getAlpha() {
+        short getAlpha() {
             return _alpha;
         }
     }

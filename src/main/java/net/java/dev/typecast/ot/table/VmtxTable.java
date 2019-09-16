@@ -25,10 +25,10 @@ import java.io.IOException;
  * Vertical Metrics Table
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class VmtxTable implements Table {
+class VmtxTable implements Table {
 
-    private int[] _vMetrics = null;
-    private short[] _topSideBearing = null;
+    private int[] _vMetrics;
+    private short[] _topSideBearing;
 
     protected VmtxTable(
             DataInput di,
@@ -49,7 +49,7 @@ public class VmtxTable implements Table {
         }
     }
 
-    public int getAdvanceHeight(int i) {
+    private int getAdvanceHeight(int i) {
         if (_vMetrics == null) {
             return 0;
         }
@@ -60,7 +60,7 @@ public class VmtxTable implements Table {
         }
     }
 
-    public short getTopSideBearing(int i) {
+    private short getTopSideBearing(int i) {
         if (_vMetrics == null) {
             return 0;
         }
@@ -72,7 +72,7 @@ public class VmtxTable implements Table {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'vmtx' Table - Vertical Metrics\n-------------------------------\n");
 //        sb.append("Size = ").append(_de.getLength()).append(" bytes, ")
             sb.append(_vMetrics.length).append(" entries\n");

@@ -66,7 +66,7 @@ public class NameRecord {
     private short _stringOffset;
     private String _record;
 
-    protected NameRecord(DataInput di) throws IOException {
+    NameRecord(DataInput di) throws IOException {
         _platformId = di.readShort();
         _encodingId = di.readShort();
         _languageId = di.readShort();
@@ -95,8 +95,8 @@ public class NameRecord {
         return _record;
     }
 
-    protected void loadString(DataInput di) throws IOException {
-        StringBuffer sb = new StringBuffer();
+    void loadString(DataInput di) throws IOException {
+        StringBuilder sb = new StringBuilder();
         di.skipBytes(_stringOffset);
         if (_platformId == ID.platformUnicode) {
             
@@ -129,16 +129,14 @@ public class NameRecord {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        
-        sb.append("             Platform ID:       ").append(_platformId)
-            .append("\n             Specific ID:       ").append(_encodingId)
-            .append("\n             Language ID:       ").append(_languageId)
-            .append("\n             Name ID:           ").append(_nameId)
-            .append("\n             Length:            ").append(_stringLength)
-            .append("\n             Offset:            ").append(_stringOffset)
-            .append("\n\n").append(_record);
-        
-        return sb.toString();
+
+        String sb = "             Platform ID:       " + _platformId +
+                "\n             Specific ID:       " + _encodingId +
+                "\n             Language ID:       " + _languageId +
+                "\n             Name ID:           " + _nameId +
+                "\n             Length:            " + _stringLength +
+                "\n             Offset:            " + _stringOffset +
+                "\n\n" + _record;
+        return sb;
     }
 }

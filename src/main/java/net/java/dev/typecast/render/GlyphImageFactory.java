@@ -33,7 +33,7 @@ import net.java.dev.typecast.ot.Glyph;
  * A factory for generating bitmaps from glyph outlines.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class GlyphImageFactory {
+class GlyphImageFactory {
     
     /**
      * Build an {@link java.awt.Image Image} from a

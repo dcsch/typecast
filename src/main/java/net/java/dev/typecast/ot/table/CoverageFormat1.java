@@ -63,7 +63,7 @@ public class CoverageFormat1 extends Coverage {
     private final int[] _glyphIds;
 
     /** Creates new CoverageFormat1 */
-    protected CoverageFormat1(DataInput di) throws IOException {
+    CoverageFormat1(DataInput di) throws IOException {
         _glyphCount = di.readUnsignedShort();
         _glyphIds = new int[_glyphCount];
         for (int i = 0; i < _glyphCount; i++) {

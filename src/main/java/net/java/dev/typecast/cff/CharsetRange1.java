@@ -24,9 +24,9 @@ import java.io.IOException;
  *
  * @author dschweinsberg
  */
-public class CharsetRange1 extends CharsetRange {
+class CharsetRange1 extends CharsetRange {
     
-    protected CharsetRange1(DataInput di) throws IOException {
+    CharsetRange1(DataInput di) throws IOException {
         setFirst(di.readUnsignedShort());
         setLeft(di.readUnsignedByte());
     }

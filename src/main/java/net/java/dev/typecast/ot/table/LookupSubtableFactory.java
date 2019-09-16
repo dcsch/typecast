@@ -57,7 +57,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public interface LookupSubtableFactory {
-    public LookupSubtable read(int type, DataInputStream dis, int offset)
+interface LookupSubtableFactory {
+    LookupSubtable read(int type, DataInputStream dis, int offset)
     throws IOException;
 }

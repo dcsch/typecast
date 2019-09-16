@@ -26,7 +26,7 @@ import net.java.dev.typecast.ot.table.TableException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public abstract class Exporter {
+abstract class Exporter {
     
     public abstract void export(OutputStream os) throws TableException;
 }

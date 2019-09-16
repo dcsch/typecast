@@ -35,7 +35,7 @@ public class ResourceReference {
     private String name;
     
     /** Creates new ResourceReference */
-    protected ResourceReference(DataInput di) throws IOException {
+    ResourceReference(DataInput di) throws IOException {
         id = di.readUnsignedShort();
         nameOffset = di.readShort();
         attributes = (short) di.readUnsignedByte();
@@ -43,7 +43,7 @@ public class ResourceReference {
         handle = di.readInt();
     }
 
-    protected void readName(DataInput di) throws IOException {
+    void readName(DataInput di) throws IOException {
         if (nameOffset > -1) {
             int len = di.readUnsignedByte();
             byte[] buf = new byte[len];

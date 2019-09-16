@@ -28,7 +28,7 @@ import java.io.IOException;
  */
 public class CmapFormat2 extends CmapFormat {
 
-    private class SubHeader {
+    private static class SubHeader {
         int _firstCode;
         int _entryCount;
         short _idDelta;
@@ -42,7 +42,7 @@ public class CmapFormat2 extends CmapFormat {
     private final SubHeader[] _subHeaders;
     private final int[] _glyphIndexArray;
 
-    protected CmapFormat2(DataInput di) throws IOException {
+    CmapFormat2(DataInput di) throws IOException {
         _length = di.readUnsignedShort();
         _language = di.readUnsignedShort();
         
@@ -128,7 +128,7 @@ public class CmapFormat2 extends CmapFormat {
         return new Range(
                 highByte | _subHeaders[index]._firstCode,
                 highByte | (_subHeaders[index]._firstCode +
-                    _subHeaders[index]._entryCount - 1));
+                        _subHeaders[index]._entryCount - 1));
     }
 
     @Override

@@ -56,7 +56,7 @@ package org.apache.batik.util;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  */
-public interface CSSConstants {
+interface CSSConstants {
 
     //
     // The CSS mime-type string.

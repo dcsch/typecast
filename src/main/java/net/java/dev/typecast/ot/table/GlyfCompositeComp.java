@@ -58,18 +58,18 @@ import java.io.IOException;
  */
 public class GlyfCompositeComp {
 
-    public static final short ARG_1_AND_2_ARE_WORDS = 0x0001;
-    public static final short ARGS_ARE_XY_VALUES = 0x0002;
+    private static final short ARG_1_AND_2_ARE_WORDS = 0x0001;
+    private static final short ARGS_ARE_XY_VALUES = 0x0002;
     public static final short ROUND_XY_TO_GRID = 0x0004;
-    public static final short WE_HAVE_A_SCALE = 0x0008;
+    private static final short WE_HAVE_A_SCALE = 0x0008;
     public static final short MORE_COMPONENTS = 0x0020;
-    public static final short WE_HAVE_AN_X_AND_Y_SCALE = 0x0040;
-    public static final short WE_HAVE_A_TWO_BY_TWO = 0x0080;
+    private static final short WE_HAVE_AN_X_AND_Y_SCALE = 0x0040;
+    private static final short WE_HAVE_A_TWO_BY_TWO = 0x0080;
     public static final short WE_HAVE_INSTRUCTIONS = 0x0100;
     public static final short USE_MY_METRICS = 0x0200;
 
-    private int _firstIndex;
-    private int _firstContour;
+    private final int _firstIndex;
+    private final int _firstContour;
     private short _argument1;
     private short _argument2;
     private int _flags;
@@ -83,7 +83,7 @@ public class GlyfCompositeComp {
     private int _point1 = 0;
     private int _point2 = 0;
 
-    protected GlyfCompositeComp(int firstIndex, int firstContour, DataInput di)
+    GlyfCompositeComp(int firstIndex, int firstContour, DataInput di)
     throws IOException {
         _firstIndex = firstIndex;
         _firstContour = firstContour;
@@ -95,8 +95,8 @@ public class GlyfCompositeComp {
             _argument1 = di.readShort();
             _argument2 = di.readShort();
         } else {
-            _argument1 = (short) di.readByte();
-            _argument2 = (short) di.readByte();
+            _argument1 = di.readByte();
+            _argument2 = di.readByte();
         }
 
         // Assign the arguments according to the flags

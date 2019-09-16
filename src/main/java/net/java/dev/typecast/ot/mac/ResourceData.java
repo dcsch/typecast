@@ -25,7 +25,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class ResourceData {
+class ResourceData {
 
     private byte[] data;
     

@@ -53,8 +53,7 @@ public class CharsetFormat2 extends Charset {
         int count = 1;
         for (CharsetRange range : _charsetRanges) {
             if (gid <= range.getLeft() + count) {
-                int sid = gid - count + range.getFirst();
-                return sid;
+                return gid - count + range.getFirst();
             }
             count += range.getLeft() + 1;
         }

@@ -15,7 +15,7 @@ import net.java.dev.typecast.ot.Disassembler;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class FpgmTable extends Program implements Table {
+class FpgmTable extends Program implements Table {
 
     protected FpgmTable(DataInput di, int length) throws IOException {
         readInstructions(di, length);

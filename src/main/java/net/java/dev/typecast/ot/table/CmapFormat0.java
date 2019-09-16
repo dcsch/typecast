@@ -33,7 +33,7 @@ public class CmapFormat0 extends CmapFormat {
     private final int _language;
     private final int[] _glyphIdArray = new int[256];
 
-    protected CmapFormat0(DataInput di) throws IOException {
+    CmapFormat0(DataInput di) throws IOException {
         _length = di.readUnsignedShort();
         _language = di.readUnsignedShort();
         for (int i = 0; i < 256; i++) {

@@ -68,32 +68,32 @@ public class LocalizableSupport implements Localizable {
     /**
      * The locale group to which this object belongs.
      */
-    protected LocaleGroup localeGroup = LocaleGroup.DEFAULT;
+    private LocaleGroup localeGroup = LocaleGroup.DEFAULT;
 
     /**
      * The resource bundle classname.
      */
-    protected String bundleName;
+    private final String bundleName;
 
     /**
      * The classloader to use to create the resource bundle.
      */
-    protected ClassLoader classLoader;
+    private final ClassLoader classLoader;
 
     /**
      * The current locale.
      */
-    protected Locale locale;
+    private Locale locale;
 
     /**
      * The locale in use.
      */
-    protected Locale usedLocale;
+    private Locale usedLocale;
 
     /**
      * The resources
      */
-    protected ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle;
 
     /**
      * Same as LocalizableSupport(s, null).
@@ -112,7 +112,7 @@ public class LocalizableSupport implements Localizable {
      *           or null.
      * @see java.util.ResourceBundle
      */
-    public LocalizableSupport(String s, ClassLoader cl) {
+    private LocalizableSupport(String s, ClassLoader cl) {
         bundleName = s;
         classLoader = cl;
     }
@@ -181,7 +181,7 @@ public class LocalizableSupport implements Localizable {
      * Implements {@link
      * org.apache.batik.i18n.ExtendedLocalizable#getResourceBundle()}.
      */
-    public ResourceBundle getResourceBundle() {
+    private ResourceBundle getResourceBundle() {
         Locale l;
 
         if (resourceBundle == null) {

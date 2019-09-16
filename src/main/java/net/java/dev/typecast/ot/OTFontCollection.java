@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class OTFontCollection {
+class OTFontCollection {
 
     private TTCHeader _ttcHeader;
     private OTFont[] _fonts;

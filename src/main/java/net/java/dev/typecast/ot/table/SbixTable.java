@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SbixTable implements Table {
 
-    public class GlyphDataRecord {
+    public static class GlyphDataRecord {
         private final short _originOffsetX;
         private final short _originOffsetY;
         private final int _graphicType;
@@ -39,7 +39,7 @@ public class SbixTable implements Table {
         
         private static final int PNG = 0x706E6720;
         
-        protected GlyphDataRecord(DataInput di, int dataLength) throws IOException {
+        GlyphDataRecord(DataInput di, int dataLength) throws IOException {
             _originOffsetX = di.readShort();
             _originOffsetY = di.readShort();
             _graphicType = di.readInt();
@@ -68,13 +68,13 @@ public class SbixTable implements Table {
         }
     }
     
-    public class Strike {
+    public static class Strike {
         private final int _ppem;
         private final int _resolution;
         private final long[] _glyphDataOffset;
         private final GlyphDataRecord[] _glyphDataRecord;
         
-        protected Strike(ByteArrayInputStream bais, int numGlyphs) throws IOException {
+        Strike(ByteArrayInputStream bais, int numGlyphs) throws IOException {
             DataInput di = new DataInputStream(bais);
             _ppem = di.readUnsignedShort();
             _resolution = di.readUnsignedShort();
@@ -112,9 +112,9 @@ public class SbixTable implements Table {
     private final int[] _strikeOffset;
     private final Strike[] _strikes;
 
-    static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
+    private static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
 
-    public SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
+    private SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
 
         // Load entire table into a buffer, and create another input stream
         byte[] buf = new byte[length];

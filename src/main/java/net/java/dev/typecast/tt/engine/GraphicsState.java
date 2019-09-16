@@ -29,14 +29,14 @@ class GraphicsState {
     public int delta_base = 9;
     public int delta_shift = 3;
     public int dual_projection_vectors;
-    public int[] freedom_vector = new int[2];
+    public final int[] freedom_vector = new int[2];
     public int zp0 = 1;
     public int zp1 = 1;
     public int zp2 = 1;
     public int instruction_control = 0;
     public int loop = 1;
     public int minimum_distance = 1;
-    public int[] projection_vector = new int[2];
+    public final int[] projection_vector = new int[2];
     public int round_state = 1;
     public int rp0 = 0;
     public int rp1 = 0;

@@ -17,7 +17,7 @@ import java.util.MissingResourceException;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  */
-public interface Localizable {
+interface Localizable {
     /**
      * Provides a way to the user to specify a locale which override the
      * default one. If null is passed to this method, the used locale

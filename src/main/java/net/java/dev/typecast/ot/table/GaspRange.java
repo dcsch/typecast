@@ -15,22 +15,22 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class GaspRange {
+class GaspRange {
 
-    public static final int GASP_GRIDFIT = 1;
-    public static final int GASP_DOGRAY = 2;
+    private static final int GASP_GRIDFIT = 1;
+    private static final int GASP_DOGRAY = 2;
     
     private int rangeMaxPPEM;
     private int rangeGaspBehavior;
     
     /** Creates new GaspRange */
-    protected GaspRange(DataInput di) throws IOException {
+    GaspRange(DataInput di) throws IOException {
         rangeMaxPPEM = di.readUnsignedShort();
         rangeGaspBehavior = di.readUnsignedShort();
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("  rangeMaxPPEM:        ").append(rangeMaxPPEM)
             .append("\n  rangeGaspBehavior:   0x").append(rangeGaspBehavior);
         if ((rangeGaspBehavior & GASP_GRIDFIT) != 0) {

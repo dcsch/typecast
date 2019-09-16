@@ -10,20 +10,19 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public abstract class Program {
+abstract class Program {
 
     private short[] instructions;
 
-    public short[] getInstructions() {
+    short[] getInstructions() {
         return instructions;
     }
 
-    protected void readInstructions(DataInput di, int count) throws IOException {
+    void readInstructions(DataInput di, int count) throws IOException {
         instructions = new short[count];
         for (int i = 0; i < count; i++) {
             instructions[i] = (short) di.readUnsignedByte();

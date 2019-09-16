@@ -60,7 +60,7 @@ import java.io.IOException;
  */
 public class GlyfTable implements Table {
 
-    private GlyfDescript[] _descript;
+    private final GlyfDescript[] _descript;
 
     public GlyfTable(
             DataInput di,

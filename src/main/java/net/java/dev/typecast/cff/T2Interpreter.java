@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class T2Interpreter {
     
-    private class SubrPair {
+    private static class SubrPair {
         final CharstringType2 cs;
         final int ip;
         SubrPair(CharstringType2 cs, int ip) {
@@ -43,7 +43,7 @@ public class T2Interpreter {
     private static final int SUBR_STACK_LIMIT = 10;
     private static final int TRANSIENT_ARRAY_ELEMENT_COUNT = 32;
     
-    static final Logger logger = LoggerFactory.getLogger(T2Interpreter.class);
+    private static final Logger logger = LoggerFactory.getLogger(T2Interpreter.class);
     
     private final Number[] _argStack = new Number[ARGUMENT_STACK_LIMIT];
     private int _argStackIndex = 0;
@@ -251,8 +251,7 @@ public class T2Interpreter {
             int xb = xa + dxb[i];
             int yb = ya + dyb[i];
             int xc = xb + dxc[i];
-            int yc = yb;
-            curveTo(xa, ya, xb, yb, xc, yc);
+            curveTo(xa, ya, xb, yb, xc, yb);
         }
         clearArg();
     }
@@ -298,16 +297,14 @@ public class T2Interpreter {
                 int ya = lastPoint.y;
                 int xb = xa + dxb[i];
                 int yb = ya + dyb[i];
-                int xc = xb;
                 int yc = yb + dyc[i];
-                int xd = xc;
                 int yd = yc + dyd[i];
-                int xe = xd + dxe[i];
+                int xe = xb + dxe[i];
                 int ye = yd + dye[i];
                 int xf = xe + dxf[i];
                 int yf = ye + (i == count - 1 ? dyf : 0);
-                curveTo(xa, ya, xb, yb, xc, yc);
-                curveTo(xd, yd, xe, ye, xf, yf);
+                curveTo(xa, ya, xb, yb, xb, yc);
+                curveTo(xb, yd, xe, ye, xf, yf);
             }
         } else {
             int count = getArgCount() / 8;
@@ -354,15 +351,13 @@ public class T2Interpreter {
                 int xb = xa + dxb[i];
                 int yb = ya + dyb[i];
                 int xc = xb + dxc[i];
-                int yc = yb;
                 int xd = xc + dxd[i];
-                int yd = yc;
                 int xe = xd + dxe[i];
-                int ye = yd + dye[i];
+                int ye = yb + dye[i];
                 int xf = xe + (i == count - 1 ? dxf : 0);
                 int yf = ye + dyf[i];
-                curveTo(xa, ya, xb, yb, xc, yc);
-                curveTo(xd, yd, xe, ye, xf, yf);
+                curveTo(xa, ya, xb, yb, xc, yb);
+                curveTo(xd, yb, xe, ye, xf, yf);
             }
         }
         clearArg();
@@ -484,15 +479,13 @@ public class T2Interpreter {
                 int xb = xa + dxb[i];
                 int yb = ya + dyb[i];
                 int xc = xb + dxc[i];
-                int yc = yb;
                 int xd = xc + dxd[i];
-                int yd = yc;
                 int xe = xd + dxe[i];
-                int ye = yd + dye[i];
+                int ye = yb + dye[i];
                 int xf = xe + (i == count - 1 ? dxf : 0);
                 int yf = ye + dyf[i];
-                curveTo(xa, ya, xb, yb, xc, yc);
-                curveTo(xd, yd, xe, ye, xf, yf);
+                curveTo(xa, ya, xb, yb, xc, yb);
+                curveTo(xd, yb, xe, ye, xf, yf);
             }
         } else {
             int count = getArgCount() / 8;
@@ -538,16 +531,14 @@ public class T2Interpreter {
                 int ya = lastPoint.y;
                 int xb = xa + dxb[i];
                 int yb = ya + dyb[i];
-                int xc = xb;
                 int yc = yb + dyc[i];
-                int xd = xc;
                 int yd = yc + dyd[i];
-                int xe = xd + dxe[i];
+                int xe = xb + dxe[i];
                 int ye = yd + dye[i];
                 int xf = xe + dxf[i];
                 int yf = ye + (i == count - 1 ? dyf : 0);
-                curveTo(xa, ya, xb, yb, xc, yc);
-                curveTo(xd, yd, xe, ye, xf, yf);
+                curveTo(xa, ya, xb, yb, xb, yc);
+                curveTo(xb, yd, xe, ye, xf, yf);
             }
         }
         clearArg();
@@ -581,9 +572,8 @@ public class T2Interpreter {
             int ya = lastPoint.y + dya[i];
             int xb = xa + dxb[i];
             int yb = ya + dyb[i];
-            int xc = xb;
             int yc = yb + dyc[i];
-            curveTo(xa, ya, xb, yb, xc, yc);
+            curveTo(xa, ya, xb, yb, xb, yc);
         }
         
         clearArg();

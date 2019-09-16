@@ -23,9 +23,9 @@ import net.java.dev.typecast.ot.Mnemonic;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Parser {
+class Parser {
 
-    private short[][] instructions = new short[3][];
+    private final short[][] instructions = new short[3][];
 
     /**
      * Advance the instruction pointer to the next executable opcode.
@@ -68,7 +68,7 @@ public class Parser {
         return instructions[ip >> 16][ip & 0xffff];
     }
 
-    public short getPushCount(int ip) {
+    private short getPushCount(int ip) {
         short instr = instructions[ip >> 16][ip & 0xffff];
         if ((Mnemonic.NPUSHB == instr) || (Mnemonic.NPUSHW == instr)) {
             return instructions[ip >> 16][(ip & 0xffff) + 1];
@@ -112,7 +112,7 @@ public class Parser {
     }
 
     public int handleIf(boolean test, int ip) {
-        if (test == false) {
+        if (!test) {
             // The TrueType spec says that we merely jump to the *next* ELSE or EIF
             // instruction in the instruction stream.  So therefore no nesting!
             // Looking at actual code, IF-ELSE-EIF can be nested!
@@ -146,14 +146,13 @@ public class Parser {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int ip = 0;
         while (ip < instructions[0].length) {
             sb.append(Mnemonic.getMnemonic(getOpcode(ip)));
             if (getPushCount(ip) > 0) {
                 int[] data = getPushData(ip);
-                for(int j = 0; j < data.length; j++)
-                sb.append(" ").append(data[j]);
+                for (int datum : data) sb.append(" ").append(datum);
             }
             sb.append("\n");
             ip = advanceIP(ip);
@@ -164,8 +163,8 @@ public class Parser {
             sb.append(Mnemonic.getMnemonic(getOpcode(ip)));
             if(getPushCount(ip) > 0) {
                 int[] data = getPushData(ip);
-                for (int j = 0; j < data.length; j++) {
-                    sb.append(" ").append(data[j]);
+                for (int datum : data) {
+                    sb.append(" ").append(datum);
                 }
             }
             sb.append("\n");
@@ -177,8 +176,8 @@ public class Parser {
             sb.append(Mnemonic.getMnemonic(getOpcode(ip)));
             if (getPushCount(ip) > 0) {
                 int[] data = getPushData(ip);
-                for (int j = 0; j < data.length; j++) {
-                    sb.append(" ").append(data[j]);
+                for (int datum : data) {
+                    sb.append(" ").append(datum);
                 }
             }
             sb.append("\n");

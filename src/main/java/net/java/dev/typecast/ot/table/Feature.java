@@ -64,7 +64,7 @@ public class Feature {
     private int[] _lookupListIndex;
 
     /** Creates new Feature */
-    protected Feature(DataInput di) throws IOException {
+    Feature(DataInput di) throws IOException {
         _featureParams = di.readUnsignedShort();
         _lookupCount = di.readUnsignedShort();
         _lookupListIndex = new int[_lookupCount];

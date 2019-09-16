@@ -15,7 +15,7 @@ import net.java.dev.typecast.ot.Disassembler;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class PrepTable extends Program implements Table {
+class PrepTable extends Program implements Table {
 
     public PrepTable(DataInput di, int length) throws IOException {
         readInstructions(di, length);

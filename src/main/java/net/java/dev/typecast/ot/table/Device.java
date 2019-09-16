@@ -15,7 +15,7 @@ import java.io.RandomAccessFile;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Device extends Object {
+class Device {
 
     private int startSize;
     private int endSize;

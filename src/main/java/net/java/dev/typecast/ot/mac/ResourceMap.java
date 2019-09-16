@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public class ResourceMap {
 
-    private byte[] headerCopy = new byte[16];
+    private final byte[] headerCopy = new byte[16];
     private int nextResourceMap;
     private int fileReferenceNumber;
     private int attributes;
@@ -61,10 +61,10 @@ public class ResourceMap {
     }
 
     public ResourceType getResourceType(String typeName) {
-        for (int i = 0; i < types.length; i++) {
-            String s = types[i].getTypeAsString();
-            if (types[i].getTypeAsString().equals(typeName)) {
-                return types[i];
+        for (ResourceType type : types) {
+            String s = type.getTypeAsString();
+            if (type.getTypeAsString().equals(typeName)) {
+                return type;
             }
         }
         return null;
