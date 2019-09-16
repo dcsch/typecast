@@ -16,23 +16,28 @@
  * limitations under the License.
  */
 
-package net.java.dev.typecast.ot;
+package net.java.dev.typecast.exchange;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import net.java.dev.typecast.ot.TTFont;
+import net.java.dev.typecast.ot.table.TableException;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.nio.file.Files;
 
-public class OTFontCollectionTest extends TestCase {
+public class SVGExporterTest extends TestCase {
     /**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public OTFontCollectionTest(String testName) {
+    public SVGExporterTest(String testName) {
         super(testName);
     }
 
@@ -40,15 +45,18 @@ public class OTFontCollectionTest extends TestCase {
      * @return the suite of tests being tested
      */
     public static Test suite() {
-        return new TestSuite(OTFontCollectionTest.class);
+        return new TestSuite(SVGExporterTest.class);
     }
 
-    public void testLoadSingleFont() throws URISyntaxException, IOException {
+    public void testExportFont() throws URISyntaxException, IOException, TableException {
         URL url = ClassLoader.getSystemResource("Lato-Regular.ttf");
         File file = new File(url.toURI());
-        OTFontCollection fontCollection = new OTFontCollection(file);
-        assertEquals(1, fontCollection.getFontCount());
-        OTFont font = fontCollection.getFont(0);
-        assertNotNull(font);
+        byte[] fontData = Files.readAllBytes(file.toPath());
+        TTFont font = new TTFont(fontData, 0);
+        SVGExporter exporter = new SVGExporter(font, 32, 32, "abc", true, false);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        exporter.export(baos);
+        String svgString = baos.toString();
+        System.out.println(svgString);
     }
 }

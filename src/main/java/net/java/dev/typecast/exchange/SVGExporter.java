@@ -132,59 +132,59 @@ public class SVGExporter
 
             if (offset == 0) {
                 sb.append(PATH_MOVE)
-                .append(String.valueOf(point.x))
+                .append(point.x)
                 .append(XML_SPACE)
-                .append(String.valueOf(point.y));
+                .append(point.y);
             }
 
             if (point.onCurve && point_plus1.onCurve) {
                 if (point_plus1.x == point.x) { // This is a vertical line
                     sb.append(PATH_VERTICAL_LINE_TO)
-                    .append(String.valueOf(point_plus1.y));
+                    .append(point_plus1.y);
                 } else if (point_plus1.y == point.y) { // This is a horizontal line
                     sb.append(PATH_HORIZONTAL_LINE_TO)
-                    .append(String.valueOf(point_plus1.x));
+                    .append(point_plus1.x);
                 } else {
                     sb.append(PATH_LINE_TO)
-                    .append(String.valueOf(point_plus1.x))
+                    .append(point_plus1.x)
                     .append(XML_SPACE)
-                    .append(String.valueOf(point_plus1.y));
+                    .append(point_plus1.y);
                 }
                 offset++;
             } else if (point.onCurve && !point_plus1.onCurve && point_plus2.onCurve) {
                 // This is a curve with no implied points
                 sb.append(PATH_QUAD_TO)
-                .append(String.valueOf(point_plus1.x))
+                .append(point_plus1.x)
                 .append(XML_SPACE)
-                .append(String.valueOf(point_plus1.y))
+                .append(point_plus1.y)
                 .append(XML_SPACE)
-                .append(String.valueOf(point_plus2.x))
+                .append(point_plus2.x)
                 .append(XML_SPACE)
-                .append(String.valueOf(point_plus2.y));
+                .append(point_plus2.y);
                 offset+=2;
             } else if (point.onCurve && !point_plus1.onCurve && !point_plus2.onCurve) {
                 // This is a curve with one implied point
                 sb.append(PATH_QUAD_TO)
-                .append(String.valueOf(point_plus1.x))
+                .append(point_plus1.x)
                 .append(XML_SPACE)
-                .append(String.valueOf(point_plus1.y))
+                .append(point_plus1.y)
                 .append(XML_SPACE)
-                .append(String.valueOf(midValue(point_plus1.x, point_plus2.x)))
+                .append(midValue(point_plus1.x, point_plus2.x))
                 .append(XML_SPACE)
-                .append(String.valueOf(midValue(point_plus1.y, point_plus2.y)));
+                .append(midValue(point_plus1.y, point_plus2.y));
                 offset+=2;
             } else if (!point.onCurve && !point_plus1.onCurve) {
                 // This is a curve with two implied points
                 sb.append(PATH_SMOOTH_QUAD_TO)
-                .append(String.valueOf(midValue(point.x, point_plus1.x)))
+                .append(midValue(point.x, point_plus1.x))
                 .append(XML_SPACE)
-                .append(String.valueOf(midValue(point.y, point_plus1.y)));
+                .append(midValue(point.y, point_plus1.y));
                 offset++;
             } else if (!point.onCurve && point_plus1.onCurve) {
                 sb.append(PATH_SMOOTH_QUAD_TO)
-                .append(String.valueOf(point_plus1.x))
+                .append(point_plus1.x)
                 .append(XML_SPACE)
-                .append(String.valueOf(point_plus1.y));
+                .append(point_plus1.y);
                 offset++;
             } else {
                 System.out.println("drawGlyph case not catered for!!");
@@ -568,14 +568,19 @@ public class SVGExporter
     }
 
     private final TTFont _font;
-    private final int _low = 32;
-    private int _high = 127;
+    private final int _low;
+    private final int _high;
     private String _id;
-    private final boolean _ascii = false;
-    private final boolean _testCard = true;
+    private final boolean _ascii;
+    private final boolean _testCard;
     
-    public SVGExporter(TTFont font) {
+    public SVGExporter(TTFont font, int low, int high, String id, boolean ascii, boolean testCard) {
         _font = font;
+        _low = low;
+        _high = high;
+        _id = id;
+        _ascii = ascii;
+        _testCard = testCard;
     }
 
     /**
@@ -587,9 +592,6 @@ public class SVGExporter
     public void export(OutputStream os) throws TableException {
         PrintStream ps = new PrintStream(os);
         
-        // TESTING
-        _high = 65536;
-
         // Write the various parts of the SVG file
         writeSvgBegin(ps);
         writeSvgDefsBegin(ps);

@@ -1,7 +1,7 @@
 /*
- * Typecast - The Font Development Environment
+ * Typecast
  *
- * Copyright (c) 2004 David Schweinsberg
+ * Copyright © 2004-2019 David Schweinsberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

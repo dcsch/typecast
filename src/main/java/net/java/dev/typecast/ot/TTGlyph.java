@@ -88,8 +88,9 @@ public class TTGlyph extends Glyph {
      */
     private void describe(GlyphDescription gd) {
         int endPtIndex = 0;
-        _points = new Point[gd.getPointCount() + 2];
-        for (int i = 0; i < gd.getPointCount(); i++) {
+        int pointCount = gd != null ? gd.getPointCount() : 0;
+        _points = new Point[pointCount + 2];
+        for (int i = 0; i < pointCount; i++) {
             boolean endPt = gd.getEndPtOfContours(endPtIndex) == i;
             if (endPt) {
                 endPtIndex++;
@@ -102,7 +103,7 @@ public class TTGlyph extends Glyph {
         }
 
         // Append the origin and advanceWidth points (n & n+1)
-        _points[gd.getPointCount()] = new Point(0, 0, true, true);
-        _points[gd.getPointCount()+1] = new Point(_advanceWidth, 0, true, true);
+        _points[pointCount] = new Point(0, 0, true, true);
+        _points[pointCount+1] = new Point(_advanceWidth, 0, true, true);
     }
 }
