@@ -99,4 +99,11 @@ public class TTFont extends OTFont {
         return _vdmx;
     }
 
+    public Glyph getGlyph(int i) {
+        return new TTGlyph(
+                _glyf.getDescription(i),
+                getHmtxTable().getLeftSideBearing(i),
+                getHmtxTable().getAdvanceWidth(i));
+    }
+
 }

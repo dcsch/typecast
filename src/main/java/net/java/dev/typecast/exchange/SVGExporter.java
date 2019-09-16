@@ -1,60 +1,27 @@
 /*
-
- ============================================================================
-                   The Apache Software License, Version 1.1
- ============================================================================
-
- Copyright (C) 1999-2003 The Apache Software Foundation. All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modifica-
- tion, are permitted provided that the following conditions are met:
-
- 1. Redistributions of  source code must  retain the above copyright  notice,
-    this list of conditions and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. The end-user documentation included with the redistribution, if any, must
-    include  the following  acknowledgment:  "This product includes  software
-    developed  by the  Apache Software Foundation  (http://www.apache.org/)."
-    Alternately, this  acknowledgment may  appear in the software itself,  if
-    and wherever such third-party acknowledgments normally appear.
-
- 4. The names "Batik" and  "Apache Software Foundation" must  not  be
-    used to  endorse or promote  products derived from  this software without
-    prior written permission. For written permission, please contact
-    apache@apache.org.
-
- 5. Products  derived from this software may not  be called "Apache", nor may
-    "Apache" appear  in their name,  without prior written permission  of the
-    Apache Software Foundation.
-
- THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
- INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- FITNESS  FOR A PARTICULAR  PURPOSE ARE  DISCLAIMED.  IN NO  EVENT SHALL  THE
- APACHE SOFTWARE  FOUNDATION  OR ITS CONTRIBUTORS  BE LIABLE FOR  ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL,  EXEMPLARY, OR CONSEQUENTIAL  DAMAGES (INCLU-
- DING, BUT NOT LIMITED TO, PROCUREMENT  OF SUBSTITUTE GOODS OR SERVICES; LOSS
- OF USE, DATA, OR  PROFITS; OR BUSINESS  INTERRUPTION)  HOWEVER CAUSED AND ON
- ANY  THEORY OF LIABILITY,  WHETHER  IN CONTRACT,  STRICT LIABILITY,  OR TORT
- (INCLUDING  NEGLIGENCE OR  OTHERWISE) ARISING IN  ANY WAY OUT OF THE  USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
- This software  consists of voluntary contributions made  by many individuals
- on  behalf of the Apache Software  Foundation. For more  information on the
- Apache Software Foundation, please see <http://www.apache.org/>.
-
-*/
+ * Typecast
+ *
+ * Copyright © 2004-2019 David Schweinsberg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.java.dev.typecast.exchange;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import net.java.dev.typecast.ot.Glyph;
-import net.java.dev.typecast.ot.OTFont;
-import net.java.dev.typecast.ot.Point;
+
+import net.java.dev.typecast.ot.*;
 import net.java.dev.typecast.ot.table.CmapFormat;
 import net.java.dev.typecast.ot.table.Feature;
 import net.java.dev.typecast.ot.table.FeatureTags;
@@ -68,7 +35,6 @@ import net.java.dev.typecast.ot.table.PostTable;
 import net.java.dev.typecast.ot.table.Script;
 import net.java.dev.typecast.ot.table.ScriptTags;
 import net.java.dev.typecast.ot.table.SingleSubst;
-import net.java.dev.typecast.ot.table.Table;
 import net.java.dev.typecast.ot.table.TableException;
 import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
@@ -299,7 +265,7 @@ public class SVGExporter
      * @param forceAscii Force the use of the ASCII character map
      * @throws net.java.dev.typecast.ot.table.TableException
      */
-    protected static void writeFontAsSVGFragment(PrintStream ps, OTFont font, String id, int first, int last, boolean forceAscii)
+    protected static void writeFontAsSVGFragment(PrintStream ps, TTFont font, String id, int first, int last, boolean forceAscii)
     throws TableException {
         int horiz_advance_x = font.getOS2Table().getAvgCharWidth();
 
@@ -348,66 +314,66 @@ public class SVGExporter
             throw new TableException("Cannot find a suitable cmap table");
         }
 
-//        // If this font includes arabic script, we want to specify substitutions
-//        // for initial, medial, terminal & isolated cases.
-//        GsubTable gsub = (GsubTable) font.getTable(Table.GSUB);
-//        SingleSubst initialSubst = null;
-//        SingleSubst medialSubst = null;
-//        SingleSubst terminalSubst = null;
-//        if (gsub != null && gsub.getScriptList() != null) {
-//            Script s = gsub.getScriptList().findScript(SCRIPT_TAG_ARAB);
-//            if (s != null) {
-//                LangSys ls = s.getDefaultLangSys();
-//                if (ls != null) {
-//                    Feature init = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_INIT);
-//                    Feature medi = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_MEDI);
-//                    Feature fina = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_FINA);
-//
-//                    initialSubst = (SingleSubst)
-//                        gsub.getLookupList().getLookup(init, 0).getSubtable(0);
-//                    medialSubst = (SingleSubst)
-//                        gsub.getLookupList().getLookup(medi, 0).getSubtable(0);
-//                    terminalSubst = (SingleSubst)
-//                        gsub.getLookupList().getLookup(fina, 0).getSubtable(0);
-//                }
-//            }
-//        }
-//
-//        // Include the missing glyph
-//        ps.println(getGlyphAsSVG(font, font.getGlyph(0), 0, horiz_advance_x,
-//            initialSubst, medialSubst, terminalSubst, ""));
-//
-//        try {
-//            // Include our requested range
-//            for (int i = first; i <= last; i++) {
-//                int glyphIndex = cmapFmt.mapCharCode(i);
-//
-//                if (glyphIndex > 0) {
-//                    ps.println(getGlyphAsSVG(
-//                        font,
-//                        font.getGlyph(glyphIndex),
-//                        glyphIndex,
-//                        horiz_advance_x,
-//                        initialSubst, medialSubst, terminalSubst,
-//                        (32 <= i && i <= 127) ?
-//                        encodeEntities("" + (char) i) :
-//                        XML_CHAR_REF_PREFIX + Integer.toHexString(i) + XML_CHAR_REF_SUFFIX));
-//                }
-//
-//            }
-//
-//            // Output kerning pairs from the requested range
-//            KernTable kern = (KernTable) font.getTable(Table.kern);
-//            if (kern != null) {
-//                KernSubtable kst = kern.getSubtable(0);
-//                PostTable post = (PostTable) font.getTable(Table.post);
-//                for (int i = 0; i < kst.getKerningPairCount(); i++) {
-//                    ps.println(getKerningPairAsSVG(kst.getKerningPair(i), post));
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.err.println(e.getMessage());
-//        }
+        // If this font includes arabic script, we want to specify substitutions
+        // for initial, medial, terminal & isolated cases.
+        GsubTable gsub = font.getGsubTable();
+        SingleSubst initialSubst = null;
+        SingleSubst medialSubst = null;
+        SingleSubst terminalSubst = null;
+        if (gsub != null && gsub.getScriptList() != null) {
+            Script s = gsub.getScriptList().findScript(SCRIPT_TAG_ARAB);
+            if (s != null) {
+                LangSys ls = s.getDefaultLangSys();
+                if (ls != null) {
+                    Feature init = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_INIT);
+                    Feature medi = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_MEDI);
+                    Feature fina = gsub.getFeatureList().findFeature(ls, FEATURE_TAG_FINA);
+
+                    initialSubst = (SingleSubst)
+                        gsub.getLookupList().getLookup(init, 0).getSubtable(0);
+                    medialSubst = (SingleSubst)
+                        gsub.getLookupList().getLookup(medi, 0).getSubtable(0);
+                    terminalSubst = (SingleSubst)
+                        gsub.getLookupList().getLookup(fina, 0).getSubtable(0);
+                }
+            }
+        }
+
+        // Include the missing glyph
+        ps.println(getGlyphAsSVG(font, font.getGlyph(0), 0, horiz_advance_x,
+            initialSubst, medialSubst, terminalSubst, ""));
+
+        try {
+            // Include our requested range
+            for (int i = first; i <= last; i++) {
+                int glyphIndex = cmapFmt.mapCharCode(i);
+
+                if (glyphIndex > 0) {
+                    ps.println(getGlyphAsSVG(
+                        font,
+                        font.getGlyph(glyphIndex),
+                        glyphIndex,
+                        horiz_advance_x,
+                        initialSubst, medialSubst, terminalSubst,
+                        (32 <= i && i <= 127) ?
+                        encodeEntities("" + (char) i) :
+                        XML_CHAR_REF_PREFIX + Integer.toHexString(i) + XML_CHAR_REF_SUFFIX));
+                }
+
+            }
+
+            // Output kerning pairs from the requested range
+            KernTable kern = font.getKernTable();
+            if (kern != null) {
+                KernSubtable kst = kern.getSubtable(0);
+                PostTable post = font.getPostTable();
+                for (int i = 0; i < kst.getKerningPairCount(); i++) {
+                    ps.println(getKerningPairAsSVG(kst.getKerningPair(i), post));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
 
         ps.print(XML_CLOSE_TAG_START);
         ps.print(SVG_FONT_TAG);
@@ -476,7 +442,7 @@ public class SVGExporter
     }
 
     protected static String getGlyphAsSVG(
-            OTFont font,
+            TTFont font,
             Glyph glyph,
             int glyphIndex,
             int defaultHorizAdvanceX,
@@ -486,75 +452,75 @@ public class SVGExporter
             String code) {
 
         StringBuilder sb = new StringBuilder();
-//        boolean substituted = false;
-//
-//        // arabic = "initial | medial | terminal | isolated"
-//        int arabInitGlyphIndex = glyphIndex;
-//        int arabMediGlyphIndex = glyphIndex;
-//        int arabTermGlyphIndex = glyphIndex;
-//        if (arabInitSubst != null) {
-//            arabInitGlyphIndex = arabInitSubst.substitute(glyphIndex);
-//        }
-//        if (arabMediSubst != null) {
-//            arabMediGlyphIndex = arabMediSubst.substitute(glyphIndex);
-//        }
-//        if (arabTermSubst != null) {
-//            arabTermGlyphIndex = arabTermSubst.substitute(glyphIndex);
-//        }
-//
-//        if (arabInitGlyphIndex != glyphIndex) {
-//            sb.append(getGlyphAsSVG(
-//                font,
-//                font.getGlyph(arabInitGlyphIndex),
-//                arabInitGlyphIndex,
-//                defaultHorizAdvanceX,
-//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_INITIAL_VALUE + XML_CHAR_QUOT,
-//                code));
-//            sb.append(EOL);
-//            substituted = true;
-//        }
-//
-//        if (arabMediGlyphIndex != glyphIndex) {
-//            sb.append(getGlyphAsSVG(
-//                font,
-//                font.getGlyph(arabMediGlyphIndex),
-//                arabMediGlyphIndex,
-//                defaultHorizAdvanceX,
-//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_MEDIAL_VALUE + XML_CHAR_QUOT,
-//                code));
-//            sb.append(EOL);
-//            substituted = true;
-//        }
-//
-//        if (arabTermGlyphIndex != glyphIndex) {
-//            sb.append(getGlyphAsSVG(
-//                font,
-//                font.getGlyph(arabTermGlyphIndex),
-//                arabTermGlyphIndex,
-//                defaultHorizAdvanceX,
-//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_TERMINAL_VALUE + XML_CHAR_QUOT,
-//                code));
-//            sb.append(EOL);
-//            substituted = true;
-//        }
-//
-//        if (substituted) {
-//            sb.append(getGlyphAsSVG(
-//                font,
-//                glyph,
-//                glyphIndex,
-//                defaultHorizAdvanceX,
-//                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_ISOLATED_VALUE + XML_CHAR_QUOT,
-//                code));
-//        } else {
-//            sb.append(getGlyphAsSVG(
-//                font,
-//                glyph,
-//                glyphIndex,
-//                defaultHorizAdvanceX,
-//                null,
-//                code));
-//        }
+        boolean substituted = false;
+
+        // arabic = "initial | medial | terminal | isolated"
+        int arabInitGlyphIndex = glyphIndex;
+        int arabMediGlyphIndex = glyphIndex;
+        int arabTermGlyphIndex = glyphIndex;
+        if (arabInitSubst != null) {
+            arabInitGlyphIndex = arabInitSubst.substitute(glyphIndex);
+        }
+        if (arabMediSubst != null) {
+            arabMediGlyphIndex = arabMediSubst.substitute(glyphIndex);
+        }
+        if (arabTermSubst != null) {
+            arabTermGlyphIndex = arabTermSubst.substitute(glyphIndex);
+        }
+
+        if (arabInitGlyphIndex != glyphIndex) {
+            sb.append(getGlyphAsSVG(
+                font,
+                font.getGlyph(arabInitGlyphIndex),
+                arabInitGlyphIndex,
+                defaultHorizAdvanceX,
+                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_INITIAL_VALUE + XML_CHAR_QUOT,
+                code));
+            sb.append(EOL);
+            substituted = true;
+        }
+
+        if (arabMediGlyphIndex != glyphIndex) {
+            sb.append(getGlyphAsSVG(
+                font,
+                font.getGlyph(arabMediGlyphIndex),
+                arabMediGlyphIndex,
+                defaultHorizAdvanceX,
+                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_MEDIAL_VALUE + XML_CHAR_QUOT,
+                code));
+            sb.append(EOL);
+            substituted = true;
+        }
+
+        if (arabTermGlyphIndex != glyphIndex) {
+            sb.append(getGlyphAsSVG(
+                font,
+                font.getGlyph(arabTermGlyphIndex),
+                arabTermGlyphIndex,
+                defaultHorizAdvanceX,
+                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_TERMINAL_VALUE + XML_CHAR_QUOT,
+                code));
+            sb.append(EOL);
+            substituted = true;
+        }
+
+        if (substituted) {
+            sb.append(getGlyphAsSVG(
+                font,
+                glyph,
+                glyphIndex,
+                defaultHorizAdvanceX,
+                SVG_ARABIC_FORM_ATTRIBUTE + XML_EQUAL_QUOT + SVG_ISOLATED_VALUE + XML_CHAR_QUOT,
+                code));
+        } else {
+            sb.append(getGlyphAsSVG(
+                font,
+                glyph,
+                glyphIndex,
+                defaultHorizAdvanceX,
+                null,
+                code));
+        }
 
         return sb.toString();
     }
@@ -601,14 +567,14 @@ public class SVGExporter
         ps.println(Messages.formatMessage(CONFIG_SVG_TEST_CARD_END, null));
     }
 
-    private final OTFont _font;
+    private final TTFont _font;
     private final int _low = 32;
     private int _high = 127;
     private String _id;
     private final boolean _ascii = false;
     private final boolean _testCard = true;
     
-    public SVGExporter(OTFont font) {
+    public SVGExporter(TTFont font) {
         _font = font;
     }
 

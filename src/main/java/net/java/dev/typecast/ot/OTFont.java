@@ -28,7 +28,7 @@ import net.java.dev.typecast.ot.table.*;
  * The TrueType font.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class OTFont {
+public abstract class OTFont {
 
     private Os2Table _os2;
     private CmapTable _cmap;
@@ -150,22 +150,7 @@ public class OTFont {
         return _maxp.getNumGlyphs();
     }
 
-//    // TODO What happens with the following when dealing with PostScript?
-//    public Glyph getGlyph(int i) {
-//        if (_glyf != null && _glyf.getDescription(i) != null) {
-//            return new TTGlyph(
-//                    _glyf.getDescription(i),
-//                    _hmtx.getLeftSideBearing(i),
-//                    _hmtx.getAdvanceWidth(i));
-//        } else if (_cff != null && _cff.getFont(0).getCharstring(i) != null) {
-//            return new T2Glyph(
-//                    (CharstringType2) _cff.getFont(0).getCharstring(i),
-//                    _hmtx.getLeftSideBearing(i),
-//                    _hmtx.getAdvanceWidth(i));
-//        } else {
-//            return null;
-//        }
-//    }
+    public abstract Glyph getGlyph(int i);
 
     int seekTable(
             TableDirectory tableDirectory,
