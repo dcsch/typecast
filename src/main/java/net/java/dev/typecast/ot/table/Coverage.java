@@ -70,7 +70,7 @@ public abstract class Coverage {
     
     public abstract int[] getGlyphIds();
     
-    protected static Coverage read(DataInput di) throws IOException {
+    static Coverage read(DataInput di) throws IOException {
         Coverage c = null;
         int format = di.readUnsignedShort();
         if (format == 1) {

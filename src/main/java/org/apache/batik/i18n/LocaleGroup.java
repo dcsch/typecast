@@ -25,7 +25,7 @@ public class LocaleGroup {
     /**
      * The shared Locale.
      */
-    protected Locale locale;
+    private Locale locale;
 
     /**
      * Sets the default locale for all the instances of ExtendedLocalizable

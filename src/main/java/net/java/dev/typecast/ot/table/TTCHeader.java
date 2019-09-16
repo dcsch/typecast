@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class TTCHeader {
     
-    public static final int ttcf = 0x74746366;
+    private static final int ttcf = 0x74746366;
 
     private int ttcTag;
     private int version;

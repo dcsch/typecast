@@ -36,7 +36,7 @@ public class CmapFormatUnknown extends CmapFormat {
      * @param format
      * @param di
      * @throws java.io.IOException */
-    protected CmapFormatUnknown(int format, DataInput di) throws IOException {
+    CmapFormatUnknown(int format, DataInput di) throws IOException {
         _format = format;
         if (_format < 8) {
             _length = di.readUnsignedShort();

@@ -66,7 +66,7 @@ public class LigatureSubstFormat1 extends LigatureSubst {
     private LigatureSet[] _ligatureSets;
 
     /** Creates new LigatureSubstFormat1 */
-    protected LigatureSubstFormat1(
+    LigatureSubstFormat1(
             DataInputStream dis,
             int offset) throws IOException {
         _coverageOffset = dis.readUnsignedShort();

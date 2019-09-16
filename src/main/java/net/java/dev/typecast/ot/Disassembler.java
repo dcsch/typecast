@@ -21,7 +21,7 @@ public class Disassembler {
      * @param ip The current instruction pointer
      * @return The new instruction pointer
      */
-    public static int advanceIP(short[] instructions, int ip) {
+    private static int advanceIP(short[] instructions, int ip) {
 
         // The high word specifies font, cvt, or glyph program
         int i = ip & 0xffff;
@@ -45,7 +45,7 @@ public class Disassembler {
         return ip;
     }
 
-    public static short getPushCount(short[] instructions, int ip) {
+    private static short getPushCount(short[] instructions, int ip) {
         short instr = instructions[ip & 0xffff];
         if ((Mnemonic.NPUSHB == instr) || (Mnemonic.NPUSHW == instr)) {
             return instructions[(ip & 0xffff) + 1];
@@ -55,7 +55,7 @@ public class Disassembler {
         return 0;
     }
 
-    public static int[] getPushData(short[] instructions, int ip) {
+    private static int[] getPushData(short[] instructions, int ip) {
         int count = getPushCount(instructions, ip);
         int[] data = new int[count];
         int i = ip & 0xffff;
@@ -81,7 +81,7 @@ public class Disassembler {
     }
 
      public static String disassemble(short[] instructions, int leadingSpaces) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int ip = 0;
         while (ip < instructions.length) {
             for (int i = 0; i < leadingSpaces; i++) {
@@ -91,12 +91,12 @@ public class Disassembler {
             sb.append(Mnemonic.getMnemonic(instructions[ip]));
             if (getPushCount(instructions, ip) > 0) {
                 int[] data = getPushData(instructions, ip);
-                for(int j = 0; j < data.length; j++) {
+                for (int datum : data) {
                     if ((instructions[ip] == Mnemonic.PUSHW) ||
-                        (instructions[ip] == Mnemonic.NPUSHW)) {
-                        sb.append(" ").append((short) data[j]);
+                            (instructions[ip] == Mnemonic.NPUSHW)) {
+                        sb.append(" ").append((short) datum);
                     } else {
-                        sb.append(" ").append(data[j]);
+                        sb.append(" ").append(datum);
                     }
                 }
             }

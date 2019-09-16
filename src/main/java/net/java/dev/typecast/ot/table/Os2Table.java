@@ -52,7 +52,6 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
-import net.java.dev.typecast.ot.Fixed;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -292,51 +291,47 @@ public class Os2Table implements Table {
     }
 
     public String toString() {
-        return new StringBuffer()
-            .append("'OS/2' Table - OS/2 and Windows Metrics\n---------------------------------------")
-            .append("\n  'OS/2' version:      ").append(_version)
-            .append("\n  xAvgCharWidth:       ").append(_xAvgCharWidth)
-            .append("\n  usWeightClass:       ").append(_usWeightClass)
-            .append("\n  usWidthClass:        ").append(_usWidthClass)
-            .append("\n  fsType:              0x").append(Integer.toHexString(_fsType).toUpperCase())
-            .append("\n  ySubscriptXSize:     ").append(_ySubscriptXSize)
-            .append("\n  ySubscriptYSize:     ").append(_ySubscriptYSize)
-            .append("\n  ySubscriptXOffset:   ").append(_ySubscriptXOffset)
-            .append("\n  ySubscriptYOffset:   ").append(_ySubscriptYOffset)
-            .append("\n  ySuperscriptXSize:   ").append(_ySuperscriptXSize)
-            .append("\n  ySuperscriptYSize:   ").append(_ySuperscriptYSize)
-            .append("\n  ySuperscriptXOffset: ").append(_ySuperscriptXOffset)
-            .append("\n  ySuperscriptYOffset: ").append(_ySuperscriptYOffset)
-            .append("\n  yStrikeoutSize:      ").append(_yStrikeoutSize)
-            .append("\n  yStrikeoutPosition:  ").append(_yStrikeoutPosition)
-            .append("\n  sFamilyClass:        ").append(_sFamilyClass>>8)
-            .append("    subclass = ").append(_sFamilyClass&0xff)
-            .append("\n  PANOSE:              ").append(_panose.toString())
-            .append("\n  Unicode Range 1( Bits 0 - 31 ): ").append(Integer.toHexString(_ulUnicodeRange1).toUpperCase())
-            .append("\n  Unicode Range 2( Bits 32- 63 ): ").append(Integer.toHexString(_ulUnicodeRange2).toUpperCase())
-            .append("\n  Unicode Range 3( Bits 64- 95 ): ").append(Integer.toHexString(_ulUnicodeRange3).toUpperCase())
-            .append("\n  Unicode Range 4( Bits 96-127 ): ").append(Integer.toHexString(_ulUnicodeRange4).toUpperCase())
-            .append("\n  achVendID:           '").append(getVendorIDAsString())
-            .append("'\n  fsSelection:         0x").append(Integer.toHexString(_fsSelection).toUpperCase())
-            .append("\n  usFirstCharIndex:    0x").append(Integer.toHexString(_usFirstCharIndex).toUpperCase())
-            .append("\n  usLastCharIndex:     0x").append(Integer.toHexString(_usLastCharIndex).toUpperCase())
-            .append("\n  sTypoAscender:       ").append(_sTypoAscender)
-            .append("\n  sTypoDescender:      ").append(_sTypoDescender)
-            .append("\n  sTypoLineGap:        ").append(_sTypoLineGap)
-            .append("\n  usWinAscent:         ").append(_usWinAscent)
-            .append("\n  usWinDescent:        ").append(_usWinDescent)
-            .append("\n  CodePage Range 1( Bits 0 - 31 ): ").append(Integer.toHexString(_ulCodePageRange1).toUpperCase())
-            .append("\n  CodePage Range 2( Bits 32- 63 ): ").append(Integer.toHexString(_ulCodePageRange2).toUpperCase())
-            .toString();
+        return "'OS/2' Table - OS/2 and Windows Metrics\n---------------------------------------" +
+                "\n  'OS/2' version:      " + _version +
+                "\n  xAvgCharWidth:       " + _xAvgCharWidth +
+                "\n  usWeightClass:       " + _usWeightClass +
+                "\n  usWidthClass:        " + _usWidthClass +
+                "\n  fsType:              0x" + Integer.toHexString(_fsType).toUpperCase() +
+                "\n  ySubscriptXSize:     " + _ySubscriptXSize +
+                "\n  ySubscriptYSize:     " + _ySubscriptYSize +
+                "\n  ySubscriptXOffset:   " + _ySubscriptXOffset +
+                "\n  ySubscriptYOffset:   " + _ySubscriptYOffset +
+                "\n  ySuperscriptXSize:   " + _ySuperscriptXSize +
+                "\n  ySuperscriptYSize:   " + _ySuperscriptYSize +
+                "\n  ySuperscriptXOffset: " + _ySuperscriptXOffset +
+                "\n  ySuperscriptYOffset: " + _ySuperscriptYOffset +
+                "\n  yStrikeoutSize:      " + _yStrikeoutSize +
+                "\n  yStrikeoutPosition:  " + _yStrikeoutPosition +
+                "\n  sFamilyClass:        " + (_sFamilyClass >> 8) +
+                "    subclass = " + (_sFamilyClass & 0xff) +
+                "\n  PANOSE:              " + _panose.toString() +
+                "\n  Unicode Range 1( Bits 0 - 31 ): " + Integer.toHexString(_ulUnicodeRange1).toUpperCase() +
+                "\n  Unicode Range 2( Bits 32- 63 ): " + Integer.toHexString(_ulUnicodeRange2).toUpperCase() +
+                "\n  Unicode Range 3( Bits 64- 95 ): " + Integer.toHexString(_ulUnicodeRange3).toUpperCase() +
+                "\n  Unicode Range 4( Bits 96-127 ): " + Integer.toHexString(_ulUnicodeRange4).toUpperCase() +
+                "\n  achVendID:           '" + getVendorIDAsString() +
+                "'\n  fsSelection:         0x" + Integer.toHexString(_fsSelection).toUpperCase() +
+                "\n  usFirstCharIndex:    0x" + Integer.toHexString(_usFirstCharIndex).toUpperCase() +
+                "\n  usLastCharIndex:     0x" + Integer.toHexString(_usLastCharIndex).toUpperCase() +
+                "\n  sTypoAscender:       " + _sTypoAscender +
+                "\n  sTypoDescender:      " + _sTypoDescender +
+                "\n  sTypoLineGap:        " + _sTypoLineGap +
+                "\n  usWinAscent:         " + _usWinAscent +
+                "\n  usWinDescent:        " + _usWinDescent +
+                "\n  CodePage Range 1( Bits 0 - 31 ): " + Integer.toHexString(_ulCodePageRange1).toUpperCase() +
+                "\n  CodePage Range 2( Bits 32- 63 ): " + Integer.toHexString(_ulCodePageRange2).toUpperCase();
     }
     
     private String getVendorIDAsString() {
-        return new StringBuffer()
-            .append((char)((_achVendorID>>24)&0xff))
-            .append((char)((_achVendorID>>16)&0xff))
-            .append((char)((_achVendorID>>8)&0xff))
-            .append((char)((_achVendorID)&0xff))
-            .toString();
+        return String.valueOf((char) ((_achVendorID >> 24) & 0xff)) +
+                (char) ((_achVendorID >> 16) & 0xff) +
+                (char) ((_achVendorID >> 8) & 0xff) +
+                (char) ((_achVendorID) & 0xff);
     }
     
 }

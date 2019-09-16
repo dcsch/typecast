@@ -21,6 +21,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -40,7 +41,7 @@ public class CmapFormat4 extends CmapFormat {
     private final int[] _glyphIdArray;
     private final int _segCount;
 
-    protected CmapFormat4(DataInput di) throws IOException {
+    CmapFormat4(DataInput di) throws IOException {
         _length = di.readUnsignedShort();
         _language = di.readUnsignedShort();
         _segCountX2 = di.readUnsignedShort(); // +2 (8)
@@ -132,23 +133,22 @@ public class CmapFormat4 extends CmapFormat {
 
     @Override
     public String toString() {
-        return new StringBuilder()
-            .append(super.toString())
-            .append(", segCountX2: ")
-            .append(_segCountX2)
-            .append(", searchRange: ")
-            .append(_searchRange)
-            .append(", entrySelector: ")
-            .append(_entrySelector)
-            .append(", rangeShift: ")
-            .append(_rangeShift)
-            .append(", endCode: ")
-            .append(_endCode)
-            .append(", startCode: ")
-            .append(_endCode)
-            .append(", idDelta: ")
-            .append(_idDelta)
-            .append(", idRangeOffset: ")
-            .append(_idRangeOffset).toString();
+        return super.toString() +
+                ", segCountX2: " +
+                _segCountX2 +
+                ", searchRange: " +
+                _searchRange +
+                ", entrySelector: " +
+                _entrySelector +
+                ", rangeShift: " +
+                _rangeShift +
+                ", endCode: " +
+                Arrays.toString(_endCode) +
+                ", startCode: " +
+                Arrays.toString(_endCode) +
+                ", idDelta: " +
+                Arrays.toString(_idDelta) +
+                ", idRangeOffset: " +
+                Arrays.toString(_idRangeOffset);
     }
 }

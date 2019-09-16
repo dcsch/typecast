@@ -59,12 +59,12 @@ import java.io.IOException;
  */
 public class ScriptList {
 
-    private int _scriptCount = 0;
+    private int _scriptCount;
     private ScriptRecord[] _scriptRecords;
     private Script[] _scripts;
     
     /** Creates new ScriptList */
-    protected ScriptList(DataInputStream dis, int offset) throws IOException {
+    ScriptList(DataInputStream dis, int offset) throws IOException {
         
         // Ensure we're in the right place
         dis.reset();

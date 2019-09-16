@@ -13,10 +13,10 @@ package net.java.dev.typecast.ot;
  */
 public class Point {
 
-    public int x = 0;
-    public int y = 0;
-    public boolean onCurve = true;
-    public boolean endOfContour = false;
+    public int x;
+    public int y;
+    public boolean onCurve;
+    public boolean endOfContour;
     public boolean touched = false;
 
     public Point(int x, int y, boolean onCurve, boolean endOfContour) {

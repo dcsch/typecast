@@ -33,20 +33,20 @@ public class ResourceType {
     private ResourceReference[] references;
     
     /** Creates new ResourceType */
-    protected ResourceType(DataInput di) throws IOException {
+    ResourceType(DataInput di) throws IOException {
         type = di.readInt();
         count = di.readUnsignedShort() + 1;
         offset = di.readUnsignedShort();
         references = new ResourceReference[count];
     }
     
-    protected void readRefs(DataInput di) throws IOException {
+    void readRefs(DataInput di) throws IOException {
         for (int i = 0; i < count; i++) {
             references[i] = new ResourceReference(di);
         }
     }
 
-    protected void readNames(DataInput di) throws IOException {
+    void readNames(DataInput di) throws IOException {
         for (int i = 0; i < count; i++) {
             references[i].readName(di);
         }
@@ -57,12 +57,10 @@ public class ResourceType {
     }
     
     public String getTypeAsString() {
-        return new StringBuffer()
-            .append((char)((type>>24)&0xff))
-            .append((char)((type>>16)&0xff))
-            .append((char)((type>>8)&0xff))
-            .append((char)((type)&0xff))
-            .toString();
+        return String.valueOf((char) ((type >> 24) & 0xff)) +
+                (char) ((type >> 16) & 0xff) +
+                (char) ((type >> 8) & 0xff) +
+                (char) ((type) & 0xff);
     }
     
     public int getCount() {

@@ -15,14 +15,14 @@ import java.io.DataInput;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class DsigEntry {
+class DsigEntry {
 
     private int format;
     private int length;
     private int offset;
     
     /** Creates new DsigEntry */
-    protected DsigEntry(DataInput di) throws IOException {
+    DsigEntry(DataInput di) throws IOException {
         format = di.readInt();
         length = di.readInt();
         offset = di.readInt();

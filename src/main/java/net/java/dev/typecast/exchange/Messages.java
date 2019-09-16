@@ -20,7 +20,7 @@ package net.java.dev.typecast.exchange;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
-import org.apache.batik.i18n.Localizable;
+
 import org.apache.batik.i18n.LocalizableSupport;
 
 /**
@@ -28,7 +28,7 @@ import org.apache.batik.i18n.LocalizableSupport;
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
  */
-public class Messages {
+class Messages {
 
     /**
      * This class does not need to be instantiated.
@@ -38,13 +38,13 @@ public class Messages {
     /**
      * The error messages bundle class name.
      */
-    protected final static String RESOURCES =
+    private final static String RESOURCES =
         "net.java.dev.typecast.exchange.Messages";
 
     /**
      * The localizable support for the error messages.
      */
-    protected static LocalizableSupport localizableSupport =
+    private static final LocalizableSupport localizableSupport =
         new LocalizableSupport(RESOURCES);
 
     /**

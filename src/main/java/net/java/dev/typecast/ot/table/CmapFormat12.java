@@ -33,7 +33,7 @@ public class CmapFormat12 extends CmapFormat {
     private final int[] _endCharCode;
     private final int[] _startGlyphId;
 
-    protected CmapFormat12(DataInput di) throws IOException {
+    CmapFormat12(DataInput di) throws IOException {
         di.readUnsignedShort(); // reserved
         _length = di.readInt();
         _language = di.readInt();
@@ -96,9 +96,8 @@ public class CmapFormat12 extends CmapFormat {
 
     @Override
     public String toString() {
-        return new StringBuilder()
-            .append(super.toString())
-            .append(", nGroups: ")
-            .append(_nGroups).toString();
+        return super.toString() +
+                ", nGroups: " +
+                _nGroups;
     }
 }

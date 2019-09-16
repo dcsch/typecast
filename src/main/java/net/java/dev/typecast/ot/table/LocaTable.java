@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory;
  */
 public class LocaTable implements Table {
 
-    private int[] _offsets = null;
-    private short _factor = 0;
+    private int[] _offsets;
+    private short _factor;
     private int _length;
 
-    static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
 
     public LocaTable(
             DataInput di,

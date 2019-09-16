@@ -28,8 +28,8 @@ public class NameIndex extends Index {
         super(di);
     }
 
-    public String getName(int index) {
-        String name = null;
+    private String getName(int index) {
+        String name;
         int offset = getOffset(index) - 1;
         int len = getOffset(index + 1) - offset - 1;
         // Ensure the name hasn't been deleted

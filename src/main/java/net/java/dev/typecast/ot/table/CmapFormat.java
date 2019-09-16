@@ -27,12 +27,12 @@ import java.io.IOException;
  */
 public abstract class CmapFormat {
     
-    public class Range {
+    public static class Range {
         
         private final int _startCode;
         private final int _endCode;
         
-        protected Range(int startCode, int endCode) {
+        Range(int startCode, int endCode) {
             _startCode = startCode;
             _endCode = endCode;
         }
@@ -46,7 +46,7 @@ public abstract class CmapFormat {
         }
     }
 
-    protected static CmapFormat create(int format, DataInput di)
+    static CmapFormat create(int format, DataInput di)
     throws IOException {
         switch(format) {
             case 0:
@@ -64,11 +64,11 @@ public abstract class CmapFormat {
         }
     }
 
-    public abstract int getFormat();
+    protected abstract int getFormat();
 
     public abstract int getLength();
 
-    public abstract int getLanguage();
+    protected abstract int getLanguage();
 
     public abstract int getRangeCount();
     
@@ -79,12 +79,11 @@ public abstract class CmapFormat {
     
     @Override
     public String toString() {
-        return new StringBuilder()
-        .append("format: ")
-        .append(getFormat())
-        .append(", length: ")
-        .append(getLength())
-        .append(", language: ")
-        .append(getLanguage()).toString();
+        return "format: " +
+                getFormat() +
+                ", length: " +
+                getLength() +
+                ", language: " +
+                getLanguage();
     }
 }

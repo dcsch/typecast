@@ -21,7 +21,7 @@ package net.java.dev.typecast.cff;
  *
  * @author dschweinsberg
  */
-public class CharsetRange {
+class CharsetRange {
     
     private int _first;
     private int _left;
@@ -33,7 +33,7 @@ public class CharsetRange {
         return _first;
     }
 
-    protected final void setFirst(int first) {
+    final void setFirst(int first) {
         _first = first;
     }
 
@@ -41,7 +41,7 @@ public class CharsetRange {
         return _left;
     }
 
-    protected final void setLeft(int left) {
+    final void setLeft(int left) {
         _left = left;
     }
     

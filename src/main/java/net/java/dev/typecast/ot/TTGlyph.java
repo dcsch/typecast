@@ -26,8 +26,8 @@ import net.java.dev.typecast.ot.table.GlyphDescription;
  */
 public class TTGlyph extends Glyph {
 
-    protected short _leftSideBearing;
-    protected int _advanceWidth;
+    private short _leftSideBearing;
+    private int _advanceWidth;
     private Point[] _points;
 
     /**

@@ -58,7 +58,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class RangeRecord {
+class RangeRecord {
 
     private final int _start;
     private final int _end;
@@ -83,7 +83,7 @@ public class RangeRecord {
         return _startCoverageIndex;
     }
 
-    public boolean isInRange(int glyphId) {
+    private boolean isInRange(int glyphId) {
         return (_start <= glyphId && glyphId <= _end);
     }
     

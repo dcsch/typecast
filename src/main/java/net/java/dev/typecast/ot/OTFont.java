@@ -118,7 +118,7 @@ public abstract class OTFont {
         return _hmtx;
     }
     
-    public MaxpTable getMaxpTable() {
+    MaxpTable getMaxpTable() {
         return _maxp;
     }
 

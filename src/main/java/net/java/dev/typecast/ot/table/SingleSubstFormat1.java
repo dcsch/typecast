@@ -64,7 +64,7 @@ public class SingleSubstFormat1 extends SingleSubst {
     private Coverage _coverage;
 
     /** Creates new SingleSubstFormat1 */
-    protected SingleSubstFormat1(DataInputStream dis, int offset) throws IOException {
+    SingleSubstFormat1(DataInputStream dis, int offset) throws IOException {
         _coverageOffset = dis.readUnsignedShort();
         _deltaGlyphID = dis.readShort();
         dis.reset();

@@ -57,7 +57,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Ligature {
+class Ligature {
 
     private int _ligGlyph;
     private int _compCount;

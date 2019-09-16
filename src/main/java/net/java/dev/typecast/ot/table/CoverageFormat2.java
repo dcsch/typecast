@@ -65,7 +65,7 @@ public class CoverageFormat2 extends Coverage {
     private final RangeRecord[] _rangeRecords;
 
     /** Creates new CoverageFormat2 */
-    protected CoverageFormat2(DataInput di) throws IOException {
+    CoverageFormat2(DataInput di) throws IOException {
         _rangeCount = di.readUnsignedShort();
         _rangeRecords = new RangeRecord[_rangeCount];
         for (int i = 0; i < _rangeCount; i++) {

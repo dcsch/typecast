@@ -21,48 +21,48 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class ColrTable implements Table {
+class ColrTable implements Table {
 
-    public class BaseGlyphRecord {
+    static class BaseGlyphRecord {
 
         private final int _gid;
         private final int _firstLayerIndex;
         private final int _numLayers;
 
-        protected BaseGlyphRecord(DataInput di) throws IOException {
+        BaseGlyphRecord(DataInput di) throws IOException {
             _gid = di.readUnsignedShort();
             _firstLayerIndex = di.readUnsignedShort();
             _numLayers = di.readUnsignedShort();
         }
 
-        public int getGid() {
+        int getGid() {
             return _gid;
         }
 
-        public int getFirstLayerIndex() {
+        int getFirstLayerIndex() {
             return _firstLayerIndex;
         }
 
-        public int getNumLayers() {
+        int getNumLayers() {
             return _numLayers;
         }
     }
 
-    public class LayerRecord {
+    static class LayerRecord {
 
         private final int _gid;
         private final int _paletteIndex;
 
-        protected LayerRecord(DataInput di) throws IOException {
+        LayerRecord(DataInput di) throws IOException {
             _gid = di.readUnsignedShort();
             _paletteIndex = di.readUnsignedShort();
         }
 
-        public int getGid() {
+        int getGid() {
             return _gid;
         }
 
-        public int getPaletteIndex() {
+        int getPaletteIndex() {
             return _paletteIndex;
         }
     }

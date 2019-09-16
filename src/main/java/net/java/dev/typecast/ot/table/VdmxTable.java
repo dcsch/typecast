@@ -27,70 +27,70 @@ import java.io.IOException;
  */
 public class VdmxTable implements Table {
 
-    private class Ratio {
+    private static class Ratio {
         
         private byte _bCharSet;
         private byte _xRatio;
         private byte _yStartRatio;
         private byte _yEndRatio;
         
-        protected Ratio(DataInput di) throws IOException {
+        Ratio(DataInput di) throws IOException {
             _bCharSet = di.readByte();
             _xRatio = di.readByte();
             _yStartRatio = di.readByte();
             _yEndRatio = di.readByte();
         }
 
-        public byte getBCharSet() {
+        byte getBCharSet() {
             return _bCharSet;
         }
         
-        public byte getXRatio() {
+        byte getXRatio() {
             return _xRatio;
         }
         
-        public byte getYStartRatio() {
+        byte getYStartRatio() {
             return _yStartRatio;
         }
         
-        public byte getYEndRatio() {
+        byte getYEndRatio() {
             return _yEndRatio;
         }
     }
     
-    private class VTableRecord {
+    private static class VTableRecord {
         
         private int _yPelHeight;
         private short _yMax;
         private short _yMin;
         
-        protected VTableRecord(DataInput di) throws IOException {
+        VTableRecord(DataInput di) throws IOException {
             _yPelHeight = di.readUnsignedShort();
             _yMax = di.readShort();
             _yMin = di.readShort();
         }
 
-        public int getYPelHeight() {
+        int getYPelHeight() {
             return _yPelHeight;
         }
         
-        public short getYMax() {
+        short getYMax() {
             return _yMax;
         }
         
-        public short getYMin() {
+        short getYMin() {
             return _yMin;
         }
     }
     
-    private class Group {
+    private static class Group {
         
         private int _recs;
         private int _startsz;
         private int _endsz;
         private VTableRecord[] _entry;
         
-        protected Group(DataInput di) throws IOException {
+        Group(DataInput di) throws IOException {
             _recs = di.readUnsignedShort();
             _startsz = di.readUnsignedByte();
             _endsz = di.readUnsignedByte();
@@ -100,19 +100,19 @@ public class VdmxTable implements Table {
             }
         }
 
-        public int getRecs() {
+        int getRecs() {
             return _recs;
         }
         
-        public int getStartSZ() {
+        int getStartSZ() {
             return _startsz;
         }
         
-        public int getEndSZ() {
+        int getEndSZ() {
             return _endsz;
         }
         
-        public VTableRecord[] getEntry() {
+        VTableRecord[] getEntry() {
             return _entry;
         }
     }
@@ -121,7 +121,7 @@ public class VdmxTable implements Table {
     private int _numRecs;
     private int _numRatios;
     private Ratio[] _ratRange;
-    private int _offset[];
+    private int[] _offset;
     private Group[] _groups;
     
     /** Creates a new instance of VdmxTable */
@@ -144,7 +144,7 @@ public class VdmxTable implements Table {
     }
     
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'VDMX' Table - Precomputed Vertical Device Metrics\n")
             .append("--------------------------------------------------\n")
             .append("  Version:                 ").append(_version).append("\n")

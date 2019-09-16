@@ -56,5 +56,5 @@ package net.java.dev.typecast.ot.table;
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  */
 public interface ScriptTags {
-    public static final String SCRIPT_TAG_ARAB = "arab";
+    String SCRIPT_TAG_ARAB = "arab";
 }

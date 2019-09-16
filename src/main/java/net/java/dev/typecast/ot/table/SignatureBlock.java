@@ -15,7 +15,7 @@ import java.io.DataInput;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class SignatureBlock {
+class SignatureBlock {
 
     private int reserved1;
     private int reserved2;
@@ -23,7 +23,7 @@ public class SignatureBlock {
     private byte[] signature;
     
     /** Creates new SignatureBlock */
-    protected SignatureBlock(DataInput di) throws IOException {
+    SignatureBlock(DataInput di) throws IOException {
         reserved1 = di.readUnsignedShort();
         reserved2 = di.readUnsignedShort();
         signatureLen = di.readInt();
@@ -32,7 +32,7 @@ public class SignatureBlock {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < signatureLen; i += 16) {
             if (signatureLen - i >= 16) {
                 sb.append(new String(signature, i, 16)).append("\n");

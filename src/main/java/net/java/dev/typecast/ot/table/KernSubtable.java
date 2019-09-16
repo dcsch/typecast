@@ -18,7 +18,7 @@ import java.io.IOException;
 public abstract class KernSubtable {
 
     /** Creates new KernSubtable */
-    protected KernSubtable() {
+    KernSubtable() {
     }
     
     public abstract int getKerningPairCount();

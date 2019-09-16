@@ -167,26 +167,24 @@ public class HeadTable implements Table {
     }
 
     public String toString() {
-        return new StringBuffer()
-            .append("'head' Table - Font Header\n--------------------------")
-            .append("\n  'head' version:      ").append(Fixed.floatValue(_versionNumber))
-            .append("\n  fontRevision:        ").append(Fixed.roundedFloatValue(_fontRevision, 8))
-            .append("\n  checkSumAdjustment:  0x").append(Integer.toHexString(_checkSumAdjustment).toUpperCase())
-            .append("\n  magicNumber:         0x").append(Integer.toHexString(_magicNumber).toUpperCase())
-            .append("\n  flags:               0x").append(Integer.toHexString(_flags).toUpperCase())
-            .append("\n  unitsPerEm:          ").append(_unitsPerEm)
-            .append("\n  created:             ").append(_created)
-            .append("\n  modified:            ").append(_modified)
-            .append("\n  xMin:                ").append(_xMin)
-            .append("\n  yMin:                ").append(_yMin)
-            .append("\n  xMax:                ").append(_xMax)
-            .append("\n  yMax:                ").append(_yMax)
-            .append("\n  macStyle bits:       ").append(Integer.toHexString(_macStyle).toUpperCase())
-            .append("\n  lowestRecPPEM:       ").append(_lowestRecPPEM)
-            .append("\n  fontDirectionHint:   ").append(_fontDirectionHint)
-            .append("\n  indexToLocFormat:    ").append(_indexToLocFormat)
-            .append("\n  glyphDataFormat:     ").append(_glyphDataFormat)
-            .toString();
+        return "'head' Table - Font Header\n--------------------------" +
+                "\n  'head' version:      " + Fixed.floatValue(_versionNumber) +
+                "\n  fontRevision:        " + Fixed.roundedFloatValue(_fontRevision, 8) +
+                "\n  checkSumAdjustment:  0x" + Integer.toHexString(_checkSumAdjustment).toUpperCase() +
+                "\n  magicNumber:         0x" + Integer.toHexString(_magicNumber).toUpperCase() +
+                "\n  flags:               0x" + Integer.toHexString(_flags).toUpperCase() +
+                "\n  unitsPerEm:          " + _unitsPerEm +
+                "\n  created:             " + _created +
+                "\n  modified:            " + _modified +
+                "\n  xMin:                " + _xMin +
+                "\n  yMin:                " + _yMin +
+                "\n  xMax:                " + _xMax +
+                "\n  yMax:                " + _yMax +
+                "\n  macStyle bits:       " + Integer.toHexString(_macStyle).toUpperCase() +
+                "\n  lowestRecPPEM:       " + _lowestRecPPEM +
+                "\n  fontDirectionHint:   " + _fontDirectionHint +
+                "\n  indexToLocFormat:    " + _indexToLocFormat +
+                "\n  glyphDataFormat:     " + _glyphDataFormat;
     }
 
 }

@@ -27,8 +27,8 @@ import net.java.dev.typecast.cff.T2Interpreter;
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class T2Glyph extends Glyph {
-    protected short _leftSideBearing;
-    protected int _advanceWidth;
+    private final short _leftSideBearing;
+    private final int _advanceWidth;
     private final Point[] _points;
     private final Integer[] _hstems;
     private final Integer[] _vstems;

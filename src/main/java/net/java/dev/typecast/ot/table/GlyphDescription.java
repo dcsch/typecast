@@ -56,29 +56,29 @@ package net.java.dev.typecast.ot.table;
  */
 public interface GlyphDescription {
     
-    public int getGlyphIndex();
+    int getGlyphIndex();
     
-    public int getEndPtOfContours(int i);
+    int getEndPtOfContours(int i);
     
-    public byte getFlags(int i);
+    byte getFlags(int i);
     
-    public short getXCoordinate(int i);
+    short getXCoordinate(int i);
     
-    public short getYCoordinate(int i);
+    short getYCoordinate(int i);
     
-    public short getXMaximum();
+    short getXMaximum();
     
-    public short getXMinimum();
+    short getXMinimum();
     
-    public short getYMaximum();
+    short getYMaximum();
     
-    public short getYMinimum();
+    short getYMinimum();
     
-    public boolean isComposite();
+    boolean isComposite();
     
-    public int getPointCount();
+    int getPointCount();
     
-    public int getContourCount();
+    int getContourCount();
 
     //  public int getComponentIndex(int c);
     //  public int getComponentCount();

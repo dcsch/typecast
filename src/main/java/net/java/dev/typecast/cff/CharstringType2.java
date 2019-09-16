@@ -205,7 +205,7 @@ public class CharstringType2 extends Charstring {
             int b2 = _data[ip + 2];
             int b3 = _data[ip + 3];
             int b4 = _data[ip + 4];
-            return new Float((b1 << 8 | b2) + ((b3 << 8 | b4) / 65536.0));
+            return (float) ((b1 << 8 | b2) + ((b3 << 8 | b4) / 65536.0));
         } else {
             return null;
         }

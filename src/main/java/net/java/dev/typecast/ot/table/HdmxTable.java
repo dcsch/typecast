@@ -28,13 +28,13 @@ import java.io.IOException;
  */
 public class HdmxTable implements Table {
     
-    public class DeviceRecord {
+    static class DeviceRecord {
         
         private short _pixelSize;
         private short _maxWidth;
         private short[] _widths;
 
-        protected DeviceRecord(int numGlyphs, DataInput di) throws IOException {
+        DeviceRecord(int numGlyphs, DataInput di) throws IOException {
             _pixelSize = di.readByte();
             _maxWidth = di.readByte();
             _widths = new short[numGlyphs];
@@ -43,15 +43,15 @@ public class HdmxTable implements Table {
             }
         }
 
-        public short getPixelSize() {
+        short getPixelSize() {
             return _pixelSize;
         }
         
-        public short getMaxWidth() {
+        short getMaxWidth() {
             return _maxWidth;
         }
         
-        public short[] getWidths() {
+        short[] getWidths() {
             return _widths;
         }
     }
@@ -78,7 +78,7 @@ public class HdmxTable implements Table {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'hdmx' Table - Horizontal Device Metrics\n----------------------------------------\n");
         sb.append("Size = ").append(_length).append(" bytes\n")
             .append("\t'hdmx' version:         ").append(_version).append("\n")

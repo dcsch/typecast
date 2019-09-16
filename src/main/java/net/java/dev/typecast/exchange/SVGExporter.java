@@ -48,10 +48,10 @@ public class SVGExporter
         extends Exporter
         implements XMLConstants, SVGConstants, ScriptTags, FeatureTags {
 
-    static final String EOL;
+    private static final String EOL;
 
-    static final String PROPERTY_LINE_SEPARATOR = "line.separator";
-    static final String PROPERTY_LINE_SEPARATOR_DEFAULT = "\n";
+    private static final String PROPERTY_LINE_SEPARATOR = "line.separator";
+    private static final String PROPERTY_LINE_SEPARATOR_DEFAULT = "\n";
 
     static {
         String  temp;
@@ -88,7 +88,7 @@ public class SVGExporter
     private static final String CONFIG_SVG_TEST_CARD_END = 
         "SVGFont.config.svg.test.card.end";
 
-    protected static String encodeEntities(String s) {
+    private static String encodeEntities(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
@@ -115,7 +115,7 @@ public class SVGExporter
         return sb.toString();
     }
 
-    protected static String getContourAsSVGPathData(Glyph glyph, int startIndex, int count) {
+    private static String getContourAsSVGPathData(Glyph glyph, int startIndex, int count) {
 
         // If this is a single point on it's own, we can't do anything with it
         if (glyph.getPoint(startIndex).endOfContour) {
@@ -196,7 +196,7 @@ public class SVGExporter
         return sb.toString();
     }
 
-    protected static String getSVGFontFaceElement(OTFont font) {
+    private static String getSVGFontFaceElement(OTFont font) {
         StringBuilder sb = new StringBuilder();
         String fontFamily = font.getNameTable().getRecordString(ID.nameFontFamilyName);
         short unitsPerEm = font.getHeadTable().getUnitsPerEm();
@@ -265,7 +265,7 @@ public class SVGExporter
      * @param forceAscii Force the use of the ASCII character map
      * @throws net.java.dev.typecast.ot.table.TableException
      */
-    protected static void writeFontAsSVGFragment(PrintStream ps, TTFont font, String id, int first, int last, boolean forceAscii)
+    private static void writeFontAsSVGFragment(PrintStream ps, TTFont font, String id, int first, int last, boolean forceAscii)
     throws TableException {
         int horiz_advance_x = font.getOS2Table().getAvgCharWidth();
 
@@ -289,7 +289,7 @@ public class SVGExporter
         ps.print(getSVGFontFaceElement(font));
 
         // Decide upon a cmap table to use for our character to glyph look-up
-        CmapFormat cmapFmt = null;
+        CmapFormat cmapFmt;
         if (forceAscii) {
             
             // We've been asked to use the ASCII/Macintosh cmap format
@@ -380,7 +380,7 @@ public class SVGExporter
         ps.println(XML_CLOSE_TAG_END);
     }
 
-    protected static String getGlyphAsSVG(
+    private static String getGlyphAsSVG(
             OTFont font,
             Glyph glyph,
             int glyphIndex,
@@ -441,7 +441,7 @@ public class SVGExporter
         return sb.toString();
     }
 
-    protected static String getGlyphAsSVG(
+    private static String getGlyphAsSVG(
             TTFont font,
             Glyph glyph,
             int glyphIndex,
@@ -525,7 +525,7 @@ public class SVGExporter
         return sb.toString();
     }
 
-    protected static String getKerningPairAsSVG(KerningPair kp, PostTable post) {
+    private static String getKerningPairAsSVG(KerningPair kp, PostTable post) {
         StringBuilder sb = new StringBuilder();
         sb.append(XML_OPEN_TAG_START).append(SVG_HKERN_TAG).append(XML_SPACE);
         sb.append(SVG_G1_ATTRIBUTE).append(XML_EQUAL_QUOT);
@@ -543,25 +543,25 @@ public class SVGExporter
         return sb.toString();
     }
 
-    protected static void writeSvgBegin(PrintStream ps) {
+    private static void writeSvgBegin(PrintStream ps) {
         ps.println(Messages.formatMessage(CONFIG_SVG_BEGIN,
                                           new Object[]{SVG_PUBLIC_ID, SVG_SYSTEM_ID}));
                    
     }
         
-    protected static void writeSvgDefsBegin(PrintStream ps) {
+    private static void writeSvgDefsBegin(PrintStream ps) {
         ps.println(XML_OPEN_TAG_START + SVG_DEFS_TAG + XML_OPEN_TAG_END_CHILDREN);
     }
 
-    protected static void writeSvgDefsEnd(PrintStream ps) {
+    private static void writeSvgDefsEnd(PrintStream ps) {
          ps.println(XML_CLOSE_TAG_START + SVG_DEFS_TAG + XML_CLOSE_TAG_END);
     }
 
-    protected static void writeSvgEnd(PrintStream ps) {
+    private static void writeSvgEnd(PrintStream ps) {
         ps.println(XML_CLOSE_TAG_START + SVG_SVG_TAG + XML_CLOSE_TAG_END);
     }
 
-    protected static void writeSvgTestCard(PrintStream ps, String fontFamily) {
+    private static void writeSvgTestCard(PrintStream ps, String fontFamily) {
         ps.println(Messages.formatMessage(CONFIG_SVG_TEST_CARD_START, null));
         ps.println(fontFamily);
         ps.println(Messages.formatMessage(CONFIG_SVG_TEST_CARD_END, null));
@@ -612,7 +612,6 @@ public class SVGExporter
 
     private static void chopUpStringBuffer(StringBuilder sb) {
         if (sb.length() < 256) {
-            return;
         } else {
             // Being rather simplistic about it, for now we'll insert a newline after
             // 240 chars

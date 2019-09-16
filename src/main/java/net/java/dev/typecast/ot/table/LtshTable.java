@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class LtshTable implements Table {
+class LtshTable implements Table {
 
     private int version;
     private int numGlyphs;
@@ -32,7 +32,7 @@ public class LtshTable implements Table {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'LTSH' Table - Linear Threshold Table\n-------------------------------------")
             .append("\n 'LTSH' Version:       ").append(version)
             .append("\n Number of Glyphs:     ").append(numGlyphs)

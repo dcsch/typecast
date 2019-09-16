@@ -63,7 +63,7 @@ public class FeatureRecord {
     private int _offset;
 
     /** Creates new FeatureRecord */
-    protected FeatureRecord(DataInput di) throws IOException {
+    FeatureRecord(DataInput di) throws IOException {
         _tag = di.readInt();
         _offset = di.readUnsignedShort();
     }
@@ -77,11 +77,9 @@ public class FeatureRecord {
     }
 
     public String getTagAsString() {
-        return new StringBuffer()
-            .append((char)((_tag>>24)&0xff))
-            .append((char)((_tag>>16)&0xff))
-            .append((char)((_tag>>8)&0xff))
-            .append((char)((_tag)&0xff))
-            .toString();
+        return String.valueOf((char) ((_tag >> 24) & 0xff)) +
+                (char) ((_tag >> 16) & 0xff) +
+                (char) ((_tag >> 8) & 0xff) +
+                (char) ((_tag) & 0xff);
     }
 }

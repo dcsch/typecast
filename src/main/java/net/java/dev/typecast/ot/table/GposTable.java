@@ -25,7 +25,7 @@ import java.io.IOException;
  * TODO: To be implemented
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class GposTable implements Table {
+class GposTable implements Table {
 
     protected GposTable(DataInput di) throws IOException {
 

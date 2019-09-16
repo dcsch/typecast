@@ -13,16 +13,16 @@ package net.java.dev.typecast.ot.table;
  */
 public class Panose {
 
-  byte bFamilyType = 0;
-  byte bSerifStyle = 0;
-  byte bWeight = 0;
-  byte bProportion = 0;
-  byte bContrast = 0;
-  byte bStrokeVariation = 0;
-  byte bArmStyle = 0;
-  byte bLetterform = 0;
-  byte bMidline = 0;
-  byte bXHeight = 0;
+  private byte bFamilyType;
+  private byte bSerifStyle;
+  private byte bWeight;
+  private byte bProportion;
+  private byte bContrast;
+  private byte bStrokeVariation;
+  private byte bArmStyle;
+  private byte bLetterform;
+  private byte bMidline;
+  private byte bXHeight;
 
   /** Creates new Panose */
   public Panose(byte[] panose) {
@@ -79,17 +79,16 @@ public class Panose {
   }
   
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(String.valueOf(bFamilyType)).append(" ")
-      .append(String.valueOf(bSerifStyle)).append(" ")
-      .append(String.valueOf(bWeight)).append(" ")
-      .append(String.valueOf(bProportion)).append(" ")
-      .append(String.valueOf(bContrast)).append(" ")
-      .append(String.valueOf(bStrokeVariation)).append(" ")
-      .append(String.valueOf(bArmStyle)).append(" ")
-      .append(String.valueOf(bLetterform)).append(" ")
-      .append(String.valueOf(bMidline)).append(" ")
-      .append(String.valueOf(bXHeight));
-    return sb.toString();
+    String sb = String.valueOf(bFamilyType) + " " +
+            String.valueOf(bSerifStyle) + " " +
+            String.valueOf(bWeight) + " " +
+            String.valueOf(bProportion) + " " +
+            String.valueOf(bContrast) + " " +
+            String.valueOf(bStrokeVariation) + " " +
+            String.valueOf(bArmStyle) + " " +
+            String.valueOf(bLetterform) + " " +
+            String.valueOf(bMidline) + " " +
+            String.valueOf(bXHeight);
+    return sb;
   }
 }

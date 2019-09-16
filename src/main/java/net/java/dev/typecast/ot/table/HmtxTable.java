@@ -58,8 +58,8 @@ import java.io.IOException;
  */
 public class HmtxTable implements Table {
 
-    private int[] _hMetrics = null;
-    private short[] _leftSideBearing = null;
+    private int[] _hMetrics;
+    private short[] _leftSideBearing;
     private int _length;
 
     public HmtxTable(
@@ -106,7 +106,7 @@ public class HmtxTable implements Table {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("'hmtx' Table - Horizontal Metrics\n---------------------------------\n");
         sb.append("Size = ").append(_length).append(" bytes, ")
             .append(_hMetrics.length).append(" entries\n");

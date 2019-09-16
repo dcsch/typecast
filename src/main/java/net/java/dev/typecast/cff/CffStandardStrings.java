@@ -23,7 +23,7 @@ package net.java.dev.typecast.cff;
  * CFF specification.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CffStandardStrings {
+class CffStandardStrings {
 
     public static final String[] standardStrings = {
         ".notdef",

@@ -31,7 +31,7 @@ import net.java.dev.typecast.ot.T2Glyph;
  * A factory for generating Graphics2D paths from glyph outlines.
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class GlyphPathFactory {
+class GlyphPathFactory {
     
     /**
      * Build a {@link java.awt.geom.GeneralPath GeneralPath} from a
@@ -71,7 +71,7 @@ public class GlyphPathFactory {
         int offset = 0;
         boolean connect = false;
         while (offset < count) {
-            Shape s = null;
+            Shape s;
             Point point_minus1 = glyph.getPoint((offset==0) ? startIndex+count-1 : startIndex+(offset-1)%count);
             Point point = glyph.getPoint(startIndex + offset%count);
             Point point_plus1 = glyph.getPoint(startIndex + (offset+1)%count);

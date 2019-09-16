@@ -23,7 +23,7 @@ public class KernSubtableFormat2 extends KernSubtable {
     private int array;
 
     /** Creates new KernSubtableFormat2 */
-    protected KernSubtableFormat2(DataInput di) throws IOException {
+    KernSubtableFormat2(DataInput di) throws IOException {
         rowWidth = di.readUnsignedShort();
         leftClassTable = di.readUnsignedShort();
         rightClassTable = di.readUnsignedShort();

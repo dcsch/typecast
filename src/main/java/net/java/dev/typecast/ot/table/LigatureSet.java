@@ -57,7 +57,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class LigatureSet {
+class LigatureSet {
 
     private int _ligatureCount;
     private int[] _ligatureOffsets;
