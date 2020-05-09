@@ -20,6 +20,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
 
 /**
@@ -57,6 +58,11 @@ public class VheaTable implements Table {
         }
         _metricDataFormat = di.readShort();
         _numberOfLongVerMetrics = di.readUnsignedShort();
+    }
+
+    @Override
+    public int getType() {
+        return vhea;
     }
 
     public short getAdvanceHeightMax() {

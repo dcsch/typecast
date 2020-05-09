@@ -10,6 +10,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
@@ -19,6 +20,11 @@ class PrepTable extends Program implements Table {
 
     public PrepTable(DataInput di, int length) throws IOException {
         readInstructions(di, length);
+    }
+
+    @Override
+    public int getType() {
+        return prep;
     }
 
     public String toString() {

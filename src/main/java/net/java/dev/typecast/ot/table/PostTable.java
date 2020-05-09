@@ -10,6 +10,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
 
 /**
@@ -326,6 +327,11 @@ public class PostTable implements Table {
         } else if (version == 0x00025000) {
         } else if (version == 0x00030000) {
         }
+    }
+
+    @Override
+    public int getType() {
+        return post;
     }
 
     public int getVersion() {

@@ -10,6 +10,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
 
 /**
@@ -55,6 +56,11 @@ public class MaxpTable implements Table {
             maxComponentElements = di.readUnsignedShort();
             maxComponentDepth = di.readUnsignedShort();
         }
+    }
+
+    @Override
+    public int getType() {
+        return maxp;
     }
 
     public int getVersionNumber() {

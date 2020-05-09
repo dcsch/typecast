@@ -50,9 +50,9 @@
 
 package net.java.dev.typecast.ot.table;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -90,6 +90,11 @@ public class NameTable implements Table {
             _records[i].loadString(
                     new DataInputStream(new ByteArrayInputStream(buffer)));
         }
+    }
+
+    @Override
+    public int getType() {
+        return name;
     }
 
     public short getNumberOfNameRecords() {

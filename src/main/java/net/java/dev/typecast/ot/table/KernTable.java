@@ -31,6 +31,11 @@ public class KernTable implements Table {
         }
     }
 
+    @Override
+    public int getType() {
+        return kern;
+    }
+
     public int getSubtableCount() {
         return nTables;
     }

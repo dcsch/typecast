@@ -77,6 +77,11 @@ public class HdmxTable implements Table {
         _length = length;
     }
 
+    @Override
+    public int getType() {
+        return hdmx;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'hdmx' Table - Horizontal Device Metrics\n----------------------------------------\n");

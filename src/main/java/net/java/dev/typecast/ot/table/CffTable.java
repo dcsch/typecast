@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+
 import net.java.dev.typecast.cff.CffFont;
 import net.java.dev.typecast.cff.Index;
 import net.java.dev.typecast.cff.NameIndex;
@@ -101,6 +102,11 @@ public class CffTable implements Table {
         return new DataInputStream(new ByteArrayInputStream(
                 _buf, offset,
                 _buf.length - offset));
+    }
+    
+    @Override
+    public int getType() {
+        return CFF;
     }
 
     public NameIndex getNameIndex() {

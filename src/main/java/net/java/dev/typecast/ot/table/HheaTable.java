@@ -10,6 +10,7 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
 
 /**
@@ -46,6 +47,11 @@ public class HheaTable implements Table {
         }
         metricDataFormat = di.readShort();
         numberOfHMetrics = di.readUnsignedShort();
+    }
+
+    @Override
+    public int getType() {
+        return hhea;
     }
 
     public short getAdvanceWidthMax() {

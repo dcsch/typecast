@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +143,11 @@ public class SbixTable implements Table {
                 buf.length - offset);
     }
     
+    @Override
+    public int getType() {
+        return sbix;
+    }
+
     public Strike[] getStrikes() {
         return _strikes;
     }
