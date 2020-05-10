@@ -54,12 +54,14 @@ public class TTFont extends OTFont {
 
         // 'loca' is required by 'glyf'
         int length = seekTable(dis, tablesOrigin, Table.loca);
-        LocaTable loca = new LocaTable(dis, length, this.getHeadTable(), this.getMaxpTable());
-
-        // If this is a TrueType outline, then we'll have at least the
-        // 'glyf' table (along with the 'loca' table)
-        length = seekTable(dis, tablesOrigin, Table.glyf);
-        _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
+        if (length > 0) {
+            LocaTable loca = new LocaTable(dis, length, this.getHeadTable(), this.getMaxpTable());
+            
+            // If this is a TrueType outline, then we'll have at least the
+            // 'glyf' table (along with the 'loca' table)
+            length = seekTable(dis, tablesOrigin, Table.glyf);
+            _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
+        }
 
         length = seekTable(dis, tablesOrigin, Table.gasp);
         if (length > 0) {
