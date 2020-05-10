@@ -54,7 +54,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
+import net.java.dev.typecast.ot.Fmt;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -162,14 +164,14 @@ public class TableDirectory {
     public String toString() {
         StringBuilder sb = new StringBuilder()
             .append("Offset Table\n------ -----")
-            .append("\n  sfnt version:     ").append(Fixed.floatValue(_version))
-            .append("\n  numTables =       ").append(_numTables)
-            .append("\n  searchRange =     ").append(_searchRange)
-            .append("\n  entrySelector =   ").append(_entrySelector)
-            .append("\n  rangeShift =      ").append(_rangeShift)
+            .append("\n  sfnt version:  ").append(Fixed.floatValue(_version))
+            .append("\n  numTables:     ").append(_numTables)
+            .append("\n  searchRange:   ").append(_searchRange)
+            .append("\n  entrySelector: ").append(_entrySelector)
+            .append("\n  rangeShift:    ").append(_rangeShift)
             .append("\n\n");
         for (int i = 0; i < _numTables; i++) {
-            sb.append(i).append(". ").append(_entries[i].toString()).append("\n");
+            sb.append("  ").append(Fmt.pad(2, i)).append(": ").append(_entries[i].toString()).append("\n");
         }
         return sb.toString();
     }

@@ -29,7 +29,6 @@ import net.java.dev.typecast.ot.table.HdmxTable;
 import net.java.dev.typecast.ot.table.KernTable;
 import net.java.dev.typecast.ot.table.LocaTable;
 import net.java.dev.typecast.ot.table.Table;
-import net.java.dev.typecast.ot.table.TableDirectory;
 import net.java.dev.typecast.ot.table.VdmxTable;
 
 public class TTFont extends OTFont {
@@ -49,39 +48,35 @@ public class TTFont extends OTFont {
     public TTFont(byte[] fontData, int tablesOrigin) throws IOException {
         super(fontData, tablesOrigin);
 
-        // Load the table directory
-//        dis.skip(directoryOffset);
-        TableDirectory tableDirectory = new TableDirectory(fontData);
-
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         dis.mark(fontData.length);
         dis.reset();
 
         // 'loca' is required by 'glyf'
-        int length = seekTable(tableDirectory, dis, tablesOrigin, Table.loca);
+        int length = seekTable(dis, tablesOrigin, Table.loca);
         LocaTable loca = new LocaTable(dis, length, this.getHeadTable(), this.getMaxpTable());
 
         // If this is a TrueType outline, then we'll have at least the
         // 'glyf' table (along with the 'loca' table)
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.glyf);
+        length = seekTable(dis, tablesOrigin, Table.glyf);
         _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
 
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.gasp);
+        length = seekTable(dis, tablesOrigin, Table.gasp);
         if (length > 0) {
             _gasp = new GaspTable(dis);
         }
 
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.kern);
+        length = seekTable(dis, tablesOrigin, Table.kern);
         if (length > 0) {
             _kern = new KernTable(dis);
         }
 
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.hdmx);
+        length = seekTable(dis, tablesOrigin, Table.hdmx);
         if (length > 0) {
             _hdmx = new HdmxTable(dis, length, this.getMaxpTable());
         }
 
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.VDMX);
+        length = seekTable(dis, tablesOrigin, Table.VDMX);
         if (length > 0) {
             _vdmx = new VdmxTable(dis);
         }

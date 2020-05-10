@@ -52,6 +52,7 @@ public abstract class OTFont {
     private PostTable _post;
     private VheaTable _vhea;
     private GsubTable _gsub;
+    private TableDirectory _tableDirectory;
 
     /**
      * @param fontData OpenType/TrueType font file data.
@@ -66,10 +67,7 @@ public abstract class OTFont {
      * @throws java.io.IOException
      */
     OTFont(byte[] fontData, int tablesOrigin) throws IOException {
-
-        // Load the table directory
-//        dis.skip(directoryOffset);
-        TableDirectory tableDirectory = new TableDirectory(fontData);
+        _tableDirectory = new TableDirectory(fontData);
 
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         dis.mark(fontData.length);
@@ -78,36 +76,43 @@ public abstract class OTFont {
         // Load some prerequisite tables
         // (These are tables that are referenced by other tables, so we need to load
         // them first)
-        seekTable(tableDirectory, dis, tablesOrigin, Table.head);
+        seekTable(dis, tablesOrigin, Table.head);
         _head = new HeadTable(dis);
 
         // 'hhea' is required by 'hmtx'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.hhea);
+        seekTable(dis, tablesOrigin, Table.hhea);
         _hhea = new HheaTable(dis);
 
         // 'maxp' is required by 'glyf', 'hmtx', 'loca', and 'vmtx'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.maxp);
+        seekTable(dis, tablesOrigin, Table.maxp);
         _maxp = new MaxpTable(dis);
 
         // 'vhea' is required by 'vmtx'
-        int length = seekTable(tableDirectory, dis, tablesOrigin, Table.vhea);
+        int length = seekTable(dis, tablesOrigin, Table.vhea);
         if (length > 0) {
             _vhea = new VheaTable(dis);
         }
 
         // 'post' is required by 'glyf'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.post);
+        seekTable(dis, tablesOrigin, Table.post);
         _post = new PostTable(dis);
 
         // Load all the other required tables
-        seekTable(tableDirectory, dis, tablesOrigin, Table.cmap);
+        seekTable(dis, tablesOrigin, Table.cmap);
         _cmap = new CmapTable(dis);
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.hmtx);
+        length = seekTable(dis, tablesOrigin, Table.hmtx);
         _hmtx = new HmtxTable(dis, length, _hhea, _maxp);
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.name);
+        length = seekTable(dis, tablesOrigin, Table.name);
         _name = new NameTable(dis, length);
-        seekTable(tableDirectory, dis, tablesOrigin, Table.OS_2);
+        seekTable(dis, tablesOrigin, Table.OS_2);
         _os2 = new Os2Table(dis);
+    }
+    
+    /**
+     * {@link TableDirectory} with all font tables.
+     */
+    public TableDirectory getTableDirectory() {
+        return _tableDirectory;
     }
 
     public Os2Table getOS2Table() {
@@ -165,10 +170,10 @@ public abstract class OTFont {
     public abstract Glyph getGlyph(int i);
 
     int seekTable(
-            TableDirectory tableDirectory,
             DataInputStream dis,
             int tablesOrigin,
             int tag) throws IOException {
+        TableDirectory tableDirectory = getTableDirectory();
         dis.reset();
         TableDirectory.Entry entry = tableDirectory.getEntryByTag(tag);
         if (entry == null) {
@@ -186,6 +191,9 @@ public abstract class OTFont {
      * Dumps information of all tables to the given {@link Writer}.
      */
     public void dumpTo(Writer out) throws IOException {
+        out.write(getTableDirectory().toString());
+        out.write("\n");
+        
         dump(out, getHeadTable());
         dump(out, getOS2Table());
         dump(out, getCmapTable());
