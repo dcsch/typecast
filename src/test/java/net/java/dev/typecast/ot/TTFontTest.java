@@ -18,7 +18,11 @@
 
 package net.java.dev.typecast.ot;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -51,5 +55,10 @@ public class TTFontTest extends TestCase {
         byte[] fontData = Files.readAllBytes(file.toPath());
         TTFont font = new TTFont(fontData, 0);
         assertEquals(HeadTable.class, font.getHeadTable().getClass());
+
+        new File("target/tmp").mkdirs();
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File("target/tmp/Lato-Regular.txt")))) {
+            font.dumpTo(out);
+        }
     }
 }

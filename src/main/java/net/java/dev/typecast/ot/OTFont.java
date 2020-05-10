@@ -21,8 +21,20 @@ package net.java.dev.typecast.ot;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.Writer;
 
-import net.java.dev.typecast.ot.table.*;
+import net.java.dev.typecast.ot.table.CmapTable;
+import net.java.dev.typecast.ot.table.GsubTable;
+import net.java.dev.typecast.ot.table.HeadTable;
+import net.java.dev.typecast.ot.table.HheaTable;
+import net.java.dev.typecast.ot.table.HmtxTable;
+import net.java.dev.typecast.ot.table.MaxpTable;
+import net.java.dev.typecast.ot.table.NameTable;
+import net.java.dev.typecast.ot.table.Os2Table;
+import net.java.dev.typecast.ot.table.PostTable;
+import net.java.dev.typecast.ot.table.Table;
+import net.java.dev.typecast.ot.table.TableDirectory;
+import net.java.dev.typecast.ot.table.VheaTable;
 
 /**
  * The TrueType font.
@@ -169,4 +181,33 @@ public abstract class OTFont {
     public String toString() {
         return _head.toString();
     }
+    
+    /**
+     * Dumps information of all tables to the given {@link Writer}.
+     */
+    public void dumpTo(Writer out) throws IOException {
+        dump(out, getHeadTable());
+        dump(out, getOS2Table());
+        dump(out, getCmapTable());
+        dump(out, getHheaTable());
+        dump(out, getHmtxTable());
+        dump(out, getMaxpTable());
+        dump(out, getNameTable());
+        dump(out, getPostTable());
+        dump(out, getVheaTable());
+        dump(out, getGsubTable());
+    }
+
+    /** 
+     * Writes the toString() representation of the given table to the given {@link Writer}.
+     */
+    protected static void dump(Writer out, Table table) throws IOException {
+        if (table != null) {
+            table.dump(out);
+            out.write("\n");
+            out.write("\n");
+        }
+    }
+    
+    
 }
