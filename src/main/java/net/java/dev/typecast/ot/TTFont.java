@@ -28,6 +28,7 @@ import net.java.dev.typecast.ot.table.GlyfTable;
 import net.java.dev.typecast.ot.table.HdmxTable;
 import net.java.dev.typecast.ot.table.KernTable;
 import net.java.dev.typecast.ot.table.LocaTable;
+import net.java.dev.typecast.ot.table.SVGTable;
 import net.java.dev.typecast.ot.table.Table;
 import net.java.dev.typecast.ot.table.VdmxTable;
 
@@ -38,6 +39,7 @@ public class TTFont extends OTFont {
     private KernTable _kern;
     private HdmxTable _hdmx;
     private VdmxTable _vdmx;
+    private SVGTable _svg;
 
     /**
      * Constructor
@@ -61,6 +63,11 @@ public class TTFont extends OTFont {
             // 'glyf' table (along with the 'loca' table)
             length = seekTable(dis, tablesOrigin, Table.glyf);
             _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
+        }
+        
+        length = seekTable(dis, tablesOrigin, Table.svg);
+        if (length > 0) {
+            _svg = new SVGTable(dis);
         }
 
         length = seekTable(dis, tablesOrigin, Table.gasp);
@@ -86,6 +93,13 @@ public class TTFont extends OTFont {
 
     public GlyfTable getGlyfTable() {
         return _glyf;
+    }
+    
+    /**
+     * Optional {@link SVGTable}.
+     */
+    public SVGTable getSvgTable() {
+        return _svg;
     }
 
     public GaspTable getGaspTable() {
@@ -115,6 +129,7 @@ public class TTFont extends OTFont {
     public void dumpTo(Writer out) throws IOException {
         super.dumpTo(out);
         dump(out, getGlyfTable());
+        dump(out, getSvgTable());
         dump(out, getGaspTable());
         dump(out, getKernTable());
         dump(out, getHdmxTable());

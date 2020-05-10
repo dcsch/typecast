@@ -63,7 +63,8 @@ public interface Table {
     int sbix = 0x73626978; // Extended Bitmaps
     int vhea = 0x76686561; // Vertical Metrics header
     int vmtx = 0x766d7478; // Vertical Metrics
-
+    int svg  = TableDirectory.fromStringTag("SVG "); // SVG outlines
+    
     /**
      * The type code of this {@link Table}.
      */
