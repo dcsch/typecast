@@ -62,6 +62,11 @@ public class TTFontTest extends TestCase {
         dumpFont("NotoColorEmoji.txt", font);
     }
     
+    public void testLoadColorFont2() throws URISyntaxException, IOException {
+        TTFont font = loadFontResource("Gilbert-Color Bold Preview5.otf");
+        dumpFont("Gilbert-Color Bold Preview5.txt", font);
+    }
+    
     private void dumpFont(String name, TTFont font)
             throws IOException, FileNotFoundException {
         new File("target/tmp").mkdirs();
