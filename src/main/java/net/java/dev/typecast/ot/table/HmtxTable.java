@@ -53,6 +53,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fmt;
 
 /**
@@ -131,9 +133,9 @@ import net.java.dev.typecast.ot.Fmt;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class HmtxTable implements Table {
+public class HmtxTable implements Table, Writable {
 
-    private int[] _hMetrics;
+    private int[] _advanceWidth;
     private short[] _leftSideBearing;
     private int _length;
 
@@ -155,25 +157,37 @@ public class HmtxTable implements Table {
             HheaTable hhea,
             MaxpTable maxp) throws IOException {
         
-        // Paired advance width and left side bearing values for each glyph.
-        // Records are indexed by glyph ID.
-        _hMetrics = new int[hhea.getNumberOfHMetrics()];
-        for (int i = 0; i < hhea.getNumberOfHMetrics(); ++i) {
-            _hMetrics[i] =
-                    di.readUnsignedByte()<<24
-                    | di.readUnsignedByte()<<16
-                    | di.readUnsignedByte()<<8
-                    | di.readUnsignedByte();
-        }
+        int numberOfHMetrics = hhea.getNumberOfHMetrics();
+        _advanceWidth = new int[numberOfHMetrics];
         
         // Left side bearings for glyph IDs greater than or equal to
         // numberOfHMetrics.
-        int lsbCount = maxp.getNumGlyphs() - hhea.getNumberOfHMetrics();
-        _leftSideBearing = new short[lsbCount];
-        for (int i = 0; i < lsbCount; ++i) {
-            _leftSideBearing[i] = di.readShort();
+        int numGlyphs = maxp.getNumGlyphs();
+        _leftSideBearing = new short[numGlyphs];
+
+        // Paired advance width and left side bearing values for each glyph.
+        // Records are indexed by glyph ID.
+        for (int glyphId = 0; glyphId < numberOfHMetrics; ++glyphId) {
+            _advanceWidth[glyphId] = di.readUnsignedShort();
+            _leftSideBearing[glyphId] = di.readShort();
         }
+        
+        for (int glyphId = numberOfHMetrics; glyphId < numGlyphs; ++glyphId) {
+            _leftSideBearing[glyphId] = di.readShort();
+        }
+        
         _length = length;
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        for (int n = 0, cnt = _advanceWidth.length; n < cnt; n++) {
+            out.writeShort(_advanceWidth[n]);
+            out.writeShort(_leftSideBearing[n]);
+        }
+        for (int n = _advanceWidth.length, cnt = _leftSideBearing.length; n < cnt; n++) {
+            out.writeShort(_leftSideBearing[n]);
+        }
     }
 
     @Override
@@ -207,13 +221,10 @@ public class HmtxTable implements Table {
      * @see "https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html"
      */
     public int getAdvanceWidth(int i) {
-        if (_hMetrics == null) {
-            return 0;
-        }
-        if (i < _hMetrics.length) {
-            return _hMetrics[i] >>> 16;
+        if (i < _advanceWidth.length) {
+            return _advanceWidth[i];
         } else {
-            return _hMetrics[_hMetrics.length - 1] >>> 16;
+            return _advanceWidth[_advanceWidth.length - 1];
         }
     }
 
@@ -234,14 +245,7 @@ public class HmtxTable implements Table {
      * @see "https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html"
      */
     public short getLeftSideBearing(int i) {
-        if (_hMetrics == null) {
-            return 0;
-        }
-        if (i < _hMetrics.length) {
-            return (short)(_hMetrics[i] & 0xffff);
-        } else {
-            return _leftSideBearing[i - _hMetrics.length];
-        }
+        return _leftSideBearing[i];
     }
 
     @Override
@@ -250,16 +254,11 @@ public class HmtxTable implements Table {
         sb.append("'hmtx' Table - Horizontal Metrics\n");
         sb.append("---------------------------------\n");
         sb.append("        Size:   ").append(_length).append(" bytes\n");
-        sb.append("        Length: ").append(_hMetrics.length).append(" entries\n");
-        for (int i = 0; i < _hMetrics.length; i++) {
+        sb.append("        Length: ").append(_leftSideBearing.length).append(" entries\n");
+        for (int i = 0; i < _leftSideBearing.length; i++) {
             sb.append("        ").append(Fmt.pad(6, i)).append(": ");
             sb.append("adv=").append(getAdvanceWidth(i));
             sb.append(", lsb=").append(getLeftSideBearing(i));
-            sb.append("\n");
-        }
-        for (int i = 0; i < _leftSideBearing.length; i++) {
-            sb.append("        ").append(Fmt.pad(6, i + _hMetrics.length)).append(": ");
-            sb.append("lsb=").append(_leftSideBearing[i]);
             sb.append("\n");
         }
         return sb.toString();

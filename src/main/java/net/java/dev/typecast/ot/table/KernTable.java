@@ -21,8 +21,13 @@ public class KernTable implements Table {
     private int nTables;
     private KernSubtable[] tables;
 
-    /** Creates new KernTable */
-    public KernTable(DataInput di) throws IOException {
+    /**
+     * Creates new KernTable
+     * 
+     * @param length
+     *        Total number of bytes.
+     */
+    public KernTable(DataInput di, int length) throws IOException {
         version = di.readUnsignedShort();
         nTables = di.readUnsignedShort();
         tables = new KernSubtable[nTables];

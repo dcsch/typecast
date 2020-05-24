@@ -32,6 +32,7 @@ class VmtxTable implements Table {
 
     protected VmtxTable(
             DataInput di,
+            int length,
             VheaTable vhea,
             MaxpTable maxp) throws IOException {
         _vMetrics = new int[vhea.getNumberOfLongVerMetrics()];

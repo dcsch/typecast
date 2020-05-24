@@ -11,11 +11,18 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
+ * GaspRange Record
+ * 
+ * @see GaspTable#getGaspRange(int)
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/gasp#gasp-table-formats"
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class GaspRange {
+class GaspRange implements Writable {
 
     private static final int GASP_GRIDFIT = 1;
     private static final int GASP_DOGRAY = 2;
@@ -28,7 +35,14 @@ class GaspRange {
         rangeMaxPPEM = di.readUnsignedShort();
         rangeGaspBehavior = di.readUnsignedShort();
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        out.writeShort(rangeMaxPPEM);
+        out.writeShort(rangeGaspBehavior);
+    }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("  rangeMaxPPEM:        ").append(rangeMaxPPEM)

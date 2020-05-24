@@ -115,7 +115,7 @@ public class SbixTable implements Table {
 
     private static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
 
-    private SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
+    protected SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
 
         // Load entire table into a buffer, and create another input stream
         byte[] buf = new byte[length];

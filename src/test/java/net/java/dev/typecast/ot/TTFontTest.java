@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,8 +32,13 @@ import java.nio.file.Files;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.java.dev.typecast.io.BinaryFileIO;
 import net.java.dev.typecast.ot.table.HeadTable;
 
+/**
+ * Test case loading and writing fonts.
+ */
+@SuppressWarnings("javadoc")
 public class TTFontTest extends TestCase {
     /**
      * Create the test case
@@ -54,38 +60,63 @@ public class TTFontTest extends TestCase {
         TTFont font = loadFontResource("Lato-Regular.ttf");
         assertEquals(HeadTable.class, font.getHeadTable().getClass());
 
-        dumpFont("Lato-Regular.txt", font);
+        dumpFont("Lato-Regular", font);
     }
 
     public void testLoadColorFont() throws URISyntaxException, IOException {
         TTFont font = loadFontResource("NotoColorEmoji.ttf");
-        dumpFont("NotoColorEmoji.txt", font);
+        dumpFont("NotoColorEmoji", font);
     }
     
     public void testLoadColorFont2() throws URISyntaxException, IOException {
         TTFont font = loadFontResource("Gilbert-Color Bold Preview5.otf");
-        dumpFont("Gilbert-Color Bold Preview5.txt", font);
+        dumpFont("Gilbert-Color Bold Preview5", font);
     }
     
     private void dumpFont(String name, TTFont font)
             throws IOException, FileNotFoundException {
         new File("target/tmp").mkdirs();
-        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File("target/tmp/" + name)))) {
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File("target/tmp/" + name + ".txt")))) {
             font.dumpTo(out);
+        }
+        
+        File fontFile = new File("target/tmp/" + name + ".ttf");
+        try (RandomAccessFile outFile = new RandomAccessFile(fontFile, "rw")) {
+            outFile.setLength(0);
+            
+            try (BinaryFileIO out = new BinaryFileIO(outFile)) {
+                long elapsed = System.currentTimeMillis();
+                font.write(out);
+                
+                elapsed = System.currentTimeMillis() - elapsed;
+                
+                System.out.println("writing " + name + " took " + elapsed + "ms");
+            }
+        }
+        
+        TTFont reloadedFont = loadFont(fontFile);
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File("target/tmp/" + name + ".reloaded.txt")))) {
+            reloadedFont.dumpTo(out);
         }
     }
 
     private TTFont loadFontResource(String name)
             throws URISyntaxException, IOException {
         URL url = ClassLoader.getSystemResource(name);
+        long elapsed = System.currentTimeMillis();
         TTFont font = loadFont(url);
+        elapsed = System.currentTimeMillis() - elapsed;
+        
+        System.out.println("Loading " + name + " took " + elapsed + "ms");
         return font;
     }
 
     private TTFont loadFont(URL url) throws URISyntaxException, IOException {
-        File file = new File(url.toURI());
+        return loadFont(new File(url.toURI()));
+    }
+
+    private TTFont loadFont(File file) throws IOException {
         byte[] fontData = Files.readAllBytes(file.toPath());
-        TTFont font = new TTFont(fontData, 0);
-        return font;
+        return new TTFont(fontData, 0);
     }
 }

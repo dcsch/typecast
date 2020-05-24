@@ -55,40 +55,20 @@ public class TTFont extends OTFont {
         dis.reset();
 
         // 'loca' is required by 'glyf'
-        int length = seekTable(dis, tablesOrigin, Table.loca);
-        if (length > 0) {
-            LocaTable loca = new LocaTable(dis, length, this.getHeadTable(), this.getMaxpTable());
-            
+        LocaTable loca = (LocaTable) initTable(dis, tablesOrigin, Table.loca);
+        if (loca != null) {
             // If this is a TrueType outline, then we'll have at least the
             // 'glyf' table (along with the 'loca' table)
-            length = seekTable(dis, tablesOrigin, Table.glyf);
-            _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
+            _glyf = (GlyfTable) initTable(dis, tablesOrigin, Table.glyf);
         }
         
-        length = seekTable(dis, tablesOrigin, Table.svg);
-        if (length > 0) {
-            _svg = new SVGTable(dis);
-        }
-
-        length = seekTable(dis, tablesOrigin, Table.gasp);
-        if (length > 0) {
-            _gasp = new GaspTable(dis);
-        }
-
-        length = seekTable(dis, tablesOrigin, Table.kern);
-        if (length > 0) {
-            _kern = new KernTable(dis);
-        }
-
-        length = seekTable(dis, tablesOrigin, Table.hdmx);
-        if (length > 0) {
-            _hdmx = new HdmxTable(dis, length, this.getMaxpTable());
-        }
-
-        length = seekTable(dis, tablesOrigin, Table.VDMX);
-        if (length > 0) {
-            _vdmx = new VdmxTable(dis);
-        }
+        _svg = (SVGTable) initTable(dis, tablesOrigin, Table.svg);
+        _gasp = (GaspTable) initTable(dis, tablesOrigin, Table.gasp);
+        _kern = (KernTable) initTable(dis, tablesOrigin, Table.kern);
+        _hdmx = (HdmxTable) initTable(dis, tablesOrigin, Table.hdmx);
+        _vdmx = (VdmxTable) initTable(dis, tablesOrigin, Table.VDMX);
+        
+        getTableDirectory().initTables(dis, tablesOrigin);
     }
 
     public GlyfTable getGlyfTable() {

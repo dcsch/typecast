@@ -11,13 +11,21 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fixed;
 
 /**
+ * Maximum Profile Table
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/maxp"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class MaxpTable implements Table {
+public class MaxpTable implements Table, Writable {
 
+    private static final int VERSION_1_0 = 0x00010000;
+    private static final int VERSION_0_5 = 0x00005000;
     private int versionNumber;
     private int numGlyphs;
     private int maxPoints;
@@ -34,13 +42,20 @@ public class MaxpTable implements Table {
     private int maxComponentElements;
     private int maxComponentDepth;
 
-    public MaxpTable(DataInput di) throws IOException {
+    /**
+     * Creates a {@link MaxpTable} from the given input.
+     *
+     * @param di
+     *        The input to read from.
+     * @param length
+     *        Total number of bytes.
+     */
+    public MaxpTable(DataInput di, int length) throws IOException {
         versionNumber = di.readInt();
         
-        // CFF fonts use version 0.5, TrueType fonts use version 1.0
-        if (versionNumber == 0x00005000) {
+        if (versionNumber == VERSION_0_5) {
             numGlyphs = di.readUnsignedShort();
-        } else if (versionNumber == 0x00010000) {
+        } else if (versionNumber == VERSION_1_0) {
             numGlyphs = di.readUnsignedShort();
             maxPoints = di.readUnsignedShort();
             maxContours = di.readUnsignedShort();
@@ -57,72 +72,142 @@ public class MaxpTable implements Table {
             maxComponentDepth = di.readUnsignedShort();
         }
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        out.writeInt(versionNumber);
+        out.writeShort(numGlyphs);
+        
+        if (versionNumber == VERSION_1_0) {
+            out.writeShort(maxPoints);
+            out.writeShort(maxContours);
+            out.writeShort(maxCompositePoints);
+            out.writeShort(maxCompositeContours);
+            out.writeShort(maxZones);
+            out.writeShort(maxTwilightPoints);
+            out.writeShort(maxStorage);
+            out.writeShort(maxFunctionDefs);
+            out.writeShort(maxInstructionDefs);
+            out.writeShort(maxStackElements);
+            out.writeShort(maxSizeOfInstructions);
+            out.writeShort(maxComponentElements);
+            out.writeShort(maxComponentDepth);
+        }
+    }
 
     @Override
     public int getType() {
         return maxp;
     }
 
+    /**
+     * CFF fonts use {@link #VERSION_0_5}, TrueType fonts use {@link #VERSION_1_0}.
+     */
     public int getVersionNumber() {
         return versionNumber;
     }
 
-    public int getMaxComponentDepth() {
-        return maxComponentDepth;
-    }
-
-    public int getMaxComponentElements() {
-        return maxComponentElements;
-    }
-
-    public int getMaxCompositeContours() {
-        return maxCompositeContours;
-    }
-
-    public int getMaxCompositePoints() {
-        return maxCompositePoints;
-    }
-
-    public int getMaxContours() {
-        return maxContours;
-    }
-
-    public int getMaxFunctionDefs() {
-        return maxFunctionDefs;
-    }
-
-    public int getMaxInstructionDefs() {
-        return maxInstructionDefs;
-    }
-
-    public int getMaxPoints() {
-        return maxPoints;
-    }
-
-    public int getMaxSizeOfInstructions() {
-        return maxSizeOfInstructions;
-    }
-
-    public int getMaxStackElements() {
-        return maxStackElements;
-    }
-
-    public int getMaxStorage() {
-        return maxStorage;
-    }
-
-    public int getMaxTwilightPoints() {
-        return maxTwilightPoints;
-    }
-
-    public int getMaxZones() {
-        return maxZones;
-    }
-
+    /**
+     * The number of glyphs in the font.
+     */
     public int getNumGlyphs() {
         return numGlyphs;
     }
 
+    /**
+     * Maximum points in a non-composite glyph.
+     */
+    public int getMaxPoints() {
+        return maxPoints;
+    }
+
+    /**
+     * Maximum contours in a non-composite glyph.
+     */
+    public int getMaxContours() {
+        return maxContours;
+    }
+
+    /**
+     * Maximum points in a composite glyph.
+     */
+    public int getMaxCompositePoints() {
+        return maxCompositePoints;
+    }
+
+    /**
+     * Maximum contours in a composite glyph.
+     */
+    public int getMaxCompositeContours() {
+        return maxCompositeContours;
+    }
+
+    /**
+     * 1 if instructions do not use the twilight zone (Z0), or 2 if instructions
+     * do use Z0; should be set to 2 in most cases.
+     */
+    public int getMaxZones() {
+        return maxZones;
+    }
+
+    /**
+     * Maximum points used in Z0.
+     */
+    public int getMaxTwilightPoints() {
+        return maxTwilightPoints;
+    }
+
+    /**
+     * Number of Storage Area locations.
+     */
+    public int getMaxStorage() {
+        return maxStorage;
+    }
+
+    /**
+     * Number of FDEFs, equal to the highest function number + 1.
+     */
+    public int getMaxFunctionDefs() {
+        return maxFunctionDefs;
+    }
+
+    /**
+     * Number of IDEFs.
+     */
+    public int getMaxInstructionDefs() {
+        return maxInstructionDefs;
+    }
+
+    /**
+     * Maximum stack depth across Font Program ('fpgm' table), CVT Program
+     * ('prep' table) and all glyph instructions (in the 'glyf' table).
+     */
+    public int getMaxStackElements() {
+        return maxStackElements;
+    }
+
+    /**
+     * Maximum byte count for glyph instructions.
+     */
+    public int getMaxSizeOfInstructions() {
+        return maxSizeOfInstructions;
+    }
+
+    /**
+     * Maximum number of components referenced at “top level” for any composite glyph.
+     */
+    public int getMaxComponentElements() {
+        return maxComponentElements;
+    }
+
+    /**
+     * Maximum levels of recursion; 1 for simple components.
+     */
+    public int getMaxComponentDepth() {
+        return maxComponentDepth;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'maxp' Table - Maximum Profile\n------------------------------")

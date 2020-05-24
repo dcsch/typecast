@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 class GdefTable implements Table {
 
-    protected GdefTable(DataInput di) throws IOException {
+    protected GdefTable(DataInput di, int i) throws IOException {
     }
 
     @Override

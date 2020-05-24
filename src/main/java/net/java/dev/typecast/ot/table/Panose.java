@@ -8,10 +8,20 @@
 
 package net.java.dev.typecast.ot.table;
 
+import java.io.DataInput;
+import java.io.IOException;
+
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
+ * PANOSE classification number.
+ *      
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/os2#panose"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Panose {
+public class Panose implements Writable {
 
   private byte bFamilyType;
   private byte bSerifStyle;
@@ -24,18 +34,34 @@ public class Panose {
   private byte bMidline;
   private byte bXHeight;
 
-  /** Creates new Panose */
-  public Panose(byte[] panose) {
-    bFamilyType = panose[0];
-    bSerifStyle = panose[1];
-    bWeight = panose[2];
-    bProportion = panose[3];
-    bContrast = panose[4];
-    bStrokeVariation = panose[5];
-    bArmStyle = panose[6];
-    bLetterform = panose[7];
-    bMidline = panose[8];
-    bXHeight = panose[9];
+  /**
+   * Creates {@link Panose} from the given input.
+   */
+  public Panose(DataInput di) throws IOException {
+    bFamilyType = di.readByte();
+    bSerifStyle = di.readByte();
+    bWeight = di.readByte();
+    bProportion = di.readByte();
+    bContrast = di.readByte();
+    bStrokeVariation = di.readByte();
+    bArmStyle = di.readByte();
+    bLetterform = di.readByte();
+    bMidline = di.readByte();
+    bXHeight = di.readByte();
+  }
+  
+  @Override
+  public void write(BinaryOutput out) throws IOException {
+      out.writeByte(bFamilyType);
+      out.writeByte(bSerifStyle);
+      out.writeByte(bWeight);
+      out.writeByte(bProportion);
+      out.writeByte(bContrast);
+      out.writeByte(bStrokeVariation);
+      out.writeByte(bArmStyle);
+      out.writeByte(bLetterform);
+      out.writeByte(bMidline);
+      out.writeByte(bXHeight);
   }
 
   public byte getFamilyType() {

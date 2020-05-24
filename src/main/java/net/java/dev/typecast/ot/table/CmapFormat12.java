@@ -20,6 +20,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * Format 12: Segmented coverage
  * 
@@ -43,7 +45,7 @@ public class CmapFormat12 extends CmapFormat {
 
     private final int _length;
     private final int _language;
-    private final int _nGroups;
+    private final int _numGroups;
     private final int[] _startCharCode;
     private final int[] _endCharCode;
     private final int[] _startGlyphId;
@@ -52,14 +54,37 @@ public class CmapFormat12 extends CmapFormat {
         di.readUnsignedShort(); // reserved
         _length = di.readInt();
         _language = di.readInt();
-        _nGroups = di.readInt();
-        _startCharCode = new int[_nGroups];
-        _endCharCode = new int[_nGroups];
-        _startGlyphId = new int[_nGroups];
-        for (int i = 0; i < _nGroups; ++i) {
+        _numGroups = di.readInt();
+        _startCharCode = new int[_numGroups];
+        _endCharCode = new int[_numGroups];
+        _startGlyphId = new int[_numGroups];
+        for (int i = 0; i < _numGroups; ++i) {
             _startCharCode[i] = di.readInt();
             _endCharCode[i] = di.readInt();
             _startGlyphId[i] = di.readInt();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(getFormat());
+
+        // Reserved
+        out.writeShort(0);
+        
+        try (BinaryOutput lengthOut = out.reserve(4)) {
+            out.writeInt(getLanguage());
+            out.writeInt(_numGroups);
+            for (int n = 0, cnt = _numGroups; n < cnt; n++) {
+                // SequentialMapGroup Record:
+                out.writeInt(_startCharCode[n]);
+                out.writeInt(_endCharCode[n]);
+                out.writeInt(_startGlyphId[n]);
+            }
+            
+            lengthOut.writeInt((int) (out.getPosition() - start));
         }
     }
 
@@ -80,12 +105,12 @@ public class CmapFormat12 extends CmapFormat {
 
     @Override
     public int getRangeCount() {
-        return _nGroups;
+        return _numGroups;
     }
 
     @Override
     public Range getRange(int index) throws ArrayIndexOutOfBoundsException {
-        if (index < 0 || index >= _nGroups) {
+        if (index < 0 || index >= _numGroups) {
             throw new ArrayIndexOutOfBoundsException();
         }
         return new Range(_startCharCode[index], _endCharCode[index]);
@@ -94,7 +119,7 @@ public class CmapFormat12 extends CmapFormat {
     @Override
     public int mapCharCode(int charCode) {
         try {
-            for (int i = 0; i < _nGroups; i++) {
+            for (int i = 0; i < _numGroups; i++) {
                 if (_endCharCode[i] >= charCode) {
                     if (_startCharCode[i] <= charCode) {
                         return charCode - _startCharCode[i] + _startGlyphId[i];
@@ -114,13 +139,13 @@ public class CmapFormat12 extends CmapFormat {
         return super.toString() +
             "    format:         " + getFormat() + "\n" +
             "    language:       " + getLanguage() + "\n" +
-            "    nGroups:        " + _nGroups + "\n" + 
+            "    nGroups:        " + _numGroups + "\n" + 
             "    mapping:        " + toStringMappingTable() + "\n"; 
     }
 
     private String toStringMappingTable() {
         StringBuilder result = new StringBuilder();
-        for (int n = 0; n < _nGroups; n++) {
+        for (int n = 0; n < _numGroups; n++) {
             if (n > 0) {
                 result.append(", ");
             }

@@ -33,8 +33,13 @@ class PcltTable implements Table {
     private byte serifStyle;
     private byte reserved;
 
-    /** Creates new PcltTable */
-    protected PcltTable(DataInput di) throws IOException {
+    /**
+     * Creates new PcltTable
+     * 
+     * @param length
+     *        Total number of bytes.
+     */
+    protected PcltTable(DataInput di, int length) throws IOException {
         version = di.readInt();
         fontNumber = di.readInt();
         pitch = di.readUnsignedShort();

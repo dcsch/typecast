@@ -53,6 +53,9 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
  * Encoding record.
  * 
@@ -89,6 +92,32 @@ public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
         _platformId = di.readUnsignedShort();
         _encodingId = di.readUnsignedShort();
         _offset = di.readInt();
+    }
+
+    /**
+     * Writes the EncodingRecord with offset data.
+     *
+     * @param out
+     *        The {@link BinaryOutput} to write to.
+     * @param start
+     *        The start position of the surrounding table.
+     * @return A {@link Writable} writing the actual format subtable.
+     */
+    public Writable writeEncodingRecord(BinaryOutput out, long start) throws IOException {
+        out.writeShort(getPlatformId());
+        out.writeShort(getEncodingId());
+        BinaryOutput offsetOut = out.reserve(4);
+        
+        return new Writable() {
+            @Override
+            public void write(BinaryOutput out) throws IOException {
+                long offset = out.getPosition() - start;
+                getFormat().write(out);
+                
+                offsetOut.writeInt((int) offset);
+                offsetOut.close();
+            }
+        };
     }
 
     /**

@@ -23,8 +23,15 @@ class DsigTable implements Table {
     private DsigEntry[] dsigEntry;
     private SignatureBlock[] sigBlocks;
 
-    /** Creates new DsigTable */
-    protected DsigTable(DataInput di) throws IOException {
+    /**
+     * Creates {@link DsigTable} from the given input.
+     * 
+     * @param di
+     *        The input to read.
+     * @param length
+     *        The total number of bytes.
+     */
+    protected DsigTable(DataInput di, int length) throws IOException {
         version = di.readInt();
         numSigs = di.readUnsignedShort();
         flag = di.readUnsignedShort();

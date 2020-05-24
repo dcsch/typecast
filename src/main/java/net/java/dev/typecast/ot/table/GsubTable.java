@@ -56,6 +56,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
+ * Glyph Substitution Table
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */

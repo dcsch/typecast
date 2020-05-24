@@ -48,4 +48,29 @@ public class Bits {
         return (bitSet & mask) == mask;
     }
 
+    /**
+     * Sets or unsets the given mask in the given bit set depending on the boolean value.
+     */
+    public static int updateMask(int bitSet, int mask, boolean value) {
+        if (value) {
+            return setMask(bitSet, mask);
+        } else {
+            return clearMask(bitSet, mask);
+        }
+    }
+
+    /**
+     * Sets the given mask in the given bit set.
+     */
+    public static int setMask(int bitSet, int mask) {
+        return bitSet | mask;
+    }
+
+    /**
+     * Unsets the given mask in the given bit.
+     */
+    public static int clearMask(int bitSet, int mask) {
+        return bitSet & (0xFFFFFFFF ^ mask);
+    }
+
 }

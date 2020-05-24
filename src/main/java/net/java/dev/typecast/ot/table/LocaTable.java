@@ -14,6 +14,9 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
  * Index to Location table
  * 
@@ -48,18 +51,20 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class LocaTable implements Table {
+public class LocaTable implements Table, Writable {
 
     private int[] _offsets;
     private int _length;
 
     private static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
+    private HeadTable _head;
 
     public LocaTable(
             DataInput di,
             int length,
             HeadTable head,
             MaxpTable maxp) throws IOException {
+        _head = head;
         _offsets = new int[maxp.getNumGlyphs() + 1];
         boolean shortEntries = head.useShortEntries();
         if (shortEntries) {
@@ -85,16 +90,41 @@ public class LocaTable implements Table {
         _length = length;
     }
     
+    void updateFormat() {
+        for (int offset : _offsets) {
+            if (offset > 2 * 0xFFFFFF || offset % 2 != 0) {
+                _head.setShortEntries(false);
+                return;
+            }
+        }
+        _head.setShortEntries(true);
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        boolean shortEntries = _head.useShortEntries();
+        if (shortEntries) {
+            for (int offset : _offsets) {
+                out.writeShort(offset);
+            }
+        } else {
+            for (int offset : _offsets) {
+                out.writeInt(offset);
+            }
+        }
+    }
+    
     @Override
     public int getType() {
         return loca;
     }
 
-    public int getOffset(int i) {
-        if (_offsets == null) {
-            return 0;
-        }
-        return _offsets[i];
+    public int getOffset(int glyphId) {
+        return _offsets[glyphId];
+    }
+    
+    public void setOffset(int glyphId, int offset) {
+        _offsets[glyphId] = offset;
     }
 
     @Override

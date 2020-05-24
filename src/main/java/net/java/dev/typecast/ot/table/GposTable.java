@@ -22,12 +22,15 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
+ * Glyph Positioning Table
+ * 
  * TODO: To be implemented
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 class GposTable implements Table {
 
-    protected GposTable(DataInput di) throws IOException {
+    protected GposTable(DataInput di, int length) throws IOException {
 
         // GPOS Header
         int version = di.readInt();

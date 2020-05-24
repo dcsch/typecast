@@ -42,7 +42,7 @@ public class VheaTable implements Table {
     private short _metricDataFormat;
     private int _numberOfLongVerMetrics;
 
-    public VheaTable(DataInput di) throws IOException {
+    public VheaTable(DataInput di, int length) throws IOException {
         _version = di.readInt();
         _ascent = di.readShort();
         _descent = di.readShort();

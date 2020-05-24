@@ -4,6 +4,7 @@
 package net.java.dev.typecast.ot;
 
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 /**
@@ -21,7 +22,18 @@ public class Fixed_2_14 {
     }
 
     private static double toDouble(int i) {
-        return (double) i / (double) 0x4000;
+        return ((double) i) / 0x4000;
+    }
+
+    /** 
+     * Writes a value in fixed 2.14 floating point format.
+     */
+    public static void write(DataOutput out, double value) throws IOException {
+        out.writeShort(fromDouble(value));
+    }
+
+    private static short fromDouble(double value) {
+        return (short) (value * 0x4000);
     }
 
 }

@@ -54,13 +54,23 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.table.NameRecord.StringOut;
+
 /**
+ * Naming Table
+ * 
+ * <p>
  * The naming table allows multilingual strings to be associated with the
  * OpenType font file. These strings can represent copyright notices, font
  * names, family names, style names, and so on.
+ * </p>
  * 
  * Other parts of the OpenType font that require these strings can refer to them
  * using a language-independent name ID. In addition to language variants, the
@@ -73,22 +83,29 @@ import java.util.stream.Collectors;
  * 
  * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/name"
  */
-public class NameTable implements Table {
+public class NameTable implements Table, Writable {
 
     private short _format;
-    private short _count;
     private short _stringOffset;
     private NameRecord[] _records;
 
+    /**
+     * Creates a {@link NameTable} from the given input.
+     *
+     * @param di
+     *        the input to read from.
+     * @param length
+     *        The total length of the table.
+     */
     public NameTable(DataInput di, int length) throws IOException {
         _format = di.readShort();
-        _count = di.readShort();
+        int count = di.readUnsignedShort();
         _stringOffset = di.readShort();
-        _records = new NameRecord[_count];
+        _records = new NameRecord[count];
         
         // Load the records, which contain the encoding information and string
         // offsets
-        for (int i = 0; i < _count; i++) {
+        for (int i = 0; i < count; i++) {
             _records[i] = new NameRecord(di);
         }
         
@@ -98,9 +115,34 @@ public class NameTable implements Table {
         di.readFully(buffer);
         
         // Now let the records get their hands on them
-        for (int i = 0; i < _count; i++) {
+        for (int i = 0; i < count; i++) {
             _records[i].loadString(
                     new DataInputStream(new ByteArrayInputStream(buffer)));
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(_format);
+        out.writeShort(_records.length);
+        
+        List<StringOut> stringOuts = new ArrayList<>(_records.length);
+        try (BinaryOutput offsetOut = out.reserve(2)) {
+            for (NameRecord record : _records) {
+                stringOuts.add(record.write(out));
+            }
+            
+            long storageStart = out.getPosition();
+            long storageOffset = storageStart - start;
+            
+            offsetOut.writeShort((int) storageOffset);
+            offsetOut.close();
+            
+            for (StringOut stringOut : stringOuts) {
+                stringOut.write(storageStart);
+            }
         }
     }
     
@@ -119,8 +161,8 @@ public class NameTable implements Table {
     /**
      * uint16   count   Number of name records.
      */
-    public short getNumberOfNameRecords() {
-        return _count;
+    public int getNumberOfNameRecords() {
+        return _records.length;
     }
     
     /**
@@ -137,7 +179,7 @@ public class NameTable implements Table {
     public String getRecordString(short nameId) {
 
         // Search for the first instance of this name ID
-        for (int i = 0; i < _count; i++) {
+        for (int i = 0; i < _records.length; i++) {
             if (_records[i].getNameId() == nameId) {
                 return _records[i].getRecordString();
             }
@@ -149,7 +191,7 @@ public class NameTable implements Table {
     public String toString() {
         return "'name' Table - Naming Table\n--------------------------------" +
                 "\n        'name' format:       " + _format +
-                "\n        count:               " + _count +
+                "\n        count:               " + getNumberOfNameRecords() +
                 "\n        stringOffset:        " + _stringOffset +
                 "\n        records:" +
                 Arrays.asList(_records).stream().map(r -> "\n" + r.toString()).collect(Collectors.joining("\n"));

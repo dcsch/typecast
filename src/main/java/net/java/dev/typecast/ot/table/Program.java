@@ -11,6 +11,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -24,7 +26,16 @@ abstract class Program {
      * and this field is followed directly by the flags field.
      */
     public int getInstructionLength() {
-        return instructions.length;
+        return instructions == null ? 0 : instructions.length;
+    }
+    
+    /**
+     * The instruction code at position n.
+     * 
+     * @see #getInstructionLength()
+     */
+    public short getInstruction(int n) {
+        return instructions[n];
     }
 
     /**
@@ -46,6 +57,18 @@ abstract class Program {
             instructions[i] = (short) di.readUnsignedByte();
         }
     }
+    
+    void writeInstructions(BinaryOutput out) throws IOException {
+        out.writeShort(getInstructionLength());
+        writeInstructionsContent(out);
+    }
+
+    void writeInstructionsContent(BinaryOutput out) throws IOException {
+        for (int n = 0, cnt = getInstructionLength(); n < cnt; n++) {
+            out.writeByte(getInstruction(n));
+        }
+    }
+    
 /*
     protected void readInstructions(ByteArrayInputStream bais, int count) {
         instructions = new short[count];

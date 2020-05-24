@@ -53,7 +53,14 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
+ * Record in the {@link NameTable}.
+ * 
+ * @see NameTable#getRecord(int)
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/name#name-records"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class NameRecord {
@@ -73,6 +80,48 @@ public class NameRecord {
         _nameId = di.readShort();
         _stringLength = di.readShort();
         _stringOffset = di.readShort();
+    }
+    
+    interface StringOut {
+
+        /** 
+         * Writes the string data to the string storage.
+         *
+         * @param storgeStart Start position of the string storage.
+         */
+        void write(long storgeStart) throws IOException;
+        
+    }
+    
+    /**
+     * Writes the {@link NameRecord}.
+     *
+     * @param out
+     *        The output to write to.
+     * @return Callback to write the actual string data.
+     */
+    public StringOut write(BinaryOutput out) throws IOException {
+        out.writeShort(_platformId);
+        out.writeShort(_encodingId);
+        out.writeShort(_languageId);
+        out.writeShort(_nameId);
+        BinaryOutput offsetOut = out.reserve(4);
+        
+        return new StringOut() {
+            @Override
+            public void write(long storgeStart) throws IOException {
+                long stringStart = out.getPosition();
+                long stringOffset = stringStart - storgeStart;
+                
+                writeString(out);
+                
+                long stringLength = out.getPosition() - stringStart;
+                
+                offsetOut.writeShort((int) stringLength);
+                offsetOut.writeShort((int) stringOffset);
+                offsetOut.close();
+            }
+        };
     }
     
     public short getEncodingId() {
@@ -99,43 +148,70 @@ public class NameRecord {
         StringBuilder sb = new StringBuilder();
         di.skipBytes(_stringOffset);
         if (_platformId == ID.platformUnicode) {
-            
             // Unicode (big-endian)
-            for (int i = 0; i < _stringLength/2; i++) {
-                sb.append(di.readChar());
-            }
+            readUnicode(di, sb);
         } else if (_platformId == ID.platformMacintosh) {
-
             // Macintosh encoding, ASCII
-            for (int i = 0; i < _stringLength; i++) {
-                sb.append((char) di.readByte());
-            }
+            readAscii(di, sb);
         } else if (_platformId == ID.platformISO) {
-            
             // ISO encoding, ASCII
-            for (int i = 0; i < _stringLength; i++) {
-                sb.append((char) di.readByte());
-            }
+            readAscii(di, sb);
         } else if (_platformId == ID.platformMicrosoft) {
-            
             // Microsoft encoding, Unicode
-            char c;
-            for (int i = 0; i < _stringLength/2; i++) {
-                c = di.readChar();
-                sb.append(c);
-            }
+            readUnicode(di, sb);
         }
         _record = sb.toString();
     }
 
-    public String toString() {
+    private void readAscii(DataInput di, StringBuilder sb) throws IOException {
+        for (int i = 0; i < _stringLength; i++) {
+            sb.append((char) di.readByte());
+        }
+    }
 
+    private void readUnicode(DataInput di, StringBuilder sb) throws IOException {
+        for (int i = 0; i < _stringLength/2; i++) {
+            sb.append(di.readChar());
+        }
+    }
+
+    void writeString(BinaryOutput out) throws IOException {
+        if (_platformId == ID.platformUnicode) {
+            // Unicode (big-endian)
+            writeUnicode(out);
+        } else if (_platformId == ID.platformMacintosh) {
+            // Macintosh encoding, ASCII
+            writeAscii(out);
+        } else if (_platformId == ID.platformISO) {
+            // ISO encoding, ASCII
+            writeAscii(out);
+        } else if (_platformId == ID.platformMicrosoft) {
+            // Microsoft encoding, Unicode
+            writeUnicode(out);
+        }
+    }
+
+    private void writeAscii(BinaryOutput out) throws IOException {
+        int length = _record.length();
+        for (int n = 0; n < length; n++) {
+            out.writeByte(_record.charAt(n));
+        }
+    }
+
+    private void writeUnicode(BinaryOutput out) throws IOException {
+        int length = _record.length();
+        for (int n = 0; n < length; n++) {
+            out.writeChar(_record.charAt(n));
+        }
+    }
+    
+    @Override
+    public String toString() {
         String sb = "             Platform ID:       " + _platformId +
                 "\n             Specific ID:       " + _encodingId +
                 "\n             Language ID:       " + _languageId +
                 "\n             Name ID:           " + _nameId +
                 "\n             Length:            " + _stringLength +
-                "\n             Offset:            " + _stringOffset +
                 "\n             Record:            " + _record;
         return sb;
     }

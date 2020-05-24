@@ -56,6 +56,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
  * Glyph Data
  * 
@@ -86,9 +89,10 @@ import java.io.Writer;
  * 
  * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/glyf"
  */
-public class GlyfTable implements Table {
+public class GlyfTable implements Table, Writable {
 
     private final GlyfDescript[] _descript;
+    private LocaTable _loca;
 
     /**
      * Creates a {@link GlyfTable}.
@@ -107,6 +111,7 @@ public class GlyfTable implements Table {
             int length,
             MaxpTable maxp,
             LocaTable loca) throws IOException {
+        _loca = loca;
         _descript = new GlyfDescript[maxp.getNumGlyphs()];
         
         // Buffer the whole table so we can randomly access it
@@ -143,6 +148,26 @@ public class GlyfTable implements Table {
                 }
             }
         }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        int glyphId = 0;
+        for (GlyfDescript glyph : _descript) {
+            long glyphOffset = out.getPosition() - start;
+            _loca.setOffset(glyphId, (int) glyphOffset);
+            
+            if (glyph != null) {
+                glyph.write(out);
+            }
+            
+            glyphId++;
+        }
+        long endOffset = out.getPosition() - start;
+        _loca.setOffset(glyphId, (int) endOffset);
+        
+        _loca.updateFormat();
     }
 
     @Override

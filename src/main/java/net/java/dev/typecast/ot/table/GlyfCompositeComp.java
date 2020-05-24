@@ -53,6 +53,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Bits;
 import net.java.dev.typecast.ot.Fixed_2_14;
 
@@ -64,7 +66,7 @@ import net.java.dev.typecast.ot.Fixed_2_14;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class GlyfCompositeComp {
+public class GlyfCompositeComp implements Writable {
 
     /**
      * Bit 0: If this is set, the arguments are 16-bit (uint16 or int16);
@@ -257,6 +259,7 @@ public class GlyfCompositeComp {
     throws IOException {
         _firstIndex = firstIndex;
         _firstContour = firstContour;
+        
         _flags = di.readUnsignedShort();
         _glyphIndex = di.readUnsignedShort();
 
@@ -282,6 +285,9 @@ public class GlyfCompositeComp {
                 _xtranslate = di.readByte();
                 _ytranslate = di.readByte();
             }
+            
+            _point1 = -1;
+            _point2 = -1;
         } else {
             if (wordArgs) {
                 _point1 = di.readUnsignedShort();
@@ -290,19 +296,113 @@ public class GlyfCompositeComp {
                 _point1 = di.readUnsignedByte();
                 _point2 = di.readUnsignedByte();
             }
+            
+            _xtranslate = 0;
+            _ytranslate = 0;
         }
         
         // Get the scale values (if any)
         if ((_flags & WE_HAVE_A_SCALE) != 0) {
             _xscale = _yscale = Fixed_2_14.read(di);
+            _scale01 = 0.0;
+            _scale10 = 0.0;
         } else if ((_flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0) {
             _xscale = Fixed_2_14.read(di);
+            _scale01 = 0.0;
+            _scale10 = 0.0;
             _yscale = Fixed_2_14.read(di);
         } else if ((_flags & WE_HAVE_A_TWO_BY_TWO) != 0) {
             _xscale = Fixed_2_14.read(di);
             _scale01 = Fixed_2_14.read(di);
             _scale10 = Fixed_2_14.read(di);
             _yscale = Fixed_2_14.read(di);
+        } else {
+            _xscale = 1.0;
+            _scale01 = 0.0;
+            _scale10 = 0.0;
+            _yscale = 1.0;
+        }
+    }
+    
+    void updateFlags() {
+        int flags = Bits.clearMask(_flags, 
+                ARGS_ARE_XY_VALUES | 
+                ARG_1_AND_2_ARE_WORDS | 
+                WE_HAVE_A_SCALE | 
+                WE_HAVE_AN_X_AND_Y_SCALE | 
+                WE_HAVE_A_TWO_BY_TWO);
+        
+        boolean xyValues = _point1 < 0;
+        boolean useWords;
+        if (xyValues) {
+            flags = Bits.setMask(flags, ARGS_ARE_XY_VALUES);
+            useWords = isSignedWord(_xtranslate) || isSignedWord(_ytranslate);
+        } else {
+            useWords = isUnsignedWord(_point1) || isUnsignedWord(_point2);
+        }
+        
+        if (useWords) {
+            flags = Bits.setMask(flags, ARG_1_AND_2_ARE_WORDS);
+        }
+        
+        if (_scale01 == 0.0 && _scale10 == 0.0) {
+            if (_xscale != 1.0 || _yscale != 1.0) {
+                if (_xscale == _yscale) {
+                    flags = Bits.setMask(flags, WE_HAVE_A_SCALE);
+                } else {
+                    flags = Bits.setMask(flags, WE_HAVE_AN_X_AND_Y_SCALE);
+                }
+            }
+        } else {
+            flags = Bits.setMask(flags, WE_HAVE_A_TWO_BY_TWO);
+        }
+        
+        _flags = flags;
+    }
+    
+    private static boolean isSignedWord(int value) {
+        return value < Byte.MIN_VALUE || value > Byte.MAX_VALUE;
+    }
+
+    private static boolean isUnsignedWord(int value) {
+        return value > 0xFF;
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        out.writeShort(_flags);
+        out.writeShort(_glyphIndex);
+
+        boolean wordArgs = (_flags & ARG_1_AND_2_ARE_WORDS) != 0;
+        if ((_flags & ARGS_ARE_XY_VALUES) != 0) {
+            if (wordArgs) {
+                out.writeShort(_xtranslate);
+                out.writeShort(_ytranslate);
+            } else {
+                out.writeByte(_xtranslate);
+                out.writeByte(_ytranslate);
+            }
+        } else {
+            if (wordArgs) {
+                out.writeShort(_point1);
+                out.writeShort(_point2);
+            } else {
+                out.writeByte(_point1);
+                out.writeByte(_point2);
+            }
+        }
+        
+        // Get the scale values (if any)
+        if ((_flags & WE_HAVE_A_SCALE) != 0) {
+            Fixed_2_14.write(out, _xscale);
+        } else if ((_flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0) {
+            Fixed_2_14.write(out, _xscale);
+            Fixed_2_14.write(out, _yscale);
+        } else if ((_flags & WE_HAVE_A_TWO_BY_TWO) != 0) {
+            Fixed_2_14.write(out, _xscale);
+            Fixed_2_14.write(out, _scale01);
+            Fixed_2_14.write(out, _scale10);
+            Fixed_2_14.write(out, _yscale);
         }
     }
 
@@ -333,6 +433,35 @@ public class GlyfCompositeComp {
         return _flags;
     }
 
+    /** 
+     * Whether this is not the last component in its glyph.
+     */
+    boolean hasMoreComponents() {
+        return (getFlags() & GlyfCompositeComp.MORE_COMPONENTS) != 0;
+    }
+
+    /**
+     * @see #hasMoreComponents()
+     */
+    void setMoreComponents(boolean value) {
+        _flags = Bits.updateMask(_flags, GlyfCompositeComp.MORE_COMPONENTS, value);
+    }
+
+    /**
+     * Whether the glyph of this component has hinting instructions (set on the
+     * last component only).
+     */
+    boolean hasInstructions() {
+        return (getFlags() & GlyfCompositeComp.WE_HAVE_INSTRUCTIONS) != 0;
+    }
+
+    /**
+     * @see #hasInstructions()
+     */
+    void setInstructions(boolean value) {
+        _flags = Bits.updateMask(_flags, GlyfCompositeComp.WE_HAVE_INSTRUCTIONS, value);
+    }
+    
     /**
      * uint16   Glyph index of this component.
      * 

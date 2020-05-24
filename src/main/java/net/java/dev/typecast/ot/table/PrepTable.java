@@ -11,15 +11,26 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
+ * Control Value Program table
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/prep"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class PrepTable extends Program implements Table {
+class PrepTable extends Program implements Table, Writable {
 
     public PrepTable(DataInput di, int length) throws IOException {
         readInstructions(di, length);
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        writeInstructionsContent(out);
     }
 
     @Override
@@ -27,6 +38,7 @@ class PrepTable extends Program implements Table {
         return prep;
     }
 
+    @Override
     public String toString() {
         return Disassembler.disassemble(getInstructions(), 0);
     }

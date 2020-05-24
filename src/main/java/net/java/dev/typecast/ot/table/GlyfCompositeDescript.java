@@ -55,6 +55,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * Glyph description for composite glyphs.  Composite glyphs are made up of one
  * or more simple glyphs, usually with some sort of transformation applied to
@@ -99,14 +101,40 @@ public class GlyfCompositeDescript extends GlyfDescript {
                 index += desc.getPointCount();
                 firstContour += desc.getContourCount();
             }
-        } while ((comp.getFlags() & GlyfCompositeComp.MORE_COMPONENTS) != 0);
+        } while (comp.hasMoreComponents());
 
-        // Are there hinting intructions to read?
-        if ((comp.getFlags() & GlyfCompositeComp.WE_HAVE_INSTRUCTIONS) != 0) {
+        if (comp.hasInstructions()) {
             readInstructions(di, di.readShort());
         }
     }
     
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        super.write(out);
+        
+        updateFlags();
+        
+        for (GlyfCompositeComp comp : _components) {
+            comp.write(out);
+        }
+        
+        if (getInstructionLength() > 0) {
+            writeInstructions(out);
+        }
+    }
+    
+    private void updateFlags() {
+        for (GlyfCompositeComp comp : _components) {
+            comp.updateFlags();
+            
+            comp.setMoreComponents(true);
+            comp.setInstructions(false);
+        }
+        GlyfCompositeComp last = _components.get(_components.size() - 1);
+        last.setMoreComponents(false);
+        last.setInstructions(getInstructionLength() > 0);
+    }
+
     public int getEndPtOfContours(int contour) {
         GlyfCompositeComp c = getCompositeCompEndPt(contour);
         if (c != null) {

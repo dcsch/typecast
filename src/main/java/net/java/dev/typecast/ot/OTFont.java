@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.java.dev.typecast.io.BinaryIO;
 import net.java.dev.typecast.ot.table.CmapTable;
 import net.java.dev.typecast.ot.table.GsubTable;
 import net.java.dev.typecast.ot.table.HeadTable;
@@ -76,36 +77,29 @@ public abstract class OTFont {
         // Load some prerequisite tables
         // (These are tables that are referenced by other tables, so we need to load
         // them first)
-        seekTable(dis, tablesOrigin, Table.head);
-        _head = new HeadTable(dis);
+        _head = (HeadTable) initTable(dis, tablesOrigin, Table.head);
 
         // 'hhea' is required by 'hmtx'
-        seekTable(dis, tablesOrigin, Table.hhea);
-        _hhea = new HheaTable(dis);
+        _hhea = (HheaTable) initTable(dis, tablesOrigin, Table.hhea);
 
         // 'maxp' is required by 'glyf', 'hmtx', 'loca', and 'vmtx'
-        seekTable(dis, tablesOrigin, Table.maxp);
-        _maxp = new MaxpTable(dis);
-
+        _maxp = (MaxpTable) initTable(dis, tablesOrigin, Table.maxp);
+        
         // 'vhea' is required by 'vmtx'
-        int length = seekTable(dis, tablesOrigin, Table.vhea);
-        if (length > 0) {
-            _vhea = new VheaTable(dis);
-        }
+        _vhea = (VheaTable) initTable(dis, tablesOrigin, Table.vhea);
 
         // 'post' is required by 'glyf'
-        seekTable(dis, tablesOrigin, Table.post);
-        _post = new PostTable(dis);
+        _post = (PostTable) initTable(dis, tablesOrigin, Table.post);
 
         // Load all the other required tables
-        seekTable(dis, tablesOrigin, Table.cmap);
-        _cmap = new CmapTable(dis);
-        length = seekTable(dis, tablesOrigin, Table.hmtx);
-        _hmtx = new HmtxTable(dis, length, _hhea, _maxp);
-        length = seekTable(dis, tablesOrigin, Table.name);
-        _name = new NameTable(dis, length);
-        seekTable(dis, tablesOrigin, Table.OS_2);
-        _os2 = new Os2Table(dis);
+        _cmap = (CmapTable) initTable(dis, tablesOrigin, Table.cmap);
+        _hmtx = (HmtxTable) initTable(dis, tablesOrigin, Table.hmtx);
+        _name = (NameTable) initTable(dis, tablesOrigin, Table.name);
+        _os2 = (Os2Table) initTable(dis, tablesOrigin, Table.OS_2);
+    }
+    
+    public void write(BinaryIO out) throws IOException {
+        _tableDirectory.write(out);
     }
     
     /**
@@ -169,18 +163,14 @@ public abstract class OTFont {
 
     public abstract Glyph getGlyph(int i);
 
-    int seekTable(
-            DataInputStream dis,
-            int tablesOrigin,
-            int tag) throws IOException {
-        TableDirectory tableDirectory = getTableDirectory();
-        dis.reset();
-        TableDirectory.Entry entry = tableDirectory.getEntryByTag(tag);
+    protected Table initTable(DataInputStream dis, int tablesOrigin, int tag) throws IOException {
+        TableDirectory directory = getTableDirectory();
+        TableDirectory.Entry entry = directory.getEntryByTag(tag);
         if (entry == null) {
-            return 0;
+            return null;
         }
-        dis.skip(tablesOrigin + entry.getOffset());
-        return entry.getLength();
+        
+        return entry.initTable(dis, tablesOrigin);
     }
 
     public String toString() {

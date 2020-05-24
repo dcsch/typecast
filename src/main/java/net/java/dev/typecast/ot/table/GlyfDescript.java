@@ -53,6 +53,9 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
  * Glyph description.
  * 
@@ -77,7 +80,7 @@ import java.io.IOException;
  * 
  * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/glyf"
  */
-public abstract class GlyfDescript extends Program implements GlyphDescription {
+public abstract class GlyfDescript extends Program implements GlyphDescription, Writable {
 
     /**
      * Bit 0: If set, the point is on the curve; otherwise, it is off the curve.
@@ -109,6 +112,11 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
     public static final byte REPEAT_FLAG = 0x08;
     
     /**
+     * Mask for clearing the {@link #REPEAT_FLAG}.
+     */
+    public static final byte REPEAT_MASK = (byte) (0XFF ^ REPEAT_FLAG);
+    
+    /**
      * Bit 4: This flag has two meanings, depending on how the
      * {@link #X_SHORT_VECTOR} flag is set. If {@link #X_SHORT_VECTOR} is set,
      * this bit describes the sign of the value, with 1 equaling positive and 0
@@ -118,7 +126,7 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
      * current x-coordinate is a signed 16-bit delta vector.
      */
     public static final byte X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR = 0x10;
-    
+
     /**
      * Bit 5: This flag has two meanings, depending on how the
      * {@link #Y_SHORT_VECTOR} flag is set. If {@link #Y_SHORT_VECTOR} is set,
@@ -191,6 +199,15 @@ public abstract class GlyfDescript extends Program implements GlyphDescription {
         _yMax = di.readShort();
     }
     
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        out.writeShort(_numberOfContours);
+        out.writeShort(_xMin);
+        out.writeShort(_yMin);
+        out.writeShort(_xMax);
+        out.writeShort(_yMax);
+    }
+
     /**
      * The {@link GlyfTable} this {@link GlyfDescript} belongs to.
      */

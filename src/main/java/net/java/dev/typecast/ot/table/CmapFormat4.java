@@ -23,6 +23,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Arrays;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * Format 4: Segment mapping to delta values
  * 
@@ -150,6 +152,38 @@ public class CmapFormat4 extends CmapFormat {
 //        if (leftover > 0) {
 //            di.skipBytes(leftover);
 //        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        out.writeShort(getFormat());
+        try (BinaryOutput lengthOut = out.reserve(2)) {
+            out.writeShort(getLanguage());
+            out.writeShort(_segCountX2);
+            out.writeShort(_searchRange);
+            out.writeShort(_entrySelector);
+            out.writeShort(_rangeShift);
+            for (int endCode : _endCode) {
+                out.writeShort(endCode);
+            }
+            // Padding
+            out.writeShort(0);
+            for (int startCode : _startCode) {
+                out.writeShort(startCode);
+            }
+            for (int idDelta : _idDelta) {
+                out.writeShort(idDelta);
+            }
+            for (int idRangeOffset : _idRangeOffset) {
+                out.writeShort(idRangeOffset);
+            }
+            for (int glyphId : _glyphIdArray) {
+                out.writeShort(glyphId);
+            }
+            
+            lengthOut.writeShort((int) (out.getPosition() - start));
+        }
     }
 
     @Override

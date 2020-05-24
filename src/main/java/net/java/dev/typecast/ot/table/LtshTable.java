@@ -21,8 +21,13 @@ class LtshTable implements Table {
     private int numGlyphs;
     private int[] yPels;
     
-    /** Creates new LtshTable */
-    protected LtshTable(DataInput di) throws IOException {
+    /**
+     * Creates new LtshTable
+     * 
+     * @param length
+     *        Total number of bytes.
+     */
+    protected LtshTable(DataInput di, int length) throws IOException {
         version = di.readUnsignedShort();
         numGlyphs = di.readUnsignedShort();
         yPels = new int[numGlyphs];

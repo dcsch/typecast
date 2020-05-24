@@ -22,6 +22,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Arrays;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * Format 6: Trimmed table mapping
  * 
@@ -45,6 +47,23 @@ public class CmapFormat6 extends CmapFormat {
         _glyphIdArray = new int[_entryCount];
         for (int i = 0; i < _entryCount; i++) {
             _glyphIdArray[i] = di.readUnsignedShort();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(getFormat());
+        try (BinaryOutput lengthOut = out.reserve(2)) {
+            out.writeShort(getLanguage());
+            out.writeShort(_firstCode);
+            out.writeShort(_entryCount);
+            for (int glyphId : _glyphIdArray) {
+                out.writeShort(glyphId);
+            }
+            
+            lengthOut.writeShort((int) (out.getPosition() - start));
         }
     }
 

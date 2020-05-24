@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Business Operation Systems GmbH. All Rights Reserved.
+ * Copyright (c)ff 2020 Business Operation Systems GmbH. All Rights Reserved.
  */
 package net.java.dev.typecast.ot.table;
 
@@ -10,8 +10,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
+
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 
 /**
  * The SVG (Scalable Vector Graphics) table
@@ -24,7 +29,7 @@ import java.util.zip.GZIPInputStream;
  * 
  * @author <a href="mailto:bhu@top-logic.com">Bernhard Haumacher</a>
  */
-public class SVGTable implements Table {
+public class SVGTable implements Table, Writable {
 
     /**
      * @see #getVersion()
@@ -41,12 +46,15 @@ public class SVGTable implements Table {
      */
     private SVGDocumentRecord[] _documentRecords;
 
-    /** 
+    /**
      * Creates a {@link SVGTable}.
      *
-     * @param di The reader to read from.
+     * @param di
+     *        The reader to read from.
+     * @param length
+     *        Total number of bytes.
      */
-    public SVGTable(DataInput di) throws IOException {
+    public SVGTable(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         
         // Offset to the SVG Document List, from the start of the SVG table.
@@ -88,6 +96,37 @@ public class SVGTable implements Table {
             lastOffset = offset;
             record.readDoc(di);
             offset += record.getSvgDocLength();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(_version);
+        
+        // Offset to the SVG Document List, from the start of the SVG table.
+        // Must be non-zero. 
+        try (BinaryOutput offsetOut = out.reserve(4)) {
+            // Reserved.
+            out.writeInt(0);
+
+            // SVG Document List starts here.
+            long docListStart = out.getPosition();
+            long docListOffset = docListStart - start;
+            offsetOut.writeInt((int) docListOffset);
+
+            int numEntries = _documentRecords.length;
+            out.writeShort(numEntries);
+            
+            List<Writable> docOuts = new ArrayList<>(_documentRecords.length);
+            for (SVGDocumentRecord record : _documentRecords) {
+                docOuts.add(record.write(out, docListStart));
+            }
+            
+            for (Writable docOut : docOuts) {
+                docOut.write(out);
+            }
         }
     }
     
@@ -178,6 +217,28 @@ public class SVGTable implements Table {
             _svgDocLength = di.readInt();
         }
         
+        public Writable write(BinaryOutput out, long docListStart) throws IOException {
+            out.writeShort(_startGlyphID);
+            out.writeShort(_endGlyphID);
+            BinaryOutput offsetOut = out.reserve(8);
+            
+            return new Writable() {
+                @Override
+                public void write(BinaryOutput out) throws IOException {
+                    long docStart = out.getPosition();
+                    long docOffset = docStart - docListStart;
+                    
+                    writeDoc(out);
+                    
+                    long docLength = out.getPosition() - docStart;
+                    
+                    offsetOut.writeInt((int) docOffset);
+                    offsetOut.writeInt((int) docLength);
+                    offsetOut.close();
+                }
+            };
+        }
+        
         /** 
          * Reads the SVG document from the given reader.
          */
@@ -211,6 +272,10 @@ public class SVGTable implements Table {
             }
             
             _document = doc.toString();
+        }
+
+        void writeDoc(BinaryOutput out) throws IOException {
+            out.write(_document.getBytes("utf-8"));
         }
 
         /**

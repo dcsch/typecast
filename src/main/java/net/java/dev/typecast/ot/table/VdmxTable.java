@@ -124,8 +124,13 @@ public class VdmxTable implements Table {
     private int[] _offset;
     private Group[] _groups;
     
-    /** Creates a new instance of VdmxTable */
-    public VdmxTable(DataInput di) throws IOException {
+    /**
+     * Creates a new instance of {@link VdmxTable}.
+     * 
+     * @param length
+     *        Total number of bytes.
+     */
+    public VdmxTable(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _numRecs = di.readUnsignedShort();
         _numRatios = di.readUnsignedShort();

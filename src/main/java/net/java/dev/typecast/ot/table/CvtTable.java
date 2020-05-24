@@ -11,10 +11,15 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
+ * Control Value Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class CvtTable implements Table {
+class CvtTable implements Table, Writable {
 
     private final short[] values;
 
@@ -23,6 +28,13 @@ class CvtTable implements Table {
         values = new short[len];
         for (int i = 0; i < len; i++) {
             values[i] = di.readShort();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        for (short value : values) {
+            out.writeShort(value);
         }
     }
 

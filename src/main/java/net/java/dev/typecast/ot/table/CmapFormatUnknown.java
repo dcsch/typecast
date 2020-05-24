@@ -21,6 +21,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
  * When we encounter a cmap format we don't understand, we can use this class
  * to hold the bare minimum information about it.
@@ -31,6 +33,7 @@ public class CmapFormatUnknown extends CmapFormat {
     private final int _format;
     private final int _length;
     private final int _language;
+    private byte[] _data;
     
     /** Creates a new instance of CmapFormatUnknown
      * @param format
@@ -42,14 +45,38 @@ public class CmapFormatUnknown extends CmapFormat {
             _length = di.readUnsignedShort();
             _language = di.readUnsignedShort();
         
-            // We don't know how to handle this data, so we'll just skip over it
-            di.skipBytes(_length - 6);
+            // We don't know how to handle this data, so we'll just keep it.
+            _data = new byte[_length - 6];
+            di.readFully(_data);
         } else {
             _length = di.readInt();
             _language = di.readInt();
 
-            // We don't know how to handle this data, so we'll just skip over it
-            di.skipBytes(_length - 10);
+            // We don't know how to handle this data, so we'll just keep it.
+            _data = new byte[_length - 10];
+            di.readFully(_data);
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(getFormat());
+        if (_format < 8) {
+            try (BinaryOutput lengthOut = out.reserve(2)) {
+                out.writeShort(getLanguage());
+                out.write(_data);
+                
+                lengthOut.writeShort((int) (out.getPosition() - start));
+            }
+        } else {
+            try  (BinaryOutput lengthOut = out.reserve(4)) {
+                out.writeInt(getLanguage());
+                out.write(_data);
+                
+                lengthOut.writeInt((int) (out.getPosition() - start));
+            }
         }
     }
 

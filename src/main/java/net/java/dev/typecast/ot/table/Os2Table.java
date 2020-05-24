@@ -53,16 +53,40 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
+ * OS/2 and Windows Metrics Table
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/os2"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class Os2Table implements Table {
+public class Os2Table implements Table, Writable {
 
+    public static final int VERSION_0 = 0;
+    public static final int VERSION_1 = 1;
+    
+    /**
+     * The format of version 2 is identical to the format for {@link #VERSION_4}.
+     */
+    public static final int VERSION_2 = 2;
+    
+    /**
+     * The format of version 3 is identical to the format for {@link #VERSION_4}
+     */
+    public static final int VERSION_3 = 3;
+    
+    
+    public static final int VERSION_4 = 4;
+    public static final int VERSION_5 = 5;
+    
     private int _version;
     private short _xAvgCharWidth;
     private int _usWeightClass;
     private int _usWidthClass;
-    private short _fsType;
+    private int _fsType;
     private short _ySubscriptXSize;
     private short _ySubscriptYSize;
     private short _ySubscriptXOffset;
@@ -80,7 +104,7 @@ public class Os2Table implements Table {
     private int _ulUnicodeRange3;
     private int _ulUnicodeRange4;
     private int _achVendorID;
-    private short _fsSelection;
+    private int _fsSelection;
     private int _usFirstCharIndex;
     private int _usLastCharIndex;
     private short _sTypoAscender;
@@ -95,13 +119,15 @@ public class Os2Table implements Table {
     private int _usDefaultChar;
     private int _usBreakChar;
     private int _usMaxContext;
+    private int _usLowerOpticalPointSize;
+    private int _usUpperOpticalPointSize;
 
-    public Os2Table(DataInput di) throws IOException {
+    public Os2Table(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _xAvgCharWidth = di.readShort();
         _usWeightClass = di.readUnsignedShort();
         _usWidthClass = di.readUnsignedShort();
-        _fsType = di.readShort();
+        _fsType = di.readUnsignedShort();
         _ySubscriptXSize = di.readShort();
         _ySubscriptYSize = di.readShort();
         _ySubscriptXOffset = di.readShort();
@@ -113,15 +139,13 @@ public class Os2Table implements Table {
         _yStrikeoutSize = di.readShort();
         _yStrikeoutPosition = di.readShort();
         _sFamilyClass = di.readShort();
-        byte[] buf = new byte[10];
-        di.readFully(buf);
-        _panose = new Panose(buf);
+        _panose = new Panose(di);
         _ulUnicodeRange1 = di.readInt();
         _ulUnicodeRange2 = di.readInt();
         _ulUnicodeRange3 = di.readInt();
         _ulUnicodeRange4 = di.readInt();
         _achVendorID = di.readInt();
-        _fsSelection = di.readShort();
+        _fsSelection = di.readUnsignedShort();
         _usFirstCharIndex = di.readUnsignedShort();
         _usLastCharIndex = di.readUnsignedShort();
         _sTypoAscender = di.readShort();
@@ -129,16 +153,77 @@ public class Os2Table implements Table {
         _sTypoLineGap = di.readShort();
         _usWinAscent = di.readUnsignedShort();
         _usWinDescent = di.readUnsignedShort();
-        _ulCodePageRange1 = di.readInt();
-        _ulCodePageRange2 = di.readInt();
         
-        // OpenType 1.3
-        if (_version == 2) {
-            _sxHeight = di.readShort();
-            _sCapHeight = di.readShort();
-            _usDefaultChar = di.readUnsignedShort();
-            _usBreakChar = di.readUnsignedShort();
-            _usMaxContext = di.readUnsignedShort();
+        if (_version >= VERSION_1) {
+            _ulCodePageRange1 = di.readInt();
+            _ulCodePageRange2 = di.readInt();
+            
+            // OpenType 1.3
+            if (_version >= VERSION_2) {
+                _sxHeight = di.readShort();
+                _sCapHeight = di.readShort();
+                _usDefaultChar = di.readUnsignedShort();
+                _usBreakChar = di.readUnsignedShort();
+                _usMaxContext = di.readUnsignedShort();
+                
+                if (_version >= VERSION_5) {
+                    _usLowerOpticalPointSize = di.readUnsignedShort();
+                    _usUpperOpticalPointSize = di.readUnsignedShort();
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        out.writeShort(_version);
+        out.writeShort(_xAvgCharWidth);
+        out.writeShort(_usWeightClass);
+        out.writeShort(_usWidthClass);
+        out.writeShort(_fsType);
+        out.writeShort(_ySubscriptXSize);
+        out.writeShort(_ySubscriptYSize);
+        out.writeShort(_ySubscriptXOffset);
+        out.writeShort(_ySubscriptYOffset);
+        out.writeShort(_ySuperscriptXSize);
+        out.writeShort(_ySuperscriptYSize);
+        out.writeShort(_ySuperscriptXOffset);
+        out.writeShort(_ySuperscriptYOffset);
+        out.writeShort(_yStrikeoutSize);
+        out.writeShort(_yStrikeoutPosition);
+        out.writeShort(_sFamilyClass);
+        _panose.write(out);
+        out.writeInt(_ulUnicodeRange1);
+        out.writeInt(_ulUnicodeRange2);
+        out.writeInt(_ulUnicodeRange3);
+        out.writeInt(_ulUnicodeRange4);
+        out.writeInt(_achVendorID);
+        out.writeShort(_fsSelection);
+        out.writeShort(_usFirstCharIndex);
+        out.writeShort(_usLastCharIndex);
+        out.writeShort(_sTypoAscender);
+        out.writeShort(_sTypoDescender);
+        out.writeShort(_sTypoLineGap);
+        out.writeShort(_usWinAscent);
+        out.writeShort(_usWinDescent);
+        
+        if (_version >= VERSION_1) {
+            out.writeInt(_ulCodePageRange1);
+            out.writeInt(_ulCodePageRange2);
+            
+            // OpenType 1.3
+            if (_version >= VERSION_2) {
+                out.writeShort(_sxHeight);
+                out.writeShort(_sCapHeight);
+                out.writeShort(_usDefaultChar);
+                out.writeShort(_usBreakChar);
+                out.writeShort(_usMaxContext);
+                
+                if (_version >= VERSION_5) {
+                    out.writeShort(_usLowerOpticalPointSize);
+                    out.writeShort(_usUpperOpticalPointSize);
+                }
+            }
         }
     }
 
@@ -163,7 +248,7 @@ public class Os2Table implements Table {
         return _usWidthClass;
     }
 
-    public short getLicenseType() {
+    public int getLicenseType() {
         return _fsType;
     }
 
@@ -235,7 +320,7 @@ public class Os2Table implements Table {
         return _achVendorID;
     }
 
-    public short getSelection() {
+    public int getSelection() {
         return _fsSelection;
     }
 
@@ -293,6 +378,14 @@ public class Os2Table implements Table {
     
     public int getMaxContext() {
         return _usMaxContext;
+    }
+    
+    public int getUsLowerOpticalPointSize() {
+        return _usLowerOpticalPointSize;
+    }
+    
+    public int getUsUpperOpticalPointSize() {
+        return _usUpperOpticalPointSize;
     }
 
     public String toString() {

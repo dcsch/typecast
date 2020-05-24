@@ -65,7 +65,7 @@ class CpalTable implements Table {
     private final int _offsetPaletteEntryLabelArray;
     private final ColorRecord[] _colorRecords;
 
-    protected CpalTable(DataInput di) throws IOException {
+    protected CpalTable(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _numPalettesEntries = di.readUnsignedShort();
         _numPalette = di.readUnsignedShort();

@@ -22,12 +22,14 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.Writable;
+
 /**
  * Entry in the {@link CmapTable}.
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public abstract class CmapFormat {
+public abstract class CmapFormat implements Writable {
     
     public static class Range {
         

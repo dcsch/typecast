@@ -53,6 +53,7 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.ot.Disassembler;
 import net.java.dev.typecast.ot.Fmt;
 
@@ -136,6 +137,20 @@ public class GlyfSimpleDescript extends GlyfDescript {
         readCoords(_count, di);
     }
     
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        super.write(out);
+        
+        for (int endPoint : _endPtsOfContours) {
+            out.writeShort(endPoint);
+        }
+        
+        writeInstructions(out);
+        updateFlags();
+        writeFlags(out);
+        writeCoords(out);
+    }
+
     @Override
     public int getNumberOfContours() {
         return _endPtsOfContours.length;
@@ -239,7 +254,53 @@ public class GlyfSimpleDescript extends GlyfDescript {
             _yCoordinates[i] = y;
         }
     }
+    
+    private void writeCoords(BinaryOutput out) throws IOException {
+        int count = _flags.length;
+        
+        short lastX = 0;
+        for (int i = 0; i < count; i++) {
+            short x = _xCoordinates[i];
+            byte flag = _flags[i];
+            
+            short dx = (short) (x - lastX);
+            if ((flag & X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR) != 0) {
+                if ((flag & X_SHORT_VECTOR) != 0) {
+                    out.writeByte(dx);
+                }
+            } else {
+                if ((flag & X_SHORT_VECTOR) != 0) {
+                    out.writeByte(-dx);
+                } else {
+                    out.writeShort(dx);
+                }
+            }
+            
+            lastX = x;
+        }
+        
+        short lastY = 0;
+        for (int i = 0; i < count; i++) {
+            short y = _yCoordinates[i];
+            byte flag = _flags[i];
+            
+            short dy = (short) (y - lastY);
+            if ((flag & Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR) != 0) {
+                if ((flag & Y_SHORT_VECTOR) != 0) {
+                    out.writeByte(dy);
+                }
+            } else {
+                if ((flag & Y_SHORT_VECTOR) != 0) {
+                    out.writeByte(-dy);
+                } else {
+                    out.writeShort(dy);
+                }
+            }
 
+            lastY = y;
+        }
+    }
+    
     /**
      * Reads the flags table.
      * 
@@ -284,6 +345,97 @@ public class GlyfSimpleDescript extends GlyfDescript {
         }
     }
     
+    /**
+     * Writes the flags array reconstructing the repeat information.
+     */
+    private void writeFlags(BinaryOutput out) throws IOException {
+        int flagCount = _flags.length;
+        for (int index = 0; index < flagCount; index++) {
+            byte nextFlag = _flags[index];
+            
+            int limit = Math.min(256, flagCount - index);
+            int equalCnt = 1;
+            while (equalCnt < limit && _flags[index + equalCnt] == nextFlag) {
+                equalCnt++;
+            }
+            
+            if (equalCnt > 1) {
+                // The repeat count announces the number of identical flags following the first one.
+                int repeatCnt = equalCnt - 1;
+                
+                out.writeByte(nextFlag | REPEAT_FLAG);
+                out.writeByte(repeatCnt);
+                index += repeatCnt;
+            } else {
+                out.writeByte(nextFlag);
+            }
+        }
+    }
+    
+    private void updateFlags() {
+        boolean overlap = (_flags[0] & OVERLAP_SIMPLE) != 0;
+        
+        int count = _flags.length;
+        
+        short lastX = 0;
+        short lastY = 0;
+        for (int i = 0; i < count; i++) {
+            boolean onCurve = (_flags[i] & ON_CURVE_POINT) != 0;
+            
+            short x = _xCoordinates[i];
+            short y = _yCoordinates[i];
+            
+            short dx = (short) (x - lastX);
+            short dy = (short) (y - lastY);
+            
+            lastX = x;
+            lastY = y;
+            
+            byte flags = 0;
+            if (onCurve) {
+                flags |= ON_CURVE_POINT;
+            }
+            
+            boolean zeroX = dx == 0;
+            if (zeroX) {
+                flags |= X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR;
+            } else {
+                boolean xPositive = dx >= 0;
+                short dxAbs = xPositive ? dx : (short) -dx;
+    
+                boolean shortX = dxAbs < 256;
+                if (shortX) {
+                    flags |= X_SHORT_VECTOR;
+                    if (xPositive) {
+                        flags |= X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR;
+                    }
+                }
+            }
+            
+            boolean zeroY = dy == 0;
+            if (zeroY) {
+                flags |= Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR;
+            } else {
+                boolean yPositive = dy >= 0;
+                short dyAbs = yPositive ? dy : (short) -dy;
+    
+                boolean shortY = dyAbs < 256;
+                if (shortY) {
+                    flags |= Y_SHORT_VECTOR;
+                    if (yPositive) {
+                        flags |= Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR;
+                    }
+                }
+            }
+            
+            _flags[i] = flags;
+        }
+        
+        if (overlap) {
+            _flags[0] |= OVERLAP_SIMPLE;
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

@@ -75,7 +75,7 @@ class ColrTable implements Table {
     private final BaseGlyphRecord[] _baseGlyphRecords;
     private final LayerRecord[] _layerRecords;
 
-    protected ColrTable(DataInput di) throws IOException {
+    protected ColrTable(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _numBaseGlyphRecords = di.readUnsignedShort();
         _offsetBaseGlyphRecord = di.readInt();

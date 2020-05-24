@@ -53,6 +53,8 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Bits;
 import net.java.dev.typecast.ot.Fixed;
 import net.java.dev.typecast.ot.LongDateTime;
@@ -70,8 +72,12 @@ import net.java.dev.typecast.ot.LongDateTime;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class HeadTable implements Table {
+public class HeadTable implements Table, Writable {
     
+    private static final short FORMAT_LONG_OFFSETS = 1;
+
+    private static final short FORMAT_SHORT_OFFSETS = 0;
+
     /**
      * @see #getMagicNumber()
      */
@@ -212,10 +218,15 @@ public class HeadTable implements Table {
      */
     private short _glyphDataFormat = GLYPH_DATA_FORMAT;
 
+    private long _checkSumAdjustmentPos;
+
     /**
      * Creates a {@link HeadTable} from binary encoding.
+     * 
+     * @param length
+     *        The total number of bytes.
      */
-    public HeadTable(DataInput di) throws IOException {
+    public HeadTable(DataInput di, int length) throws IOException {
         _majorVersion = di.readUnsignedShort();
         _minorVersion = di.readUnsignedShort();
         _fontRevision = di.readInt();
@@ -235,7 +246,35 @@ public class HeadTable implements Table {
         _indexToLocFormat = di.readShort();
         _glyphDataFormat = di.readShort();
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        
+        out.writeShort(_majorVersion);
+        out.writeShort(_minorVersion);
+        out.writeInt(_fontRevision);
 
+        // Updated later on.
+        _checkSumAdjustmentPos = out.getPosition();
+        _checkSumAdjustment = 0;
+        out.writeInt(_checkSumAdjustment);
+        
+        out.writeInt(_magicNumber);
+        out.writeShort(_flags);
+        out.writeShort(_unitsPerEm);
+        out.writeLong(_created);
+        out.writeLong(_modified);
+        out.writeShort(_xMin);
+        out.writeShort(_yMin);
+        out.writeShort(_xMax);
+        out.writeShort(_yMax);
+        out.writeShort(_macStyle);
+        out.writeShort(_lowestRecPPEM);
+        out.writeShort(_fontDirectionHint);
+        out.writeShort(_indexToLocFormat);
+        out.writeShort(_glyphDataFormat);
+    }
+    
     @Override
     public int getType() {
         return head;
@@ -297,6 +336,12 @@ public class HeadTable implements Table {
      */
     public int getCheckSumAdjustment() {
         return _checkSumAdjustment;
+    }
+    
+    void updateChecksumAdjustment(BinaryOutput out, int value) throws IOException {
+        _checkSumAdjustment = value;
+        out.setPosition(_checkSumAdjustmentPos);
+        out.writeInt(_checkSumAdjustment);
     }
     
     /**
@@ -574,7 +619,8 @@ public class HeadTable implements Table {
     /**
      * int16
      * 
-     * 0 for short offsets (Offset16), 1 for long (Offset32).
+     * {@link #FORMAT_SHORT_OFFSETS} for short offsets (Offset16),
+     * {@link #FORMAT_LONG_OFFSETS} for long (Offset32).
      */
     public short getIndexToLocFormat() {
         return _indexToLocFormat;
@@ -584,7 +630,11 @@ public class HeadTable implements Table {
      * Whether short offsets (Offset16) are used.
      */
     public boolean useShortEntries() {
-        return getIndexToLocFormat() == 0;
+        return getIndexToLocFormat() == FORMAT_SHORT_OFFSETS;
+    }
+    
+    void setShortEntries(boolean value) {
+        _indexToLocFormat = value ? FORMAT_SHORT_OFFSETS : FORMAT_LONG_OFFSETS;
     }
 
     /**
