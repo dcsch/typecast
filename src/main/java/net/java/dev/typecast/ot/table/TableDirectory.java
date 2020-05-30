@@ -377,9 +377,9 @@ public class TableDirectory {
         // Offset Table:
         io.writeInt(_sfntVersion);
         io.writeShort(numTables);
-        io.writeShort(getSearchRange());
-        io.writeShort(getEntrySelector());
-        io.writeShort(getRangeShift());
+        io.writeShort(getSearchRange(numTables));
+        io.writeShort(getEntrySelector(numTables));
+        io.writeShort(getRangeShift(numTables));
         
         List<Writable> tableOuts = new ArrayList<>(numTables);
         for (Entry entry : entries) {
@@ -431,8 +431,10 @@ public class TableDirectory {
      * (Maximum power of 2 <= {@link #getNumTables()}) x 16.
      */
     public short getSearchRange() {
-        int numTables = getNumTables();
-        
+        return getSearchRange(getNumTables());
+    }
+
+    private short getSearchRange(int numTables) {
         int maxPow = 1;
         while (true) {
             int next = maxPow << 1;
@@ -448,8 +450,10 @@ public class TableDirectory {
      * Log2(maximum power of 2 <= {@link #getNumTables()}).
      */
     public short getEntrySelector() {
-        int numTables = getNumTables();
-        
+        return getEntrySelector(getNumTables());
+    }
+
+    private short getEntrySelector(int numTables) {
         int log = 0;
         int maxPow = 1;
         while (true) {
@@ -468,7 +472,11 @@ public class TableDirectory {
      * NumTables x 16-{@link #getSearchRange()}.
      */
     public short getRangeShift() {
-        return (short) (getNumTables() * 16 - getSearchRange());
+        return getRangeShift(getNumTables());
+    }
+
+    private short getRangeShift(int numTables) {
+        return (short) (numTables * 16 - getSearchRange(numTables));
     }
 
     /**
