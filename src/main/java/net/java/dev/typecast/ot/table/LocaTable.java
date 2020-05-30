@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.Fmt;
 
 /**
  * Index to Location table
@@ -92,7 +93,7 @@ public class LocaTable implements Table, Writable {
     
     void updateFormat() {
         for (int offset : _offsets) {
-            if (offset > 2 * 0xFFFFFF || offset % 2 != 0) {
+            if (offset > 2 * 0xFFFF || offset % 2 != 0) {
                 _head.setShortEntries(false);
                 return;
             }
@@ -105,7 +106,7 @@ public class LocaTable implements Table, Writable {
         boolean shortEntries = _head.useShortEntries();
         if (shortEntries) {
             for (int offset : _offsets) {
-                out.writeShort(offset);
+                out.writeShort(offset / 2);
             }
         } else {
             for (int offset : _offsets) {
@@ -130,12 +131,11 @@ public class LocaTable implements Table, Writable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("'loca' Table - Index To Location Table\n--------------------------------------\n")
-            .append("Size = ").append(_length).append(" bytes, ")
-            .append(_offsets.length).append(" entries\n");
+        sb.append("'loca' Table - Index To Location Table\n");
+        sb.append("--------------------------------------\n");
+        sb.append("    entries = " + _offsets.length + "\n");
         for (int i = 0; i < _offsets.length; i++) {
-            sb.append("        Idx ").append(i)
-                .append(" -> glyfOff 0x").append(getOffset(i)).append("\n");
+            sb.append("    Index " + Fmt.pad(5, i) + " -> Offset " + Fmt.pad(7, getOffset(i)) + "\n");
         }
         return sb.toString();
     }
