@@ -69,7 +69,7 @@ import net.java.dev.typecast.ot.Fmt;
  * contour.
  * </p>
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/glyf"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/glyf">Spec: Simple Glyph Description</a>
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -442,7 +442,10 @@ public class GlyfSimpleDescript extends GlyfDescript {
         sb.append("        Simple Glyph\n");
         sb.append("        ------------\n");
         sb.append(super.toString());
-        sb.append("\n\n");
+        sb.append("\n");
+        sb.append("          Overlap: " + ((_flags[0] & OVERLAP_SIMPLE) != 0) + "\n");
+        sb.append("\n");
+        
         sb.append("        EndPoints\n");
         sb.append("        ---------");
         for (int i = 0; i < _endPtsOfContours.length; i++) {
@@ -454,56 +457,78 @@ public class GlyfSimpleDescript extends GlyfDescript {
         sb.append("          length: ");
         sb.append(getInstructions().length).append("\n");
         sb.append(Disassembler.disassemble(getInstructions(), 10));
-        sb.append("\n        Flags\n        -----");
+        sb.append("\n");
+        sb.append("        Coordinates\n");
+        sb.append("        -----------\n");
+        short lastX = 0;
+        short lastY = 0;
         for (int i = 0; i < _flags.length; i++) {
-            sb.append("\n          ").append(Fmt.pad(3, i)).append(":  ");
-            if ((_flags[i] & OVERLAP_SIMPLE) != 0) {
-                sb.append("SOver ");
+            sb.append("        ").append(Fmt.pad(3, i)).append(":  ");
+            boolean xShort = (_flags[i] & X_SHORT_VECTOR) != 0;
+            if (xShort) {
+                sb.append("xShort ");
             } else {
-                sb.append("      ");
+                sb.append("       ");
             }
-            if ((_flags[i] & Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR) != 0) {
-                sb.append("YDual ");
+            boolean yShort = (_flags[i] & Y_SHORT_VECTOR) != 0;
+            if (yShort) {
+                sb.append("yShort ");
             } else {
-                sb.append("      ");
+                sb.append("       ");
             }
-            if ((_flags[i] & X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR) != 0) {
-                sb.append("XDual ");
+            boolean xDualOrPositive = (_flags[i] & X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR) != 0;
+            if (xDualOrPositive) {
+                if (xShort) {
+                    sb.append("xPos  ");
+                } else {
+                    sb.append("xNull ");
+                }
             } else {
-                sb.append("      ");
+                if (xShort) {
+                    sb.append("xPos  ");
+                } else {
+                    sb.append("xNeg  ");
+                }
+            }
+            boolean yDualOrPositive = (_flags[i] & Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR) != 0;
+            if (yDualOrPositive) {
+                if (yShort) {
+                    sb.append("yPos  ");
+                } else {
+                    sb.append("yNull ");
+                }
+            } else {
+                if (yShort) {
+                    sb.append("yNeg  ");
+                } else {
+                    sb.append("      ");
+                }
             }
             if ((_flags[i] & REPEAT_FLAG) != 0) {
                 sb.append("Repeat ");
             } else {
                 sb.append("       ");
             }
-            if ((_flags[i] & Y_SHORT_VECTOR) != 0) {
-                sb.append("Y-Short ");
-            } else {
-                sb.append("        ");
-            }
-            if ((_flags[i] & X_SHORT_VECTOR) != 0) {
-                sb.append("X-Short ");
-            } else {
-                sb.append("        ");
-            }
             if ((_flags[i] & ON_CURVE_POINT) != 0) {
-                sb.append("On");
+                sb.append("OnCurve ");
             } else {
-                sb.append("  ");
+                sb.append("        ");
             }
-        }
-        sb.append("\n\n        Coordinates\n        -----------");
-        short oldX = 0;
-        short oldY = 0;
-        for (int i = 0; i < _xCoordinates.length; i++) {
-            sb.append("\n          ").append(Fmt.pad(3, i))
-                .append(": Rel (").append(_xCoordinates[i] - oldX)
-                .append(", ").append(_yCoordinates[i] - oldY)
-                .append(")  ->  Abs (").append(_xCoordinates[i])
-                .append(", ").append(_yCoordinates[i]).append(")");
-            oldX = _xCoordinates[i];
-            oldY = _yCoordinates[i];
+            
+            short x = _xCoordinates[i];
+            short y = _yCoordinates[i];
+            
+            int dx = x - lastX;
+            int dy = y - lastY;
+            
+            sb.append(": ");
+            sb.append("Abs(" + Fmt.pad(5, x) + ", " + Fmt.pad(5, y) + ")");
+            sb.append(" -> ");
+            sb.append("Rel(" + Fmt.pad(5, dx) + ", " + Fmt.pad(5, dy) + ")");
+            sb.append("\n");
+            
+            lastX = x;
+            lastY = y;
         }
         return sb.toString();
     }

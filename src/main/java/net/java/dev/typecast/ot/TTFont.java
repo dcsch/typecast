@@ -21,7 +21,6 @@ package net.java.dev.typecast.ot;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Writer;
 
 import net.java.dev.typecast.ot.table.GaspTable;
 import net.java.dev.typecast.ot.table.GlyfTable;
@@ -105,14 +104,4 @@ public class TTFont extends OTFont {
                 getHmtxTable().getAdvanceWidth(i));
     }
 
-    @Override
-    public void dumpTo(Writer out) throws IOException {
-        super.dumpTo(out);
-        dump(out, getGlyfTable());
-        dump(out, getSvgTable());
-        dump(out, getGaspTable());
-        dump(out, getKernTable());
-        dump(out, getHdmxTable());
-        dump(out, getVdmxTable());
-    }
 }

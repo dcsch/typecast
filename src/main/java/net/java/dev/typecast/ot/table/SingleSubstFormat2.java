@@ -99,11 +99,13 @@ public class SingleSubstFormat2 extends SingleSubst {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("                glyphCount = " + _glyphCount + "\n");
+        sb.append("                substitutes = " + LangSys.toString(_substitutes) + "\n");
         int[] glyphIds = _coverage.getGlyphIds();
         for (int glyphId : glyphIds) {
             int i = _coverage.findGlyph(glyphId);
             if (i > -1) {
-                sb.append(String.format("%d = %d\n", glyphId, _substitutes[i]));
+                sb.append("                " + String.format("%d = %d\n", glyphId, _substitutes[i]));
             }
         }
         return sb.toString();

@@ -457,7 +457,7 @@ public class PostTable implements Table, Writable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("'post' Table - PostScript Metrics\n---------------------------------\n")
+        sb.append("'post' Table - PostScript Metrics\n---------------------------------")
             .append("\n        'post' version:        ").append(Fixed.floatValue(version))
             .append("\n        italicAngle:           ").append(Fixed.floatValue(italicAngle))
             .append("\n        underlinePosition:     ").append(underlinePosition)
@@ -466,10 +466,11 @@ public class PostTable implements Table, Writable {
             .append("\n        minMemType42:          ").append(minMemType42)
             .append("\n        maxMemType42:          ").append(maxMemType42)
             .append("\n        minMemType1:           ").append(minMemType1)
-            .append("\n        maxMemType1:           ").append(maxMemType1);
+            .append("\n        maxMemType1:           ").append(maxMemType1)
+            .append("\n");
 
         if (version == VERSION_2_0) {
-            sb.append("\n\n        Format 2.0:  Non-Standard (for PostScript) TrueType Glyph Set.\n");
+            sb.append("\n        Format 2.0:  Non-Standard (for PostScript) TrueType Glyph Set.\n");
             sb.append("        numGlyphs:      ").append(getNumGlyphs()).append("\n");
             for (int glyph = 0; glyph < getNumGlyphs(); glyph++) {
                 sb.append("        Glyf ").append(glyph).append(" -> ");

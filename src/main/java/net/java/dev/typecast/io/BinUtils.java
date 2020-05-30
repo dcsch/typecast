@@ -31,4 +31,18 @@ public class BinUtils {
         }
     }
 
+    /**
+     * Ensures that the next write position in the given {@link BinaryOutput} is at a
+     * 2 byte word position.
+     */
+    public static void padding2(BinaryOutput out) throws IOException {
+        long length = out.getPosition();
+        int offset = (int) (length % 2);
+        if (offset > 0) {
+            for (int n = offset; n < 2; n++) {
+                out.write(0);
+            }
+        }
+    }
+    
 }

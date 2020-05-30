@@ -422,7 +422,8 @@ public class Os2Table implements Table, Writable {
                 "\n  usWinAscent:         " + _usWinAscent +
                 "\n  usWinDescent:        " + _usWinDescent +
                 "\n  CodePage Range 1( Bits 0 - 31 ): " + Integer.toHexString(_ulCodePageRange1).toUpperCase() +
-                "\n  CodePage Range 2( Bits 32- 63 ): " + Integer.toHexString(_ulCodePageRange2).toUpperCase();
+                "\n  CodePage Range 2( Bits 32- 63 ): " + Integer.toHexString(_ulCodePageRange2).toUpperCase() +
+                "\n\n";
     }
     
     private String getVendorIDAsString() {

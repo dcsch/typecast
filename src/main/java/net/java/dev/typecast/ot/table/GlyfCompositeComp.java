@@ -57,6 +57,7 @@ import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Bits;
 import net.java.dev.typecast.ot.Fixed_2_14;
+import net.java.dev.typecast.ot.Fmt;
 
 /**
  * A component of a {@link GlyfCompositeDescript}
@@ -361,6 +362,8 @@ public class GlyfCompositeComp implements Writable {
     }
     
     private static boolean isSignedWord(int value) {
+        // TODO: The value -128 is not encoded as byte but as short in the Lato
+        // font but the value range of int8 should be [-128, 127].
         return value < Byte.MIN_VALUE || value > Byte.MAX_VALUE;
     }
 
@@ -592,10 +595,19 @@ public class GlyfCompositeComp implements Writable {
              "\n            firstIndex: " + getFirstIndex() +  
              "\n            firstContour: " + getFirstContour() +  
              "\n            flags: " + 
+                (Bits.isSet(_flags, ARG_1_AND_2_ARE_WORDS) ? "ARG_1_AND_2_ARE_WORDS " : "") + 
+                (Bits.isSet(_flags, ARGS_ARE_XY_VALUES) ? "ARGS_ARE_XY_VALUES " : "") + 
+                (Bits.isSet(_flags, ROUND_XY_TO_GRID) ? "ROUND_XY_TO_GRID " : "") + 
+                (Bits.isSet(_flags, WE_HAVE_A_SCALE) ? "WE_HAVE_A_SCALE " : "") + 
+                (Bits.isSet(_flags, MORE_COMPONENTS) ? "MORE_COMPONENTS " : "") + 
+                (Bits.isSet(_flags, WE_HAVE_AN_X_AND_Y_SCALE) ? "WE_HAVE_AN_X_AND_Y_SCALE " : "") + 
+                (Bits.isSet(_flags, WE_HAVE_A_TWO_BY_TWO) ? "WE_HAVE_A_TWO_BY_TWO " : "") + 
+                (Bits.isSet(_flags, WE_HAVE_INSTRUCTIONS) ? "WE_HAVE_INSTRUCTIONS " : "") + 
                 (Bits.isSet(_flags, USE_MY_METRICS) ? "USE_MY_METRICS " : "") + 
                 (Bits.isSet(_flags, OVERLAP_COMPOUND) ? "OVERLAP_COMPOUND " : "") + 
-                (Bits.isSet(_flags, SCALED_COMPONENT_OFFSET) ? "SCALED_COMPONENT_OFFSET " : "")+ 
-                (Bits.isSet(_flags, UNSCALED_COMPONENT_OFFSET) ? "UNSCALED_COMPONENT_OFFSET" : "")+
+                (Bits.isSet(_flags, SCALED_COMPONENT_OFFSET) ? "SCALED_COMPONENT_OFFSET " : "") + 
+                (Bits.isSet(_flags, UNSCALED_COMPONENT_OFFSET) ? "UNSCALED_COMPONENT_OFFSET" : "") +
+                " (0x" + Fmt.padHex(4, _flags) + ")" + 
              "\n            transform:"+
              "\n                "+ getXScale() + "  " + getScale01() + "  " + getXTranslate() +
              "\n                "+ getScale10() + "  " + getYScale() + "  " + getYTranslate() + 

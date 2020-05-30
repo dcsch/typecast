@@ -87,5 +87,13 @@ public class SingleSubstFormat1 extends SingleSubst {
     public String getTypeAsString() {
         return "SingleSubstFormat1";
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                _deltaGlyphID = " + _deltaGlyphID + "\n");
+        sb.append(_coverage.toString());
+        return sb.toString();
+    }
 }
 

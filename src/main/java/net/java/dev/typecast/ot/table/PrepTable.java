@@ -16,9 +16,9 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * Control Value Program table
+ * Control Value Program Table
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/prep"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/prep">Spec: Control Value Program Table</a>
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -40,7 +40,11 @@ class PrepTable extends Program implements Table, Writable {
 
     @Override
     public String toString() {
-        return Disassembler.disassemble(getInstructions(), 0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("prep - Control Value Program Table\n");
+        sb.append("----------------------------------\n");
+        sb.append(Disassembler.disassemble(getInstructions(), 4));
+        return sb.toString();
     }
 
 }

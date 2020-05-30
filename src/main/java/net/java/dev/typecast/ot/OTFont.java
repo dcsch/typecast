@@ -181,19 +181,7 @@ public abstract class OTFont {
      * Dumps information of all tables to the given {@link Writer}.
      */
     public void dumpTo(Writer out) throws IOException {
-        out.write(getTableDirectory().toString());
-        out.write("\n");
-        
-        dump(out, getHeadTable());
-        dump(out, getOS2Table());
-        dump(out, getCmapTable());
-        dump(out, getHheaTable());
-        dump(out, getHmtxTable());
-        dump(out, getMaxpTable());
-        dump(out, getNameTable());
-        dump(out, getPostTable());
-        dump(out, getVheaTable());
-        dump(out, getGsubTable());
+        getTableDirectory().dumpTo(out);
     }
 
     /** 

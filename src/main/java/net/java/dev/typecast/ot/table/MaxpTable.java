@@ -227,9 +227,8 @@ public class MaxpTable implements Table, Writable {
                 .append("\n        maxSizeOfInstructions:  ").append(maxSizeOfInstructions)
                 .append("\n        maxComponentElements:   ").append(maxComponentElements)
                 .append("\n        maxComponentDepth:      ").append(maxComponentDepth);
-        } else {
-            sb.append("\n");
         }
+        sb.append("\n");
         return sb.toString();
     }
 

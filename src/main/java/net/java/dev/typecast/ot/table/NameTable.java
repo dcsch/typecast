@@ -194,7 +194,8 @@ public class NameTable implements Table, Writable {
                 "\n        count:               " + getNumberOfNameRecords() +
                 "\n        stringOffset:        " + _stringOffset +
                 "\n        records:" +
-                Arrays.asList(_records).stream().map(r -> "\n" + r.toString()).collect(Collectors.joining("\n"));
+                Arrays.asList(_records).stream().map(r -> "\n" + r.toString()).collect(Collectors.joining("\n")) + 
+                "\n";
     }
 
 }

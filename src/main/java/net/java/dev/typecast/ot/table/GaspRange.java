@@ -53,6 +53,7 @@ class GaspRange implements Writable {
         if ((rangeGaspBehavior & GASP_DOGRAY) != 0) {
             sb.append("- GASP_DOGRAY");
         }
+        sb.append("\n");
         return sb.toString();
     }
 }

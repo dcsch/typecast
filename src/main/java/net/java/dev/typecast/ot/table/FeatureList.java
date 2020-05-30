@@ -114,4 +114,21 @@ public class FeatureList {
         return null;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("    featureList\n");
+        sb.append("    -----------\n");
+        sb.append("        featureCount     = " + _featureCount + "\n");
+        sb.append("        \n");
+        
+        int num = 1;
+        for (Feature feature : _features) {
+            sb.append("        feature " + (num++) + "\n");
+            sb.append("        -----------\n");
+            sb.append(feature.toString());
+            sb.append("        \n");
+        }
+        return sb.toString();
+    }
 }

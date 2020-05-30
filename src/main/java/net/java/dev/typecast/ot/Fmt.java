@@ -10,17 +10,42 @@ package net.java.dev.typecast.ot;
  */
 public class Fmt {
 
-    private static final String PADDING = "                ";
-
     /**
      * Left aligned number in a field of the given number of digits.
      */
     public static String pad(int digits, int value) {
-        String result = Integer.toString(value);
-        if (result.length() >= digits) {
-            return result;
+        return pad(digits, ' ', Integer.toString(value));
+    }
+
+    /**
+     * Left aligned number in a field of the given number of digits.
+     */
+    public static String padHex(int digits, int value) {
+        return pad(digits, '0', Integer.toHexString(value));
+    }
+    
+    /**
+     * Create a left aligned string by prepending it with the given padding
+     * character up to the given number of total characters.
+     *
+     * @param length
+     *        The total length of the resulting string.
+     * @param paddingChar
+     *        The character to pad with.
+     * @param value
+     *        The value to pad.
+     * @return The padded value.
+     */
+    public static String pad(int length, char paddingChar, String value) {
+        if (value.length() >= length) {
+            return value;
         }
-        return PADDING.substring(0, digits - result.length()) + result;
+        StringBuilder buffer = new StringBuilder(length);
+        for (int n = 0, cnt = length - value.length(); n < cnt; n++) {
+            buffer.append(paddingChar);
+        }
+        buffer.append(value);
+        return buffer.toString();
     }
     
 }

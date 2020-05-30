@@ -142,10 +142,6 @@ public class GsubTable implements Table, LookupSubtableFactory {
         return _lookupList;
     }
 
-    public String toString() {
-        return "GSUB";
-    }
-
     public static String lookupTypeAsString(int type) {
         switch (type) {
         case 1:
@@ -162,6 +158,18 @@ public class GsubTable implements Table, LookupSubtableFactory {
             return "Chaining";
         }
         return "Unknown";
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("'GSUB' Table - Glyph Substitution Table\n");
+        sb.append("---------------------------------------\n");
+        sb.append("    Content not shown.\n");
+//        sb.append(_scriptList.toString());
+//        sb.append(_featureList.toString());
+//        sb.append(_lookupList.toString());
+        return sb.toString();
     }
 
 }

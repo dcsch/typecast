@@ -18,7 +18,7 @@ import net.java.dev.typecast.ot.Disassembler;
 /**
  * Font Program table
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/fpgm"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/fpgm">Spec: Font Program table</a>
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -38,8 +38,13 @@ class FpgmTable extends Program implements Table, Writable {
         return fpgm;
     }
 
+    @Override
     public String toString() {
-        return Disassembler.disassemble(getInstructions(), 0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("fpgm - Font Program Table\n");
+        sb.append("-------------------------\n");
+        sb.append(Disassembler.disassemble(getInstructions(), 4));
+        return sb.toString();
     }
     
 }

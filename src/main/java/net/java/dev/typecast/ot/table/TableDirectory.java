@@ -54,6 +54,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +65,6 @@ import net.java.dev.typecast.io.BinaryIO;
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fixed;
-import net.java.dev.typecast.ot.Fmt;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -181,10 +181,12 @@ public class TableDirectory {
 
         @Override
         public String toString() {
-            return "'" + getTagAsString() +
-                    "' - chksm = 0x" + Integer.toHexString(_checksum) +
-                    ", off = 0x" + Integer.toHexString(_offset) +
-                    ", len = " + _length;
+            return 
+                "    '" + getTagAsString() + "'\n" + 
+                "    ------\n" + 
+                "        Checksum = 0x" + Integer.toHexString(_checksum) + "\n" + 
+                "        Offset   = 0x" + Integer.toHexString(_offset) + "\n" + 
+                "        Length   = " + _length + "\n";
         }
 
         /**
@@ -294,6 +296,16 @@ public class TableDirectory {
             }
             
             return getTable();
+        }
+
+        /**
+         * Writes this {@link Entry} to the given writer, including the
+         * {@link Table#dump(Writer) table dump}.
+         */
+        public void dumpTo(Writer out) throws IOException {
+            if (getTable() != null) {
+                getTable().dump(out);
+            }
         }
     }
 
@@ -499,14 +511,15 @@ public class TableDirectory {
     public String toString() {
         StringBuilder sb = new StringBuilder()
             .append("Offset Table\n------ -----")
-            .append("\n  sfntVersion:   ").append(Fixed.floatValue(_sfntVersion))
-            .append("\n  numTables:     ").append(getNumTables())
-            .append("\n  searchRange:   ").append(_searchRange)
-            .append("\n  entrySelector: ").append(_entrySelector)
-            .append("\n  rangeShift:    ").append(_rangeShift)
+            .append("\n    sfntVersion:   ").append(Fixed.floatValue(_sfntVersion))
+            .append("\n    numTables:     ").append(getNumTables())
+            .append("\n    searchRange:   ").append(_searchRange)
+            .append("\n    entrySelector: ").append(_entrySelector)
+            .append("\n    rangeShift:    ").append(_rangeShift)
             .append("\n\n");
         for (int i = 0; i < getNumTables(); i++) {
-            sb.append("  ").append(Fmt.pad(2, i)).append(": ").append(_entries[i].toString()).append("\n");
+            sb.append(_entries[i].toString());
+            sb.append("\n");
         }
         return sb.toString();
     }
@@ -538,5 +551,19 @@ public class TableDirectory {
             ((tag.charAt(1) & 0xFF) << 16) |
             ((tag.charAt(2) & 0xFF) << 8) |
             (tag.charAt(3) & 0xff);
+    }
+
+    /**
+     * Writes the {@link TableDirectory} and all {@link Table#dump(Writer) table
+     * dumps} to the given {@link Writer}.
+     */
+    public void dumpTo(Writer out) throws IOException {
+        out.write(toString());
+        out.write("\n");
+        
+        for (Entry entry : _entries) {
+            entry.dumpTo(out);
+            out.write("\n");
+        }
     }
 }

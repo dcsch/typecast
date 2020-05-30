@@ -30,13 +30,18 @@ import java.io.IOException;
  */
 class GposTable implements Table {
 
-    protected GposTable(DataInput di, int length) throws IOException {
+    private int _version;
+    private int _scriptList;
+    private int _featureList;
+    private int _lookupList;
 
-        // GPOS Header
-        int version = di.readInt();
-        int scriptList = di.readInt();
-        int featureList = di.readInt();
-        int lookupList = di.readInt();
+    protected GposTable(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        _scriptList = di.readInt();
+        _featureList = di.readInt();
+        _lookupList = di.readInt();
+        
+        // TODO: Implement.
     }
 
     @Override
@@ -44,8 +49,16 @@ class GposTable implements Table {
         return GPOS;
     }
 
+    @Override
     public String toString() {
-        return "GPOS";
+        StringBuilder sb = new StringBuilder();
+        sb.append("'GPOS' Table - Glyph Positioning Table\n");
+        sb.append("--------------------------------------\n");
+        sb.append("    version      = ").append(_version).append("\n");
+        sb.append("    scriptList   = ").append(_scriptList).append("\n");
+        sb.append("    featureList  = ").append(_featureList).append("\n");
+        sb.append("    lookupList   = ").append(_lookupList).append("\n");
+        return sb.toString();
     }
 
 }

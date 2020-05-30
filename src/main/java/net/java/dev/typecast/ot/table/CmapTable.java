@@ -142,29 +142,31 @@ public class CmapTable implements Table, Writable {
             bytesRead += 8;
         }
 
-        // Sort into their order of offset
-        Arrays.sort(_entries);
+        // For reading, sort into their order of offset.
+        CmapIndexEntry[] entries = new CmapIndexEntry[numTables];
+        System.arraycopy(_entries, 0, entries, 0, numTables);
+        Arrays.sort(entries);
 
         // Get each of the tables
         int lastOffset = -1;
         CmapFormat lastFormat = null;
-        for (int i = 0; i < numTables; i++) {
-            if (_entries[i].getOffset() == lastOffset) {
+        for (CmapIndexEntry entry : entries) {
+            if (entry.getOffset() == lastOffset) {
 
                 // This is a multiple entry
-                _entries[i].setFormat(lastFormat);
+                entry.setFormat(lastFormat);
                 continue;
-            } else if (_entries[i].getOffset() > bytesRead) {
-                di.skipBytes(_entries[i].getOffset() - (int) bytesRead);
-            } else if (_entries[i].getOffset() != bytesRead) {
+            } else if (entry.getOffset() > bytesRead) {
+                di.skipBytes(entry.getOffset() - (int) bytesRead);
+            } else if (entry.getOffset() != bytesRead) {
                 
                 // Something is amiss
                 throw new IOException();
             }
             int formatType = di.readUnsignedShort();
             lastFormat = CmapFormat.create(formatType, di);
-            lastOffset = _entries[i].getOffset();
-            _entries[i].setFormat(lastFormat);
+            lastOffset = entry.getOffset();
+            entry.setFormat(lastFormat);
             bytesRead += lastFormat.getLength();
         }
     }
@@ -263,6 +265,8 @@ public class CmapTable implements Table, Writable {
 //        for (int i = 0; i < numTables; i++) {
 //            sb.append("\t").append(formats[i].toString()).append("\n");
 //        }
+        
+        sb.append("\n");
         return sb.toString();
     }
 

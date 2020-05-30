@@ -664,8 +664,9 @@ public class HeadTable implements Table, Writable {
                 "\n  macStyle bits:       " + Integer.toHexString(_macStyle).toUpperCase() +
                 "\n  lowestRecPPEM:       " + _lowestRecPPEM +
                 "\n  fontDirectionHint:   " + _fontDirectionHint +
-                "\n  indexToLocFormat:    " + _indexToLocFormat +
-                "\n  glyphDataFormat:     " + _glyphDataFormat;
+                "\n  shortOffsets:        " + (_indexToLocFormat == FORMAT_SHORT_OFFSETS) + " (format: " + _indexToLocFormat + ")"+
+                "\n  glyphDataFormat:     " + _glyphDataFormat +
+                "\n";
     }
 
 }
