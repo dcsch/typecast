@@ -8,7 +8,13 @@
 
 package net.java.dev.typecast.io;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import net.java.dev.typecast.ot.Fmt;
 
 /**
  * Utilities for writing to {@link BinaryOutput}.
@@ -41,6 +47,35 @@ public class BinUtils {
         if (offset > 0) {
             for (int n = offset; n < 2; n++) {
                 out.write(0);
+            }
+        }
+    }
+
+    /** 
+     * Writes a hex dump of the given byte array to the given {@link File}.
+     */
+    public static void hexDump(File file, byte[] buf) throws IOException {
+        StringBuilder result = new StringBuilder();
+        for (int n = 0, cnt = buf.length; n < cnt; n += 16) {
+            result.append(Fmt.pad(10, n));
+            
+            result.append(":");
+            for (int d = 0, limit = Math.min(16, cnt - n); d < limit; d++) {
+                result.append(" ");
+                if (d % 4 == 0) {
+                    result.append(" ");
+                }
+                if (d == 8) {
+                    result.append("  ");
+                }
+                result.append(Fmt.padHex(2, buf[n + d] & 0xFF));
+            }
+            result.append("\n");
+        }
+        
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            try (Writer w = new OutputStreamWriter(out, "ASCII")) {
+                w.write(result.toString());
             }
         }
     }

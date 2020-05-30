@@ -53,16 +53,12 @@ package net.java.dev.typecast.ot.table;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import net.java.dev.typecast.io.BinUtils;
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
-import net.java.dev.typecast.ot.Fmt;
 
 /**
  * Glyph Data
@@ -123,8 +119,6 @@ public class GlyfTable implements Table, Writable {
         byte[] buf = new byte[length];
         di.readFully(buf);
         
-        // hexDump(buf);
-        
         ByteArrayInputStream bais = new ByteArrayInputStream(buf);
         
         // Process all the simple glyphs
@@ -162,45 +156,12 @@ public class GlyfTable implements Table, Writable {
         }
     }
     
-    static int numDump = 1;
-    
-    /** 
-     * Prints a hex dump of the given byte array.
-     */
-    private static void hexDump(byte[] buf) throws IOException {
-        StringBuilder result = new StringBuilder();
-        for (int n = 0, cnt = buf.length; n < cnt; n += 16) {
-            result.append(Fmt.pad(10, n));
-            
-            result.append(":");
-            for (int d = 0, limit = Math.min(16, cnt - n); d < limit; d++) {
-                result.append(" ");
-                if (d % 4 == 0) {
-                    result.append(" ");
-                }
-                if (d == 8) {
-                    result.append("  ");
-                }
-                result.append(Fmt.padHex(2, buf[n + d] & 0xFF));
-            }
-            result.append("\n");
-        }
-        
-        try (FileOutputStream out = new FileOutputStream(new File("glyf.dump-" + (numDump++) + ".txt"))) {
-            try (Writer w = new OutputStreamWriter(out, "ASCII")) {
-                w.write(result.toString());
-            }
-        }
-    }
-
     @Override
     public void write(BinaryOutput out) throws IOException {
         long start = out.getPosition();
         int glyphId = 0;
         for (GlyfDescript glyph : _descript) {
-            // TODO: The spec does not mention any required padding within the
-            // 'glyf' table, but the Lato font uses such padding.
-            BinUtils.padding4(out);
+            BinUtils.padding2(out);
             
             long glyphOffset = out.getPosition() - start;
             _loca.setOffset(glyphId, (int) glyphOffset);
@@ -211,10 +172,6 @@ public class GlyfTable implements Table, Writable {
             
             glyphId++;
         }
-
-        // TODO: The spec does not mention any required padding within the
-        // 'glyf' table, but the Lato font uses such padding.
-        BinUtils.padding2(out);
 
         long endOffset = out.getPosition() - start;
         _loca.setOffset(glyphId, (int) endOffset);
