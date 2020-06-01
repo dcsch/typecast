@@ -25,25 +25,30 @@ import java.io.IOException;
  * Vertical Metrics Table
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class VmtxTable implements Table {
+public class VmtxTable extends AbstractTable {
 
     private int[] _vMetrics;
     private short[] _topSideBearing;
 
-    protected VmtxTable(
-            DataInput di,
-            int length,
-            VheaTable vhea,
-            MaxpTable maxp) throws IOException {
-        _vMetrics = new int[vhea.getNumberOfLongVerMetrics()];
-        for (int i = 0; i < vhea.getNumberOfLongVerMetrics(); ++i) {
+    /**
+     * Creates a {@link VmtxTable}.
+     */
+    public VmtxTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numberOfLongVerMetrics = vhea().getNumberOfLongVerMetrics();
+        _vMetrics = new int[numberOfLongVerMetrics];
+        for (int i = 0; i < numberOfLongVerMetrics; ++i) {
             _vMetrics[i] =
                     di.readUnsignedByte()<<24
                     | di.readUnsignedByte()<<16
                     | di.readUnsignedByte()<<8
                     | di.readUnsignedByte();
         }
-        int tsbCount = maxp.getNumGlyphs() - vhea.getNumberOfLongVerMetrics();
+        int tsbCount = maxp().getNumGlyphs() - numberOfLongVerMetrics;
         _topSideBearing = new short[tsbCount];
         for (int i = 0; i < tsbCount; ++i) {
             _topSideBearing[i] = di.readShort();
@@ -77,6 +82,7 @@ class VmtxTable implements Table {
         }
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'vmtx' Table - Vertical Metrics\n-------------------------------\n");

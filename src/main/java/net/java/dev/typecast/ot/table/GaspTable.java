@@ -10,34 +10,36 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
 
 /**
- * Grid-fitting and Scan-conversion Procedure Table
+ * gasp — Grid-fitting and Scan-conversion Procedure Table
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/gasp"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/gasp">Spec: Grid-fitting and Scan-conversion Procedure Table</a>
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GaspTable implements Table, Writable {
 
-    private int version;
-    private GaspRange[] gaspRange;
-    
     /**
-     * Creates new GaspTable
-     * 
-     * @param length
-     *        The total number of bytes.
+     * Version 1 of {@link GaspTable}.
      */
-    public GaspTable(DataInput di, int length) throws IOException {
+    public static final int VERSION_1 = 1;
+
+    private int version = VERSION_1;
+    
+    private final ArrayList<GaspRange> gaspRange = new ArrayList<>();
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         version = di.readUnsignedShort();
         int numRanges = di.readUnsignedShort();
-        gaspRange = new GaspRange[numRanges];
+        gaspRange.ensureCapacity(numRanges);
         for (int i = 0; i < numRanges; i++) {
-            gaspRange[i] = new GaspRange(di);
+            gaspRange.add(new GaspRange(di));
         }
     }
     
@@ -57,10 +59,17 @@ public class GaspTable implements Table, Writable {
     }
     
     /**
+     * Version number.
+     */
+    public int getVersion() {
+        return version;
+    }
+    
+    /**
      * Number of {@link GaspRange}s in this table.
      */
     public int getNumRanges() {
-        return gaspRange.length;
+        return gaspRange.size();
     }
 
     /**
@@ -69,7 +78,7 @@ public class GaspTable implements Table, Writable {
      * @see #getNumRanges()
      */
     public GaspRange getGaspRange(int index) {
-        return gaspRange[index];
+        return gaspRange.get(index);
     }
 
     @Override
@@ -80,7 +89,7 @@ public class GaspTable implements Table, Writable {
         sb.append("\n  numRanges:           ").append(getNumRanges());
         for (int i = 0; i < getNumRanges(); i++) {
             sb.append("\n\n  gasp Range ").append(i).append("\n");
-            sb.append(gaspRange[i].toString());
+            sb.append(getGaspRange(i).toString());
         }
         return sb.toString();
     }

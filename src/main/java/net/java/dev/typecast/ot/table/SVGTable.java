@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -44,17 +44,10 @@ public class SVGTable implements Table, Writable {
     /**
      * @see #getDocumentRecords()
      */
-    private SVGDocumentRecord[] _documentRecords;
+    private final ArrayList<SVGDocumentRecord> _documentRecords = new ArrayList<>();
 
-    /**
-     * Creates a {@link SVGTable}.
-     *
-     * @param di
-     *        The reader to read from.
-     * @param length
-     *        Total number of bytes.
-     */
-    public SVGTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         
         // Offset to the SVG Document List, from the start of the SVG table.
@@ -69,24 +62,23 @@ public class SVGTable implements Table, Writable {
         int numEntries = di.readUnsignedShort();
         offset += 2;
         
-        _documentRecords = new SVGDocumentRecord[numEntries];
+        _documentRecords.ensureCapacity(numEntries);
         for (int n = 0; n < numEntries; n++) {
-            _documentRecords[n] = new SVGDocumentRecord(di);
+            _documentRecords.add(SVGDocumentRecord.readFrom(di));
         }
         offset += numEntries * 12;
         
-        SVGDocumentRecord[] recordsInOffsetOrder = new SVGDocumentRecord[numEntries];
-        System.arraycopy(_documentRecords, 0, recordsInOffsetOrder, 0, numEntries);
-        Arrays.sort(recordsInOffsetOrder, (a, b) -> Integer.compare(a.getSvgDocOffset(), b.getSvgDocOffset()));
+        ArrayList<SVGDocumentRecord> recordsInOffsetOrder = new ArrayList<>(_documentRecords);
+        Collections.sort(recordsInOffsetOrder, (a, b) -> Integer.compare(a.getSvgDocOffset(), b.getSvgDocOffset()));
         
         int lastOffset = 0;
         for (int n = 0; n < numEntries; n++) {
-            SVGDocumentRecord record = recordsInOffsetOrder[n];
+            SVGDocumentRecord record = recordsInOffsetOrder.get(n);
             
             int docOffset = record.getSvgDocOffset();
             if (docOffset == lastOffset) {
                 // Pointing to the same document.
-                record.setDocument(recordsInOffsetOrder[n - 1].getDocument());
+                record.setDocument(recordsInOffsetOrder.get(n - 1).getDocument());
             } else {
                 int skip = docOffset - offset;
                 assert skip >= 0;
@@ -116,10 +108,10 @@ public class SVGTable implements Table, Writable {
             long docListOffset = docListStart - start;
             offsetOut.writeInt((int) docListOffset);
 
-            int numEntries = _documentRecords.length;
+            int numEntries = _documentRecords.size();
             out.writeShort(numEntries);
             
-            List<Writable> docOuts = new ArrayList<>(_documentRecords.length);
+            List<Writable> docOuts = new ArrayList<>(numEntries);
             for (SVGDocumentRecord record : _documentRecords) {
                 docOuts.add(record.write(out, docListStart));
             }
@@ -142,7 +134,7 @@ public class SVGTable implements Table, Writable {
      * discontinuous glyph ID ranges.
      * </p>
      */
-    public SVGDocumentRecord[] getDocumentRecords() {
+    public List<SVGDocumentRecord> getDocumentRecords() {
         return _documentRecords;
     }
     
@@ -163,7 +155,7 @@ public class SVGTable implements Table, Writable {
         return "SVG Table\n" +
                "---------\n" + 
                "  Version: " + getVersion() + "\n" +
-               "  Number of records: " + getDocumentRecords().length;
+               "  Number of records: " + getDocumentRecords().size();
     }
     
     @Override
@@ -207,16 +199,23 @@ public class SVGTable implements Table, Writable {
 
         /** 
          * Creates a {@link SVGDocumentRecord}.
-         *
-         * @param di
          */
-        public SVGDocumentRecord(DataInput di) throws IOException {
+        public void read(DataInput di) throws IOException {
             _startGlyphID = di.readUnsignedShort();
             _endGlyphID = di.readUnsignedShort();
             _svgDocOffset = di.readInt();
             _svgDocLength = di.readInt();
         }
         
+        /** 
+         * Reads a {@link SVGDocumentRecord} from the given input.
+         */
+        public static SVGDocumentRecord readFrom(DataInput di) throws IOException {
+            SVGDocumentRecord result = new SVGDocumentRecord();
+            result.read(di);
+            return result;
+        }
+
         public Writable write(BinaryOutput out, long docListStart) throws IOException {
             out.writeShort(_startGlyphID);
             out.writeShort(_endGlyphID);

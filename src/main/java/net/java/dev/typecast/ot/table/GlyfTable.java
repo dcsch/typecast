@@ -55,6 +55,7 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 
 import net.java.dev.typecast.io.BinUtils;
 import net.java.dev.typecast.io.BinaryOutput;
@@ -90,30 +91,21 @@ import net.java.dev.typecast.io.Writable;
  * 
  * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/glyf"
  */
-public class GlyfTable implements Table, Writable {
+public class GlyfTable extends AbstractTable implements Writable {
 
-    private final GlyfDescript[] _descript;
-    private LocaTable _loca;
+    private final ArrayList<GlyfDescript> _descript = new ArrayList<>();
 
     /**
      * Creates a {@link GlyfTable}.
-     *
-     * @param di
-     *        The reader to read from.
-     * @param length
-     *        The length of the table in bytes.
-     * @param maxp
-     *        The corresponding {@link MaxpTable}.
-     * @param loca
-     *        The corresponding {@link LocaTable}.
      */
-    public GlyfTable(
-            DataInput di,
-            int length,
-            MaxpTable maxp,
-            LocaTable loca) throws IOException {
-        _loca = loca;
-        _descript = new GlyfDescript[maxp.getNumGlyphs()];
+    public GlyfTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numGlyphs = maxp().getNumGlyphs();
+        _descript.ensureCapacity(numGlyphs);
         
         // Buffer the whole table so we can randomly access it
         byte[] buf = new byte[length];
@@ -122,35 +114,38 @@ public class GlyfTable implements Table, Writable {
         ByteArrayInputStream bais = new ByteArrayInputStream(buf);
         
         // Process all the simple glyphs
-        for (int i = 0; i < maxp.getNumGlyphs(); i++) {
-            int offset = loca.getOffset(i);
+        LocaTable locaTable = loca();
+        for (int i = 0; i < numGlyphs; i++) {
+            int offset = locaTable.getOffset(i);
             
-            int len = loca.getOffset(i + 1) - offset;
+            int len = locaTable.getOffset(i + 1) - offset;
             if (len > 0) {
                 bais.reset();
                 bais.skip(offset);
                 DataInputStream dis = new DataInputStream(bais);
                 short numberOfContours = dis.readShort();
                 if (numberOfContours >= 0) {
-                    _descript[i] = new GlyfSimpleDescript(this, i, numberOfContours, dis);
+                    _descript.add(new GlyfSimpleDescript(this, i, numberOfContours, dis));
+                } else {
+                    _descript.add(null);
                 }
             } else {
-                _descript[i] = null;
+                _descript.add(null);
             }
         }
 
         // Now do all the composite glyphs
-        for (int i = 0; i < maxp.getNumGlyphs(); i++) {
-            int offset = loca.getOffset(i);
+        for (int i = 0; i < numGlyphs; i++) {
+            int offset = locaTable.getOffset(i);
             
-            int len = loca.getOffset(i + 1) - offset;
+            int len = locaTable.getOffset(i + 1) - offset;
             if (len > 0) {
                 bais.reset();
                 bais.skip(offset);
                 DataInputStream dis = new DataInputStream(bais);
                 short numberOfContours = dis.readShort();
                 if (numberOfContours < 0) {
-                    _descript[i] = new GlyfCompositeDescript(this, i, dis);
+                    _descript.set(i, new GlyfCompositeDescript(this, i, dis));
                 }
             }
         }
@@ -160,11 +155,12 @@ public class GlyfTable implements Table, Writable {
     public void write(BinaryOutput out) throws IOException {
         long start = out.getPosition();
         int glyphId = 0;
+        LocaTable locaTable = loca();
         for (GlyfDescript glyph : _descript) {
             BinUtils.padding2(out);
             
             long glyphOffset = out.getPosition() - start;
-            _loca.setOffset(glyphId, (int) glyphOffset);
+            locaTable.setOffset(glyphId, (int) glyphOffset);
             
             if (glyph != null) {
                 glyph.write(out);
@@ -174,9 +170,9 @@ public class GlyfTable implements Table, Writable {
         }
 
         long endOffset = out.getPosition() - start;
-        _loca.setOffset(glyphId, (int) endOffset);
+        locaTable.setOffset(glyphId, (int) endOffset);
         
-        _loca.updateFormat();
+        locaTable.updateFormat();
     }
 
     @Override
@@ -190,7 +186,7 @@ public class GlyfTable implements Table, Writable {
      * @see #getDescription(int)
      */
     public int getNumGlyphs() {
-        return _descript.length;
+        return _descript.size();
     }
 
     /**
@@ -199,8 +195,8 @@ public class GlyfTable implements Table, Writable {
      * @see #getNumGlyphs()
      */
     public GlyfDescript getDescription(int i) {
-        if (i < _descript.length) {
-            return _descript[i];
+        if (i < _descript.size()) {
+            return _descript.get(i);
         } else {
             return null;
         }
@@ -216,7 +212,7 @@ public class GlyfTable implements Table, Writable {
     
     @Override
     public void dump(Writer out) throws IOException {
-        Table.super.dump(out);
+        super.dump(out);
         out.write("\n");
         
         for (int n = 0, cnt = getNumGlyphs(); n< cnt; n++) {

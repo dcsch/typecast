@@ -22,9 +22,10 @@ import net.java.dev.typecast.ot.Disassembler;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class FpgmTable extends Program implements Table, Writable {
+public class FpgmTable extends Program implements Table, Writable {
 
-    protected FpgmTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         readInstructions(di, length);
     }
     

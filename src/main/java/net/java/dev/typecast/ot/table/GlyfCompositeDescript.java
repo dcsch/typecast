@@ -88,7 +88,7 @@ public class GlyfCompositeDescript extends GlyfDescript {
             GlyfTable parentTable,
             int glyphIndex,
             DataInput di) throws IOException {
-        super(parentTable, glyphIndex, (short) -1, di);
+        super(parentTable, glyphIndex, di);
         
         // Get all of the composite components
         GlyfCompositeComp comp;
@@ -133,6 +133,11 @@ public class GlyfCompositeDescript extends GlyfDescript {
         GlyfCompositeComp last = _components.get(_components.size() - 1);
         last.setMoreComponents(false);
         last.setInstructions(getInstructionLength() > 0);
+    }
+    
+    @Override
+    public int getNumberOfContours() {
+        return -1;
     }
 
     public int getEndPtOfContours(int contour) {

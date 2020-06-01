@@ -53,7 +53,7 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.java.dev.typecast.io.BinaryOutput;
@@ -114,17 +114,11 @@ public class CmapTable implements Table, Writable {
     public static final int VERSION = 0x0000;
     
     private int _version = VERSION;
-    private CmapIndexEntry[] _entries;
+    
+    private ArrayList<CmapIndexEntry> _entries = new ArrayList<>();
 
-    /**
-     * Creates a {@link CmapTable}.
-     *
-     * @param di
-     *        The reader to read from.
-     * @param length
-     *        The total length of the table in bytes.
-     */
-    public CmapTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         int numTables = di.readUnsignedShort();
         long bytesRead = 4;
@@ -136,16 +130,15 @@ public class CmapTable implements Table, Writable {
         // by the language field in the corresponding subtable. Each platform
         // ID, platform-specific encoding ID, and subtable language combination
         // may appear only once in the 'cmap' table.
-        _entries = new CmapIndexEntry[numTables];
+        _entries.ensureCapacity(numTables);
         for (int i = 0; i < numTables; i++) {
-            _entries[i] = new CmapIndexEntry(di);
+            _entries.add(new CmapIndexEntry(di));
             bytesRead += 8;
         }
 
         // For reading, sort into their order of offset.
-        CmapIndexEntry[] entries = new CmapIndexEntry[numTables];
-        System.arraycopy(_entries, 0, entries, 0, numTables);
-        Arrays.sort(entries);
+        List<CmapIndexEntry> entries = new ArrayList<CmapIndexEntry>(_entries);
+        Collections.sort(entries);
 
         // Get each of the tables
         int lastOffset = -1;
@@ -181,7 +174,7 @@ public class CmapTable implements Table, Writable {
         // The encoding record entries in the 'cmap' header must be sorted first
         // by platform ID, then by platform-specific encoding ID, and then by
         // the language field in the corresponding subtable.
-        Arrays.sort(_entries, (e1, e2) -> {
+        Collections.sort(_entries, (e1, e2) -> {
             int platformCmp = Integer.compare(e1.getPlatformId(), e2.getPlatformId());
             if (platformCmp != 0) {
                 return platformCmp;
@@ -196,7 +189,7 @@ public class CmapTable implements Table, Writable {
             return langCmp;
         });
         
-        List<Writable> formatWriters = new ArrayList<>(_entries.length);
+        List<Writable> formatWriters = new ArrayList<>(_entries.size());
         for (CmapIndexEntry entry : _entries) {
             formatWriters.add(entry.writeEncodingRecord(out, start));
         }
@@ -229,20 +222,18 @@ public class CmapTable implements Table, Writable {
      * Number of encoding tables that follow.
      */
     public int getNumTables() {
-        return _entries.length;
+        return _entries.size();
     }
     
     public CmapIndexEntry getCmapIndexEntry(int i) {
-        return _entries[i];
+        return _entries.get(i);
     }
     
     public CmapFormat getCmapFormat(short platformId, short encodingId) {
-
         // Find the requested format
-        for (int i = 0; i < getNumTables(); i++) {
-            if (_entries[i].getPlatformId() == platformId
-                    && _entries[i].getEncodingId() == encodingId) {
-                return _entries[i].getFormat();
+        for (CmapIndexEntry entry : _entries) {
+            if (entry.getPlatformId() == platformId && entry.getEncodingId() == encodingId) {
+                return entry.getFormat();
             }
         }
         return null;
@@ -257,8 +248,8 @@ public class CmapTable implements Table, Writable {
         sb.append("  numTables: " + getNumTables() + "\n");
 
         // Get each of the index entries
-        for (int i = 0; i < getNumTables(); i++) {
-            sb.append("\n").append(_entries[i].toString());
+        for (CmapIndexEntry entry : _entries) {
+            sb.append("\n").append(entry.toString());
         }
 
         // Get each of the tables

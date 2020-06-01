@@ -16,11 +16,11 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fixed;
 
 /**
- * PostScript Table
- * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/post"
+ * post — PostScript Table
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/post">Spec: PostScript Table</a>
  */
 public class PostTable implements Table, Writable {
 
@@ -310,92 +310,87 @@ public class PostTable implements Table, Writable {
         "dcroat"        // 257
     };
 
-    private int version;
-    private int italicAngle;
-    private short underlinePosition;
-    private short underlineThickness;
-    private int isFixedPitch;
-    private int minMemType42;
-    private int maxMemType42;
-    private int minMemType1;
-    private int maxMemType1;
+    private int _version = VERSION_2_0;
+    private int _italicAngle;
+    private short _underlinePosition;
+    private short _underlineThickness;
+    private int _isFixedPitch;
+    private int _minMemType42;
+    private int _maxMemType42;
+    private int _minMemType1;
+    private int _maxMemType1;
     
     // v2
-    private int[] glyphNameIndex;
-    private String[] psGlyphNames;
+    private int[] _glyphNameIndex;
+    private String[] _psGlyphNames;
 
-    /**
-     * Creates new {@link PostTable}
-     * 
-     * @param length
-     *        Total number of bytes.
-     */
-    public PostTable(DataInput di, int length) throws IOException {
-        version = di.readInt();
-        italicAngle = di.readInt();
-        underlinePosition = di.readShort();
-        underlineThickness = di.readShort();
-        isFixedPitch = di.readInt();
-        minMemType42 = di.readInt();
-        maxMemType42 = di.readInt();
-        minMemType1 = di.readInt();
-        maxMemType1 = di.readInt();
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        _italicAngle = di.readInt();
+        _underlinePosition = di.readShort();
+        _underlineThickness = di.readShort();
+        _isFixedPitch = di.readInt();
+        _minMemType42 = di.readInt();
+        _maxMemType42 = di.readInt();
+        _minMemType1 = di.readInt();
+        _maxMemType1 = di.readInt();
         
-        if (version == VERSION_2_0) {
+        if (_version == VERSION_2_0) {
             int numGlyphs = di.readUnsignedShort();
-            glyphNameIndex = new int[numGlyphs];
+            _glyphNameIndex = new int[numGlyphs];
             for (int i = 0; i < numGlyphs; i++) {
-                glyphNameIndex[i] = di.readUnsignedShort();
+                _glyphNameIndex[i] = di.readUnsignedShort();
             }
-            int numberNewGlyphs = max(glyphNameIndex);
+            int numberNewGlyphs = max(_glyphNameIndex);
             if (numberNewGlyphs > 257) {
                 numberNewGlyphs -= 257;
-                psGlyphNames = new String[numberNewGlyphs];
+                _psGlyphNames = new String[numberNewGlyphs];
                 for (int i = 0; i < numberNewGlyphs; i++) {
                     int len = di.readUnsignedByte();
                     byte[] buf = new byte[len];
                     di.readFully(buf);
-                    psGlyphNames[i] = new String(buf, "ASCII");
+                    _psGlyphNames[i] = new String(buf, "ASCII");
                 }
             }
-        } else if (version == VERSION_2_5) {
+        } else if (_version == VERSION_2_5) {
             // TODO
-        } else if (version == VERSION_3_0) {
+        } else if (_version == VERSION_3_0) {
             // TODO
         }
     }
     
     @Override
     public void write(BinaryOutput out) throws IOException {
-        out.writeInt(version);
-        out.writeInt(italicAngle);
-        out.writeShort(underlinePosition);
-        out.writeShort(underlineThickness);
-        out.writeInt(isFixedPitch);
-        out.writeInt(minMemType42);
-        out.writeInt(maxMemType42);
-        out.writeInt(minMemType1);
-        out.writeInt(maxMemType1);
+        out.writeInt(_version);
+        out.writeInt(_italicAngle);
+        out.writeShort(_underlinePosition);
+        out.writeShort(_underlineThickness);
+        out.writeInt(_isFixedPitch);
+        out.writeInt(_minMemType42);
+        out.writeInt(_maxMemType42);
+        out.writeInt(_minMemType1);
+        out.writeInt(_maxMemType1);
         
-        if (version == VERSION_2_0) {
-            out.writeShort(glyphNameIndex.length);
-            for (int nameIndex : glyphNameIndex) {
+        if (_version == VERSION_2_0) {
+            out.writeShort(_glyphNameIndex.length);
+            for (int nameIndex : _glyphNameIndex) {
                 out.writeShort(nameIndex);
             }
             
-            if (psGlyphNames != null) {
-                int numberNewGlyphs = max(glyphNameIndex);
+            if (_psGlyphNames != null) {
+                int numberNewGlyphs = max(_glyphNameIndex);
                 if (numberNewGlyphs > 257) {
                     numberNewGlyphs -= 257;
-                    for (String glyphName : psGlyphNames) {
+                    for (String glyphName : _psGlyphNames) {
                         out.writeByte(glyphName.length());
                         out.write(glyphName.getBytes("ASCII"));
                     }
                 }
             }
-        } else if (version == VERSION_2_5) {
+        } else if (_version == VERSION_2_5) {
             // TODO
-        } else if (version == VERSION_3_0) {
+        } else if (_version == VERSION_3_0) {
             // TODO
         }
     }
@@ -406,7 +401,7 @@ public class PostTable implements Table, Writable {
     }
 
     public int getVersion() {
-        return version;
+        return _version;
     }
 
     private static int max(int[] array) {
@@ -420,21 +415,21 @@ public class PostTable implements Table, Writable {
     }
 
     public int getNumGlyphs() {
-        return glyphNameIndex.length;
+        return _glyphNameIndex.length;
     }
 
     public String getGlyphName(int glyph) {
-        switch (version) {
+        switch (_version) {
         case VERSION_1_0:
             return MAC_GLYPH_NAME[glyph];
             
         case VERSION_2_0:
-            int nameIndex = glyphNameIndex[glyph];
+            int nameIndex = _glyphNameIndex[glyph];
             if (nameIndex <= 257) {
                 // Macintosh standard order.
                 return MAC_GLYPH_NAME[nameIndex];
             } else {
-                return psGlyphNames[nameIndex - 258];
+                return _psGlyphNames[nameIndex - 258];
             }
         default:
             return null;
@@ -442,12 +437,12 @@ public class PostTable implements Table, Writable {
     }
 
     private boolean isMacGlyphName(int i) {
-        switch (version) {
+        switch (_version) {
             case VERSION_1_0:
                 return true;
                 
             case VERSION_2_0:
-                return glyphNameIndex[i] <= 257;
+                return _glyphNameIndex[i] <= 257;
                 
             default:
                 return false;
@@ -458,34 +453,34 @@ public class PostTable implements Table, Writable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'post' Table - PostScript Metrics\n---------------------------------")
-            .append("\n        'post' version:        ").append(Fixed.floatValue(version))
-            .append("\n        italicAngle:           ").append(Fixed.floatValue(italicAngle))
-            .append("\n        underlinePosition:     ").append(underlinePosition)
-            .append("\n        underlineThickness:    ").append(underlineThickness)
-            .append("\n        isFixedPitch:          ").append(isFixedPitch)
-            .append("\n        minMemType42:          ").append(minMemType42)
-            .append("\n        maxMemType42:          ").append(maxMemType42)
-            .append("\n        minMemType1:           ").append(minMemType1)
-            .append("\n        maxMemType1:           ").append(maxMemType1)
+            .append("\n        'post' version:        ").append(Fixed.floatValue(_version))
+            .append("\n        italicAngle:           ").append(Fixed.floatValue(_italicAngle))
+            .append("\n        underlinePosition:     ").append(_underlinePosition)
+            .append("\n        underlineThickness:    ").append(_underlineThickness)
+            .append("\n        isFixedPitch:          ").append(_isFixedPitch)
+            .append("\n        minMemType42:          ").append(_minMemType42)
+            .append("\n        maxMemType42:          ").append(_maxMemType42)
+            .append("\n        minMemType1:           ").append(_minMemType1)
+            .append("\n        maxMemType1:           ").append(_maxMemType1)
             .append("\n");
 
-        if (version == VERSION_2_0) {
+        if (_version == VERSION_2_0) {
             sb.append("\n        Format 2.0:  Non-Standard (for PostScript) TrueType Glyph Set.\n");
             sb.append("        numGlyphs:      ").append(getNumGlyphs()).append("\n");
             for (int glyph = 0; glyph < getNumGlyphs(); glyph++) {
                 sb.append("        Glyf ").append(glyph).append(" -> ");
                 if (isMacGlyphName(glyph)) {
-                    sb.append("Mac Glyph # ").append(glyphNameIndex[glyph])
-                        .append(", '").append(MAC_GLYPH_NAME[glyphNameIndex[glyph]]).append("'\n");
+                    sb.append("Mac Glyph # ").append(_glyphNameIndex[glyph])
+                        .append(", '").append(MAC_GLYPH_NAME[_glyphNameIndex[glyph]]).append("'\n");
                 } else {
-                    sb.append("PSGlyf Name # ").append(glyphNameIndex[glyph] - 257)
-                        .append(", name= '").append(psGlyphNames[glyphNameIndex[glyph] - 258]).append("'\n");
+                    sb.append("PSGlyf Name # ").append(_glyphNameIndex[glyph] - 257)
+                        .append(", name= '").append(_psGlyphNames[_glyphNameIndex[glyph] - 258]).append("'\n");
                 }
             }
             sb.append("\n        Full List of PSGlyf Names\n        ------------------------\n");
-            for (int i = 0; i < psGlyphNames.length; i++) {
+            for (int i = 0; i < _psGlyphNames.length; i++) {
                 sb.append("        PSGlyf Name # ").append(i + 1)
-                    .append(": ").append(psGlyphNames[i])
+                    .append(": ").append(_psGlyphNames[i])
                     .append("\n");
             }
         }

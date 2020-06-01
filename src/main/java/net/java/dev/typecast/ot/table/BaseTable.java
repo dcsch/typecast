@@ -22,9 +22,13 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Baseline Table
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/base">Spec: BASE - Baseline table</a>
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class BaseTable implements Table {
@@ -113,17 +117,16 @@ public abstract class BaseTable implements Table {
         
         private int _minCoordOffset;
         private int _maxCoordOffset;
-        private int _featMinMaxCount;
-        private FeatMinMaxRecord[] _featMinMaxRecord;
+        private ArrayList<FeatMinMaxRecord> _featMinMaxRecord = new ArrayList<>();
         
         MinMax(int minMaxOffset) throws IOException {
             DataInput di = getDataInputForOffset(minMaxOffset);
             _minCoordOffset = di.readUnsignedShort();
             _maxCoordOffset = di.readUnsignedShort();
-            _featMinMaxCount = di.readUnsignedShort();
-            _featMinMaxRecord = new FeatMinMaxRecord[_featMinMaxCount];
-            for (int i = 0; i < _featMinMaxCount; ++i) {
-                _featMinMaxRecord[i] = new FeatMinMaxRecord(di);
+            int featMinMaxCount = di.readUnsignedShort();
+            _featMinMaxRecord.ensureCapacity(featMinMaxCount);
+            for (int i = 0; i < featMinMaxCount; ++i) {
+                _featMinMaxRecord.add(new FeatMinMaxRecord(di));
             }
         }
     }

@@ -17,11 +17,16 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
+ * CPAL — Color Palette Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/cpal">Spec: Color Palette Table</a>
  */
-class CpalTable implements Table {
+public class CpalTable implements Table {
 
     static class ColorRecord {
 
@@ -54,51 +59,60 @@ class CpalTable implements Table {
         }
     }
 
-    private final int _version;
-    private final int _numPalettesEntries;
-    private final int _numPalette;
-    private final int _numColorRecords;
-    private final int _offsetFirstColorRecord;
-    private final int[] _colorRecordIndices;
-    private final int _offsetPaletteTypeArray;
-    private final int _offsetPaletteLabelArray;
-    private final int _offsetPaletteEntryLabelArray;
-    private final ColorRecord[] _colorRecords;
+    /**
+     * Version 0 of {@link CpalTable}.
+     */
+    private static final int VERSION_0 = 0;
 
-    protected CpalTable(DataInput di, int length) throws IOException {
+    /**
+     * Version 1 of {@link CpalTable}.
+     */
+    private static final int VERSION_1 = 1;
+
+    private int _version = VERSION_0;
+    private int _numPalettesEntries;
+    private int[] _colorRecordIndices;
+    private final ArrayList<ColorRecord> _colorRecords = new ArrayList<>();
+
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _numPalettesEntries = di.readUnsignedShort();
-        _numPalette = di.readUnsignedShort();
-        _numColorRecords = di.readUnsignedShort();
-        _offsetFirstColorRecord = di.readInt();
+        int numPalette = di.readUnsignedShort();
+        int numColorRecords = di.readUnsignedShort();
+        int offsetFirstColorRecord = di.readInt();
 
         int byteCount = 12;
-        _colorRecordIndices = new int[_numPalette];
-        for (int i = 0; i < _numPalette; ++i) {
+        _colorRecordIndices = new int[numPalette];
+        for (int i = 0; i < numPalette; ++i) {
             _colorRecordIndices[i] = di.readUnsignedShort();
             byteCount += 2;
         }
-        if (_version == 1) {
-            _offsetPaletteTypeArray = di.readInt();
-            _offsetPaletteLabelArray = di.readInt();
-            _offsetPaletteEntryLabelArray = di.readInt();
+        
+        int offsetPaletteTypeArray;
+        int offsetPaletteLabelArray;
+        int offsetPaletteEntryLabelArray;
+        if (_version == VERSION_1) {
+            offsetPaletteTypeArray = di.readInt();
+            offsetPaletteLabelArray = di.readInt();
+            offsetPaletteEntryLabelArray = di.readInt();
             byteCount += 12;
         } else {
-            _offsetPaletteTypeArray = -1;
-            _offsetPaletteLabelArray = -1;
-            _offsetPaletteEntryLabelArray = -1;
+            offsetPaletteTypeArray = -1;
+            offsetPaletteLabelArray = -1;
+            offsetPaletteEntryLabelArray = -1;
         }
 
-        if (_offsetFirstColorRecord > byteCount) {
-            di.skipBytes(byteCount - _offsetFirstColorRecord);
+        if (offsetFirstColorRecord > byteCount) {
+            di.skipBytes(byteCount - offsetFirstColorRecord);
         }
 
-        _colorRecords = new ColorRecord[_numColorRecords];
-        for (int i = 0; i < _numColorRecords; ++i) {
-            _colorRecords[i] = new ColorRecord(di);
+        _colorRecords.ensureCapacity(numColorRecords);
+        for (int i = 0; i < numColorRecords; ++i) {
+            _colorRecords.add(new ColorRecord(di));
         }
 
-        if (_version == 1) {
+        if (_version == VERSION_1) {
             // TODO find some sample version 1 content
         }
     }
@@ -108,6 +122,9 @@ class CpalTable implements Table {
         return CPAL;
     }
 
+    /**
+     * Number of palette entries in each palette.
+     */
     public int getNumPalettesEntries() {
         return _numPalettesEntries;
     }

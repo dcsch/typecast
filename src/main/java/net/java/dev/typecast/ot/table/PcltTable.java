@@ -12,55 +12,59 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
+ * PCLT - PCL 5 Table
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/pclt">Spec: PCL 5 Table</a>
  */
-class PcltTable implements Table {
-
-    private int version;
-    private long fontNumber;
-    private int pitch;
-    private int xHeight;
-    private int style;
-    private int typeFamily;
-    private int capHeight;
-    private int symbolSet;
-    private final char[] typeface = new char[16];
-    private final short[] characterComplement = new short[8];
-    private final char[] fileName = new char[6];
-    private short strokeWeight;
-    private short widthType;
-    private byte serifStyle;
-    private byte reserved;
+public class PcltTable implements Table {
 
     /**
-     * Creates new PcltTable
-     * 
-     * @param length
-     *        Total number of bytes.
+     * Version 1.0 of {@link PcltTable}.
      */
-    protected PcltTable(DataInput di, int length) throws IOException {
-        version = di.readInt();
-        fontNumber = di.readInt();
-        pitch = di.readUnsignedShort();
-        xHeight = di.readUnsignedShort();
-        style = di.readUnsignedShort();
-        typeFamily = di.readUnsignedShort();
-        capHeight = di.readUnsignedShort();
-        symbolSet = di.readUnsignedShort();
+    public static final int VERSION_1_0 = 0x00010000;
+    
+    private int _version = VERSION_1_0;
+    private long _fontNumber;
+    private int _pitch;
+    private int _xHeight;
+    private int _style;
+    private int _typeFamily;
+    private int _capHeight;
+    private int _symbolSet;
+    private final char[] _typeface = new char[16];
+    private final short[] _characterComplement = new short[8];
+    private final char[] _fileName = new char[6];
+    private short _strokeWeight;
+    private short _widthType;
+    private byte _serifStyle;
+
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        _fontNumber = di.readInt();
+        _pitch = di.readUnsignedShort();
+        _xHeight = di.readUnsignedShort();
+        _style = di.readUnsignedShort();
+        _typeFamily = di.readUnsignedShort();
+        _capHeight = di.readUnsignedShort();
+        _symbolSet = di.readUnsignedShort();
         for (int i = 0; i < 16; i++) {
-            typeface[i] = (char) di.readUnsignedByte();
+            _typeface[i] = (char) di.readUnsignedByte();
         }
         for (int i = 0; i < 8; i++) {
-            characterComplement[i] = (short) di.readUnsignedByte();
+            _characterComplement[i] = (short) di.readUnsignedByte();
         }
         for (int i = 0; i < 6; i++) {
-            fileName[i] = (char) di.readUnsignedByte();
+            _fileName[i] = (char) di.readUnsignedByte();
         }
-        strokeWeight = (short) di.readUnsignedByte();
-        widthType = (short) di.readUnsignedByte();
-        serifStyle = di.readByte();
-        reserved = di.readByte();
+        _strokeWeight = (short) di.readUnsignedByte();
+        _widthType = (short) di.readUnsignedByte();
+        _serifStyle = di.readByte();
+        
+        // Reserved.
+        di.readByte();
     }
 
     @Override
@@ -68,25 +72,25 @@ class PcltTable implements Table {
         return PCLT;
     }
 
+    @Override
     public String toString() {
         return "'PCLT' Table - Printer Command Language Table\n---------------------------------------------" +
-                "\n        version:             0x" + Integer.toHexString(version).toUpperCase() +
-                "\n        fontNumber:          " + fontNumber + " (0x" + Long.toHexString(fontNumber).toUpperCase() +
-                ")\n        pitch:               " + pitch +
-                "\n        xHeight:             " + xHeight +
-                "\n        style:               0x" + style +
-                "\n        typeFamily:          0x" + (typeFamily >> 12) +
-                " " + (typeFamily & 0xfff) +
-                "\n        capHeight:           " + capHeight +
-                "\n        symbolSet:           " + symbolSet +
-                "\n        typeFace:            " + new String(typeface) +
+                "\n        version:             0x" + Integer.toHexString(_version).toUpperCase() +
+                "\n        fontNumber:          " + _fontNumber + " (0x" + Long.toHexString(_fontNumber).toUpperCase() +
+                ")\n        pitch:               " + _pitch +
+                "\n        xHeight:             " + _xHeight +
+                "\n        style:               0x" + _style +
+                "\n        typeFamily:          0x" + (_typeFamily >> 12) +
+                " " + (_typeFamily & 0xfff) +
+                "\n        capHeight:           " + _capHeight +
+                "\n        symbolSet:           " + _symbolSet +
+                "\n        typeFace:            " + new String(_typeface) +
                 "\n        characterComplement  0x" +
-                Integer.toHexString(characterComplement[0]).toUpperCase() +
-                "\n        fileName:            " + new String(fileName) +
-                "\n        strokeWeight:        " + strokeWeight +
-                "\n        widthType:           " + widthType +
-                "\n        serifStyle:          " + serifStyle +
-                "\n        reserved:            " + reserved;
+                Integer.toHexString(_characterComplement[0]).toUpperCase() +
+                "\n        fileName:            " + new String(_fileName) +
+                "\n        strokeWeight:        " + _strokeWeight +
+                "\n        widthType:           " + _widthType +
+                "\n        serifStyle:          " + _serifStyle;
     }
 
 }

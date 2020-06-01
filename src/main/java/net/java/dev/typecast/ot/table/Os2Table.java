@@ -82,7 +82,8 @@ public class Os2Table implements Table, Writable {
     public static final int VERSION_4 = 4;
     public static final int VERSION_5 = 5;
     
-    private int _version;
+    private int _version = VERSION_5;
+    
     private short _xAvgCharWidth;
     private int _usWeightClass;
     private int _usWidthClass;
@@ -122,7 +123,8 @@ public class Os2Table implements Table, Writable {
     private int _usLowerOpticalPointSize;
     private int _usUpperOpticalPointSize;
 
-    public Os2Table(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
         _xAvgCharWidth = di.readShort();
         _usWeightClass = di.readUnsignedShort();

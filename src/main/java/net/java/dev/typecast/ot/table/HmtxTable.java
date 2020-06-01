@@ -58,7 +58,7 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fmt;
 
 /**
- * Horizontal Metrics Table
+ * hmtx — Horizontal Metrics Table
  * 
  * <p>
  * Glyph metrics used for horizontal text layout include glyph advance widths,
@@ -129,11 +129,11 @@ import net.java.dev.typecast.ot.Fmt;
  * derived from numberOfHMetrics plus the numGlyphs field in the 'maxp' table.
  * </p>
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/hmtx"
- * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/hmtx">Spec: Horizontal Metrics Table</a>
  */
-public class HmtxTable implements Table, Writable {
+public class HmtxTable extends AbstractTable implements Writable {
 
     private int[] _advanceWidth;
     private short[] _leftSideBearing;
@@ -141,28 +141,19 @@ public class HmtxTable implements Table, Writable {
 
     /**
      * Creates a {@link HmtxTable}.
-     *
-     * @param di
-     *        The reader to read from.
-     * @param length
-     *        The length of the table in bytes.
-     * @param hhea
-     *        The corresponding {@link HheaTable}.
-     * @param maxp
-     *        The corresponding {@link MaxpTable}.
      */
-    public HmtxTable(
-            DataInput di,
-            int length,
-            HheaTable hhea,
-            MaxpTable maxp) throws IOException {
-        
-        int numberOfHMetrics = hhea.getNumberOfHMetrics();
+    public HmtxTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numberOfHMetrics = hhea().getNumberOfHMetrics();
         _advanceWidth = new int[numberOfHMetrics];
         
         // Left side bearings for glyph IDs greater than or equal to
         // numberOfHMetrics.
-        int numGlyphs = maxp.getNumGlyphs();
+        int numGlyphs = maxp().getNumGlyphs();
         _leftSideBearing = new short[numGlyphs];
 
         // Paired advance width and left side bearing values for each glyph.

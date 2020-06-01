@@ -17,10 +17,13 @@
  */
 package net.java.dev.typecast.ot.table;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.io.Writer;
 
 /**
+ * Base interface for all True Type Font tables.
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public interface Table {
@@ -69,6 +72,18 @@ public interface Table {
      * The type code of this {@link Table}.
      */
     int getType();
+
+    /**
+     * Reads this table from the given input source.
+     *
+     * @param di
+     *        The input to read from.
+     * @param length
+     *        The total length of the table in bytes.
+     * @throws IOException
+     *         If reading fails.
+     */
+    void read(DataInput di, int length) throws IOException;
 
     /** 
      * Writes full debug information to the given writer.

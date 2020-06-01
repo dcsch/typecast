@@ -64,7 +64,7 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.table.NameRecord.StringOut;
 
 /**
- * Naming Table
+ * name — Naming Table
  * 
  * <p>
  * The naming table allows multilingual strings to be associated with the
@@ -81,23 +81,26 @@ import net.java.dev.typecast.ot.table.NameRecord.StringOut;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/name"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/name">Spec: Naming Table</a>
  */
 public class NameTable implements Table, Writable {
 
-    private short _format;
+    /**
+     * Format 0 of {@link NameTable}.
+     */
+    public static final short FORMAT_0 = 0;
+
+    /**
+     * Format 1 of {@link NameTable}.
+     */
+    public static final short FORMAT_1 = 1;
+    
+    private short _format = FORMAT_1;
     private short _stringOffset;
     private NameRecord[] _records;
 
-    /**
-     * Creates a {@link NameTable} from the given input.
-     *
-     * @param di
-     *        the input to read from.
-     * @param length
-     *        The total length of the table.
-     */
-    public NameTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _format = di.readShort();
         int count = di.readUnsignedShort();
         _stringOffset = di.readShort();

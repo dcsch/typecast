@@ -10,50 +10,83 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
+ * DSIG — Digital Signature Table
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/dsig">Spec: Digital Signature Table</a>
  */
-class DsigTable implements Table {
+public class DsigTable implements Table {
 
-    private int version;
-    private int numSigs;
-    private int flag;
-    private DsigEntry[] dsigEntry;
-    private SignatureBlock[] sigBlocks;
+    private static final int VERSION_1 = 0x00000001;
+    
+    private int _version = VERSION_1;
+    private int _flag;
+    private final ArrayList<DsigEntry> _dsigEntry = new ArrayList<>();
 
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        int numSigs = di.readUnsignedShort();
+        _flag = di.readUnsignedShort();
+        _dsigEntry.ensureCapacity(numSigs);
+        for (int i = 0; i < numSigs; i++) {
+            _dsigEntry.add(new DsigEntry(di));
+        }
+        for (int i = 0; i < numSigs; i++) {
+            _dsigEntry.get(i).setSignature(new SignatureBlock(di));
+        }
+    }
+    
     /**
-     * Creates {@link DsigTable} from the given input.
-     * 
-     * @param di
-     *        The input to read.
-     * @param length
-     *        The total number of bytes.
+     * Version of the {@link DsigTable}.
      */
-    protected DsigTable(DataInput di, int length) throws IOException {
-        version = di.readInt();
-        numSigs = di.readUnsignedShort();
-        flag = di.readUnsignedShort();
-        dsigEntry = new DsigEntry[numSigs];
-        sigBlocks = new SignatureBlock[numSigs];
-        for (int i = 0; i < numSigs; i++) {
-            dsigEntry[i] = new DsigEntry(di);
-        }
-        for (int i = 0; i < numSigs; i++) {
-            sigBlocks[i] = new SignatureBlock(di);
-        }
+    public int getVersion() {
+        return _version;
     }
 
     @Override
     public int getType() {
         return DSIG;
     }
+    
+    /**
+     * Permission flags Bit 0: cannot be resigned, Bits 1-7: Reserved (Set to 0)
+     */
+    public int getFlags() {
+        return _flag;
+    }
 
+    /** 
+     * Number of signature blocks.
+     * 
+     * @see #getSignature(int)
+     */
+    public int getNumSigs() {
+        return _dsigEntry.size();
+    }
+
+    /** 
+     * The {@link SignatureBlock} with the given index.
+     * 
+     * @see #getNumSigs()
+     */
+    public SignatureBlock getSignature(int i) {
+        return _dsigEntry.get(i).getSignature();
+    }
+
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("DSIG\n");
-        for (int i = 0; i < numSigs; i++) {
-            sb.append(sigBlocks[i].toString());
+        StringBuilder sb = new StringBuilder();
+        sb.append("DSIG table\n");
+        sb.append("----------\n");
+        sb.append("    version = " + getVersion() + "\n");
+        sb.append("    flags   = " + getVersion() + "\n");
+        for (int i = 0; i < getNumSigs(); i++) {
+            sb.append(getSignature(i).toString());
         }
         return sb.toString();
     }

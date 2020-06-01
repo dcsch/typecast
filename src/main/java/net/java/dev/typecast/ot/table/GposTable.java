@@ -22,20 +22,23 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
- * Glyph Positioning Table
+ * GPOS — Glyph Positioning Table
  * 
  * TODO: To be implemented
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/gpos">Spec: Glyph Positioning Table</a>
  */
-class GposTable implements Table {
+public class GposTable implements Table {
 
     private int _version;
     private int _scriptList;
     private int _featureList;
     private int _lookupList;
 
-    protected GposTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readInt();
         _scriptList = di.readInt();
         _featureList = di.readInt();

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.java.dev.typecast.cff.CffFont;
 import net.java.dev.typecast.cff.Index;
@@ -60,37 +61,30 @@ import net.java.dev.typecast.cff.TopDictIndex;
  * in the font.
  * </p>
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/cff"
- * @see "https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf"
- * @see "https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf"
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/cff">Spec: Compact Font Format table</a>
+ * @see <a href="https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf">Adobe Technical Note #5176: The Compact Font Format Specification</a>
+ * @see <a href="https://wwwimages2.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf">Adobe Technical Note #5177: Type 2 Charstring Format</a>
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CffTable implements Table {
     
-    private final int _major;
-    private final int _minor;
-    private final int _hdrSize;
-    private final int _offSize;
-    private final NameIndex _nameIndex;
-    private final TopDictIndex _topDictIndex;
-    private final StringIndex _stringIndex;
-    private final Index _globalSubrIndex;
-    private final CffFont[] _fonts;
+    private int _major;
+    private int _minor;
+    private int _hdrSize;
+    private int _offSize;
+    private NameIndex _nameIndex;
+    private TopDictIndex _topDictIndex;
+    private StringIndex _stringIndex;
+    private Index _globalSubrIndex;
+    private final ArrayList<CffFont> _fonts = new ArrayList<>();
 
-    private final byte[] _buf;
-
-    /** Creates a new instance of {@link CffTable}
-     * 
-     * @param di
-     * @param length
-     * @throws java.io.IOException */
-    protected CffTable(DataInput di, int length) throws IOException {
-
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         // Load entire table into a buffer, and create another input stream
-        _buf = new byte[length];
-        di.readFully(_buf);
-        DataInput di2 = getDataInputForOffset(0);
+        byte[] buf = new byte[length];
+        di.readFully(buf);
+        DataInput di2 = getDataInputForOffset(buf, 0);
 
         // Header
         _major = di2.readUnsignedByte();
@@ -99,7 +93,7 @@ public class CffTable implements Table {
         _offSize = di2.readUnsignedByte();
         
         // Name INDEX
-        di2 = getDataInputForOffset(_hdrSize);
+        di2 = getDataInputForOffset(buf, _hdrSize);
         _nameIndex = new NameIndex(di2);
         
         // Top DICT INDEX
@@ -126,16 +120,16 @@ public class CffTable implements Table {
         // within the CFF data.
         
         // Load each of the fonts
-        _fonts = new CffFont[_topDictIndex.getCount()];
+        _fonts.ensureCapacity(_topDictIndex.getCount());
         for (int i = 0; i < _topDictIndex.getCount(); ++i) {
-            _fonts[i] = new CffFont(this, i, _topDictIndex.getTopDict(i));
+            _fonts.add(new CffFont(this, buf, i, _topDictIndex.getTopDict(i)));
         }
     }
     
-    public final DataInput getDataInputForOffset(int offset) {
+    public static DataInput getDataInputForOffset(byte[] buf, int offset) {
         return new DataInputStream(new ByteArrayInputStream(
-                _buf, offset,
-                _buf.length - offset));
+                buf, offset,
+                buf.length - offset));
     }
     
     @Override
@@ -154,9 +148,13 @@ public class CffTable implements Table {
     public Index getGlobalSubrIndex() {
         return _globalSubrIndex;
     }
+    
+    public int getNumFonts() {
+        return _fonts.size();
+    }
 
     public CffFont getFont(int fontIndex) {
-        return _fonts[fontIndex];
+        return _fonts.get(fontIndex);
     }
 
     @Override
@@ -171,9 +169,9 @@ public class CffTable implements Table {
         sb.append(_stringIndex.toString());
         sb.append("\nGlobal Subr INDEX\n");
         sb.append(_globalSubrIndex.toString());
-        for (int i = 0; i < _fonts.length; ++i) {
+        for (int i = 0; i < getNumFonts(); ++i) {
             sb.append("\nCharStrings INDEX ").append(i).append("\n");
-            sb.append(_fonts[i].getCharStringsIndex().toString());
+            sb.append(getFont(i).getCharStringsIndex().toString());
         }
         return sb.toString();
     }

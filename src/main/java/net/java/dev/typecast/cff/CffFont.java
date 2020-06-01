@@ -20,9 +20,13 @@ package net.java.dev.typecast.cff;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.List;
+
 import net.java.dev.typecast.ot.table.CffTable;
 
 /**
+ * CFF font in a {@link CffTable}.
+ * 
+ * @see CffTable#getFont(int)
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -37,7 +41,7 @@ public class CffFont {
     private final Charstring[] _charstrings;
 
     public CffFont(
-            CffTable table,
+            CffTable table, byte[] buf,
             int index,
             Dict topDict) throws IOException {
         _table = table;
@@ -47,19 +51,19 @@ public class CffFont {
         // We load this before Charsets because we may need to know the number
         // of glyphs
         Integer charStringsOffset = (Integer) _topDict.getValue(17);
-        DataInput di = _table.getDataInputForOffset(charStringsOffset);
+        DataInput di = CffTable.getDataInputForOffset(buf, charStringsOffset);
         _charStringsIndex = new Index(di);
         int glyphCount = _charStringsIndex.getCount();
 
         // Private DICT
         List<Integer> privateSizeAndOffset = (List<Integer>) _topDict.getValue(18);
-        di = _table.getDataInputForOffset(privateSizeAndOffset.get(1));
+        di = CffTable.getDataInputForOffset(buf, privateSizeAndOffset.get(1));
         _privateDict = new Dict(di, privateSizeAndOffset.get(0));
 
         // Local Subrs INDEX
         Integer localSubrsOffset = (Integer) _privateDict.getValue(19);
         if (localSubrsOffset != null) {
-            di = table.getDataInputForOffset(privateSizeAndOffset.get(1) + localSubrsOffset);
+            di = CffTable.getDataInputForOffset(buf, privateSizeAndOffset.get(1) + localSubrsOffset);
             _localSubrIndex = new Index(di);
         } else {
             _localSubrIndex = null;
@@ -68,7 +72,7 @@ public class CffFont {
 
         // Charsets
         Integer charsetOffset = (Integer) _topDict.getValue(15);
-        di = table.getDataInputForOffset(charsetOffset);
+        di = CffTable.getDataInputForOffset(buf, charsetOffset);
         int format = di.readUnsignedByte();
         switch (format) {
             case 0:
@@ -93,7 +97,7 @@ public class CffFont {
             _charstrings[i] = new CharstringType2(
                     this,
                     index,
-                    table.getStringIndex().getString(_charset.getSID(i)),
+                    _table.getStringIndex().getString(_charset.getSID(i)),
                     _charStringsIndex.getData(),
                     offset,
                     len);

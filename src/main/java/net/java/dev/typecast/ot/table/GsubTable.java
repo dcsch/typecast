@@ -62,19 +62,26 @@ import java.io.IOException;
  */
 public class GsubTable implements Table, LookupSubtableFactory {
 
+    /**
+     * Version 1.0 of {@link GsubTable}.
+     */
+    public static final int VERSION_1_0 = 0x00010000;
+
+    private int _version = VERSION_1_0;
+    
     private ScriptList _scriptList;
     private FeatureList _featureList;
     private LookupList _lookupList;
     
-    protected GsubTable(DataInput di, int length) throws IOException {
-
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         // Load into a temporary buffer, and create another input stream
         byte[] buf = new byte[length];
         di.readFully(buf);
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(buf));
 
         // GSUB Header
-        int version = dis.readInt();
+        _version = dis.readInt();
         int scriptListOffset = dis.readUnsignedShort();
         int featureListOffset = dis.readUnsignedShort();
         int lookupListOffset = dis.readUnsignedShort();
@@ -128,6 +135,13 @@ public class GsubTable implements Table, LookupSubtableFactory {
     @Override
     public int getType() {
         return GSUB;
+    }
+    
+    /**
+     * Major, minor version as high and low word.
+     */
+    public int getVersion() {
+        return _version;
     }
 
     public ScriptList getScriptList() {

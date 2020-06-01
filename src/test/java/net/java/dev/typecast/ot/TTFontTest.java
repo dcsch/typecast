@@ -73,6 +73,12 @@ public class TTFontTest extends TestCase {
         dumpFont("Gilbert-Color Bold Preview5", font);
     }
     
+    public void testCreateFont() throws IOException {
+        TTFont font = new TTFont();
+        font.addTable(new HeadTable());
+        dumpFont("created-font", font);
+    }
+    
     private void dumpFont(String name, TTFont font)
             throws IOException, FileNotFoundException {
         new File("target/tmp").mkdirs();

@@ -60,7 +60,7 @@ import net.java.dev.typecast.ot.Fixed;
 import net.java.dev.typecast.ot.LongDateTime;
 
 /**
- * Font Header Table
+ * head — Font Header Table
  * 
  * This table gives global information about the font. The bounding box values
  * ({@link #getXMin()}, {@link #getXMax()}, {@link #getYMin()},
@@ -68,9 +68,9 @@ import net.java.dev.typecast.ot.LongDateTime;
  * Glyphs with no contours should be ignored for the purposes of these
  * calculations.
  * 
- * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/head"
- * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/head">Spec: Font Header Table</a>
  */
 public class HeadTable implements Table, Writable {
     
@@ -220,13 +220,8 @@ public class HeadTable implements Table, Writable {
 
     private long _checkSumAdjustmentPos;
 
-    /**
-     * Creates a {@link HeadTable} from binary encoding.
-     * 
-     * @param length
-     *        The total number of bytes.
-     */
-    public HeadTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _majorVersion = di.readUnsignedShort();
         _minorVersion = di.readUnsignedShort();
         _fontRevision = di.readInt();

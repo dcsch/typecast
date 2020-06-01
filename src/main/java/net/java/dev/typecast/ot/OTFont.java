@@ -38,23 +38,31 @@ import net.java.dev.typecast.ot.table.TableDirectory;
 import net.java.dev.typecast.ot.table.VheaTable;
 
 /**
- * The TrueType font.
+ * OpenType font.
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class OTFont {
 
-    private Os2Table _os2;
-    private CmapTable _cmap;
-    private HeadTable _head;
-    private HheaTable _hhea;
-    private HmtxTable _hmtx;
-    private MaxpTable _maxp;
-    private NameTable _name;
-    private PostTable _post;
-    private VheaTable _vhea;
-    private GsubTable _gsub;
-    private TableDirectory _tableDirectory;
-
+    private final TableDirectory _tableDirectory;
+    
+    /** 
+     * Creates a {@link OTFont}.
+     */
+    public OTFont() {
+        _tableDirectory = new TableDirectory(this);
+    }
+    
+    /**
+     * Creates a {@link OTFont} from the given binary font file data.
+     * 
+     * @see #read(byte[], int)
+     */
+    public OTFont(byte[] fontData, int tablesOrigin) throws IOException {
+        this();
+        read(fontData, tablesOrigin);
+    }
+    
     /**
      * @param fontData OpenType/TrueType font file data.
      * @param directoryOffset The Table Directory offset within the file.  For a
@@ -67,8 +75,8 @@ public abstract class OTFont {
      * individual font resource data.
      * @throws java.io.IOException
      */
-    OTFont(byte[] fontData, int tablesOrigin) throws IOException {
-        _tableDirectory = new TableDirectory(fontData);
+    public void read(byte[] fontData, int tablesOrigin) throws IOException {
+        _tableDirectory.read(fontData);
 
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         dis.mark(fontData.length);
@@ -77,25 +85,25 @@ public abstract class OTFont {
         // Load some prerequisite tables
         // (These are tables that are referenced by other tables, so we need to load
         // them first)
-        _head = (HeadTable) initTable(dis, tablesOrigin, Table.head);
+        initTable(dis, tablesOrigin, Table.head);
 
         // 'hhea' is required by 'hmtx'
-        _hhea = (HheaTable) initTable(dis, tablesOrigin, Table.hhea);
+        initTable(dis, tablesOrigin, Table.hhea);
 
         // 'maxp' is required by 'glyf', 'hmtx', 'loca', and 'vmtx'
-        _maxp = (MaxpTable) initTable(dis, tablesOrigin, Table.maxp);
+        initTable(dis, tablesOrigin, Table.maxp);
         
         // 'vhea' is required by 'vmtx'
-        _vhea = (VheaTable) initTable(dis, tablesOrigin, Table.vhea);
+        initTable(dis, tablesOrigin, Table.vhea);
 
         // 'post' is required by 'glyf'
-        _post = (PostTable) initTable(dis, tablesOrigin, Table.post);
+        initTable(dis, tablesOrigin, Table.post);
 
         // Load all the other required tables
-        _cmap = (CmapTable) initTable(dis, tablesOrigin, Table.cmap);
-        _hmtx = (HmtxTable) initTable(dis, tablesOrigin, Table.hmtx);
-        _name = (NameTable) initTable(dis, tablesOrigin, Table.name);
-        _os2 = (Os2Table) initTable(dis, tablesOrigin, Table.OS_2);
+        initTable(dis, tablesOrigin, Table.cmap);
+        initTable(dis, tablesOrigin, Table.hmtx);
+        initTable(dis, tablesOrigin, Table.name);
+        initTable(dis, tablesOrigin, Table.OS_2);
     }
     
     public void write(BinaryIO out) throws IOException {
@@ -108,57 +116,77 @@ public abstract class OTFont {
     public TableDirectory getTableDirectory() {
         return _tableDirectory;
     }
+    
+    /**
+     * Adds the given {@link Table} to this font.
+     * 
+     * <p>
+     * If a {@link Table} with the same {@link Table#getType()} is already
+     * present in this font, it is removed and returned.
+     * </p>
+     *
+     * @param table
+     * @return The {@link Table} with the same {@link Table#getType()} that was
+     *         part of this font before.
+     */
+    public Table addTable(Table table) {
+        return getTableDirectory().addTable(table);
+    }
+    
+    public Table removeTable(int tag) {
+        return getTableDirectory().removeTable(tag);
+    }
 
     public Os2Table getOS2Table() {
-        return _os2;
+        return getTableDirectory().os2();
     }
     
     public CmapTable getCmapTable() {
-        return _cmap;
+        return getTableDirectory().cmap();
     }
     
     public HeadTable getHeadTable() {
-        return _head;
+        return getTableDirectory().head();
     }
     
     public HheaTable getHheaTable() {
-        return _hhea;
+        return getTableDirectory().hhea();
     }
     
     public HmtxTable getHmtxTable() {
-        return _hmtx;
+        return getTableDirectory().hmtx();
     }
     
     MaxpTable getMaxpTable() {
-        return _maxp;
+        return getTableDirectory().maxp();
     }
 
     public NameTable getNameTable() {
-        return _name;
+        return getTableDirectory().name();
     }
 
     public PostTable getPostTable() {
-        return _post;
+        return getTableDirectory().post();
     }
 
     public VheaTable getVheaTable() {
-        return _vhea;
+        return getTableDirectory().vhea();
     }
 
     public GsubTable getGsubTable() {
-        return _gsub;
+        return getTableDirectory().gsub();
     }
 
     public int getAscent() {
-        return _hhea.getAscender();
+        return getHheaTable().getAscender();
     }
 
     public int getDescent() {
-        return _hhea.getDescender();
+        return getHheaTable().getDescender();
     }
 
     public int getNumGlyphs() {
-        return _maxp.getNumGlyphs();
+        return getMaxpTable().getNumGlyphs();
     }
 
     public abstract Glyph getGlyph(int i);
@@ -169,12 +197,12 @@ public abstract class OTFont {
         if (entry == null) {
             return null;
         }
-        
         return entry.initTable(dis, tablesOrigin);
     }
 
+    @Override
     public String toString() {
-        return _head.toString();
+        return getHeadTable().toString();
     }
     
     /**

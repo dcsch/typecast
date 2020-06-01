@@ -21,16 +21,24 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.java.dev.typecast.ot.Bits;
+
 /**
- * This table provides access to bitmap data in a standard graphics format
- * (such as PNG, JPEG, TIFF).
+ * sbix — Standard Bitmap Graphics Table
+ * 
+ * Provides access to bitmap data in a standard graphics format (such as PNG,
+ * JPEG, TIFF).
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/sbix">Spec: Standard Bitmap Graphics Table</a>
  */
-public class SbixTable implements Table {
+public class SbixTable extends AbstractTable {
 
     public static class GlyphDataRecord {
         private final short _originOffsetX;
@@ -106,17 +114,31 @@ public class SbixTable implements Table {
             return String.format("ppem: %d, resolution: %d", _ppem, _resolution);
         }
     }
+
+    /**
+     * Version 1 of {@link SbixTable}.
+     */
+    public static final int VERSION_1 = 1;
+
+    private static final int FLAGS_BASE = 0x0001;
     
-    private final int _version;
-    private final int _flags;
-    private final int _numStrikes;
-    private final int[] _strikeOffset;
-    private final Strike[] _strikes;
+    private static final int FLAG_OUTLINE = 0x0002;
+
+    private int _version = VERSION_1;
+    private int _flags = FLAGS_BASE;
+    private final ArrayList<Strike> _strikes = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(SbixTable.class);
 
-    protected SbixTable(DataInput di, int length, MaxpTable maxp) throws IOException {
-
+    /**
+     * Creates a {@link SbixTable}.
+     */
+    public SbixTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         // Load entire table into a buffer, and create another input stream
         byte[] buf = new byte[length];
         di.readFully(buf);
@@ -124,16 +146,17 @@ public class SbixTable implements Table {
 
         _version = di2.readUnsignedShort();
         _flags = di2.readUnsignedShort();
-        _numStrikes = di2.readInt();
-        _strikeOffset = new int[_numStrikes];
-        for (int i = 0; i < _numStrikes; ++i) {
+        int numStrikes = di2.readInt();
+        int[] _strikeOffset = new int[numStrikes];
+        for (int i = 0; i < numStrikes; ++i) {
             _strikeOffset[i] = di2.readInt();
         }
         
-        _strikes = new Strike[_numStrikes];
-        for (int i = 0; i < _numStrikes; ++i) {
+        int numGlyphs = maxp().getNumGlyphs();
+        _strikes.ensureCapacity(numStrikes);
+        for (int i = 0; i < numStrikes; ++i) {
             ByteArrayInputStream bais = getByteArrayInputStreamForOffset(buf, _strikeOffset[i]);
-            _strikes[i] = new Strike(bais, maxp.getNumGlyphs());
+            _strikes.add(new Strike(bais, numGlyphs));
         }
     }
 
@@ -147,9 +170,46 @@ public class SbixTable implements Table {
     public int getType() {
         return sbix;
     }
+    
+    /**
+     * Table version number
+     */
+    public int getVersion() {
+        return _version;
+    }
+    
+    /**
+     * Bit 0: Set to 1.
+     * Bit 1: Draw outlines.
+     * Bits 2 to 15: reserved (set to 0).
+     */
+    public int getFlags() {
+        return _flags;
+    }
+    
+    /**
+     * Whether to draw the bitmap and the outline, only bitmaps otherwis.
+     */
+    public boolean getDrawBitmapAndOutline() {
+        return Bits.isSet(_flags, FLAG_OUTLINE);
+    }
+    
+    /**
+     * Number of {@link Strike}s.
+     * 
+     * @see #getStrike(int)
+     */
+    public int getNumStrikes() {
+        return _strikes.size();
+    }
 
-    public Strike[] getStrikes() {
-        return _strikes;
+    /**
+     * {@link Strike} with the given index.
+     * 
+     * @see #getNumStrikes()
+     */
+    public Strike getStrike(int index) {
+        return _strikes.get(index);
     }
 
 }

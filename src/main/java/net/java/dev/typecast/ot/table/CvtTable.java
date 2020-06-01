@@ -22,11 +22,12 @@ import net.java.dev.typecast.ot.Fmt;
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class CvtTable implements Table, Writable {
+public class CvtTable implements Table, Writable {
 
-    private final short[] values;
+    private short[] values;
 
-    protected CvtTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         int len = length / 2;
         values = new short[len];
         for (int i = 0; i < len; i++) {

@@ -56,7 +56,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,6 +64,7 @@ import net.java.dev.typecast.io.BinaryIO;
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fixed;
+import net.java.dev.typecast.ot.OTFont;
 
 /**
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
@@ -74,23 +74,49 @@ public class TableDirectory {
     /**
      * Table Record entry.
      */
-    public class Entry {
+    public static class Entry {
 
-        private int _tag;
+        private final TableDirectory _directory;
+        private final int _tag;
         private int _checksum;
         private int _offset;
         private int _length;
         private Table _table;
         
         long _checkSumPos;
-
-        Entry(DataInput di) throws IOException {
-            _tag = di.readInt();
+        
+        /** 
+         * Creates a {@link TableDirectory.Entry}.
+         */
+        public Entry(TableDirectory directory, int tag) {
+            _directory = directory;
+            _tag = tag;
+        }
+        
+        /**
+         * Reads an {@link Entry} from the given input.
+         */
+        public static Entry readFrom(TableDirectory directory, DataInput di) throws IOException {
+            int tag = di.readInt();
+            
+            Entry result = new Entry(directory, tag);
+            result.read(di);
+            return result;
+        }
+        
+        private void read(DataInput di) throws IOException {
             _checksum = di.readInt();
             _offset = di.readInt();
             _length = di.readInt();
         }
         
+        /**
+         * The owning {@link TableDirectory}.
+         */
+        public TableDirectory getDirectory() {
+            return _directory;
+        }
+
         void updateOffset(int offset, int length) {
             _offset = offset;
             _length = length;
@@ -196,92 +222,101 @@ public class TableDirectory {
             return _table;
         }
         
-        /** 
-         * @see #getTable()
-         */
-        public void setTable(Table table) {
+        Table setTable(Table table) {
+            Table before = _table;
             _table = table;
+            getDirectory().cacheTable(getTag(), table);
+            return before;
         }
 
         Table readTable(DataInputStream di) throws IOException {
+            Table table = createTable();
+            if (table != null) {
+                table.read(di, getLength());
+            }
+            return table;
+        }
+
+        private Table createTable() {
             switch (getTag()) {
                 case Table.CFF:
                     // TODO: Implemented but does not work.
                     // return new CffTable(di, getLength());
                     return null;
                 case Table.cmap:
-                    return new CmapTable(di, getLength());
+                    return new CmapTable();
                 case Table.COLR:
-                    return new ColrTable(di, getLength());
+                    return new ColrTable();
                 case Table.CPAL:
-                    return new CpalTable(di, getLength());
+                    return new CpalTable();
                 case Table.cvt:
-                    return new CvtTable(di, getLength());
+                    return  new CvtTable();
                 case Table.DSIG:
-                    return new DsigTable(di, getLength());
+                    return new DsigTable();
                 case Table.EBDT:
                 case Table.EBLC:
                 case Table.EBSC:
                     // TODO: Not supported.
                     return null;
                 case Table.fpgm:
-                    return new FpgmTable(di, getLength());
+                    return new FpgmTable();
                 case Table.fvar:
                     // TODO: Not supported.
                     return null;
                 case Table.gasp:
-                    return new GaspTable(di, getLength());
+                    return new GaspTable();
                 case Table.GDEF:
-                    return new GdefTable(di, getLength());
-                case Table.glyf:
-                    return new GlyfTable(di, getLength(), maxp(), loca());
+                    return new GdefTable();
+                case Table.glyf: {
+                    return new GlyfTable(getDirectory());
+                }
                 case Table.GPOS:
-                    return new GposTable(di, getLength());
+                    return new GposTable();
                 case Table.GSUB:
-                    return new GsubTable(di, getLength());
+                    return new GsubTable();
                 case Table.hdmx:
-                    return new HdmxTable(di, getLength(), maxp());
+                    return new HdmxTable(getDirectory());
                 case Table.head:
-                    return new HeadTable(di, getLength());
+                    return new HeadTable();
                 case Table.hhea:
-                    return new HheaTable(di, getLength());
+                    return new HheaTable();
                 case Table.hmtx:
-                    return new HmtxTable(di, getLength(), hhea(), maxp());
+                    return new HmtxTable(getDirectory());
                 case Table.JSTF:
                     // TODO: Not supported.
                     return null;
                 case Table.kern:
-                    return new KernTable(di, getLength());
+                    return new KernTable();
                 case Table.loca:
-                    return new LocaTable(di, getLength(), head(), maxp());
+                    return new LocaTable(getDirectory());
                 case Table.LTSH:
-                    return new LtshTable(di, getLength());
+                    return new LtshTable();
                 case Table.maxp:
-                    return new MaxpTable(di, getLength());
+                    return new MaxpTable();
                 case Table.MMFX:
                 case Table.MMSD:
                     // TODO: Not supported.
                     return null;
                 case Table.name:
-                    return new NameTable(di, getLength());
+                    return new NameTable();
                 case Table.OS_2:
-                    return new Os2Table(di, getLength());
+                    return new Os2Table();
                 case Table.PCLT:
-                    return new PcltTable(di, getLength());
+                    return new PcltTable();
                 case Table.post:
-                    return new PostTable(di, getLength());
+                    return new PostTable();
                 case Table.prep:
-                    return new PrepTable(di, getLength());
+                    return new PrepTable();
                 case Table.sbix:
-                    return new SbixTable(di, getLength(), maxp());
+                    return new SbixTable(getDirectory());
                 case Table.svg:
-                    return new SVGTable(di, getLength());
+                    return new SVGTable();
                 case Table.VDMX:
-                    return new VdmxTable(di, getLength());
+                    return new VdmxTable();
                 case Table.vhea:
-                    return new VheaTable(di, getLength());
+                    return new VheaTable();
                 case Table.vmtx:
-                    return new VmtxTable(di, getLength(), vhea(), maxp());
+                    return new VmtxTable(getDirectory());
                 default:
                     // Not supported.
                     return null;
@@ -289,13 +324,19 @@ public class TableDirectory {
         }
 
         public Table initTable(DataInputStream di, int tablesOrigin) throws IOException {
-            if (getTable() == null) {
+            Table table = getTable();
+            if (table == null) {
                 seekTable(di, tablesOrigin, this);
-                Table table = readTable(di);
+                table = readTable(di);
                 setTable(table);
             }
-            
-            return getTable();
+            return table;
+        }
+
+        private Entry seekTable(DataInputStream dis, int tablesOrigin, Entry entry) throws IOException {
+            dis.reset();
+            dis.skip(tablesOrigin + entry.getOffset());
+            return entry;
         }
 
         /**
@@ -309,22 +350,75 @@ public class TableDirectory {
         }
     }
 
+    private final OTFont _font;
+    
     private int _sfntVersion = TRUE_TYPE;
     private short _searchRange;
     private short _entrySelector;
     private short _rangeShift;
-    private Entry[] _entries;
+    
+    private final ArrayList<Entry> _entries = new ArrayList<>();
 
-    public TableDirectory(byte[] fontData) throws IOException {
+    private HeadTable _head;
+
+    private MaxpTable _maxp;
+
+    private LocaTable _loca;
+
+    private GlyfTable _glyf;
+
+    private NameTable _name;
+
+    private HmtxTable _hmtx;
+
+    private GsubTable _gsub;
+
+    private CmapTable _cmap;
+
+    private PostTable _post;
+
+    private Os2Table _os2;
+
+    private HheaTable _hhea;
+
+    private VheaTable _vhea;
+
+    private SVGTable _svg;
+
+    private HdmxTable _hdmx;
+
+    private VdmxTable _vdmx;
+
+    private KernTable _kern;
+
+    private GaspTable _gasp;
+
+    /**
+     * Creates a {@link TableDirectory}.
+     *
+     * @param font See {@link #getFont()}.
+     */
+    public TableDirectory(OTFont font) {
+        _font = font;
+    }
+    
+    /**
+     * The {@link OTFont} this directory belongs to.
+     */
+    public OTFont getFont() {
+        return _font;
+    }
+    
+    public void read(byte[] fontData) throws IOException {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         _sfntVersion = dis.readInt();
         short numTables = dis.readShort();
         _searchRange = dis.readShort();
         _entrySelector = dis.readShort();
         _rangeShift = dis.readShort();
-        _entries = new Entry[numTables];
+        _entries.ensureCapacity(numTables);
         for (int i = 0; i < numTables; i++) {
-            _entries[i] = new Entry(dis);
+            _entries.add(Entry.readFrom(this, dis));
         }
     }
     
@@ -336,38 +430,222 @@ public class TableDirectory {
         // constructed so that information derived from former tables is stored
         // in later ones. While reading this information from latter tables is
         // required for reading former tables.
-        for (int n = _entries.length - 1; n >= 0; n--) {
-            Entry entry = _entries[n];
+        for (int n = _entries.size() - 1; n >= 0; n--) {
+            Entry entry = getEntry(n);
             entry.initTable(di, tablesOrigin);
         }
     }
-
-    LocaTable loca() {
-        return (LocaTable) getEntryByTag(Table.loca).getTable();
+    
+    /**
+     * Adds the given {@link Table} to this {@link TableDirectory}.
+     *
+     * @param table
+     *        The {@link Table} to add.
+     * @return The {@link Table} with the same {@link Table#getType()} that was
+     *         overwritten.
+     */
+    public Table addTable(Table table) {
+        int tag = table.getType();
+        Entry entry = getEntryByTag(tag);
+        if (entry == null) {
+            entry = new Entry(this, tag);
+            _entries.add(entry);
+        }
+        return entry.setTable(table);
+    }
+    
+    /** 
+     * Removes the {@link Table} with the given {@link Table#getType()}.
+     */
+    public Table removeTable(int tag) {
+        return getEntryByTag(tag).setTable(null);
     }
 
-    HheaTable hhea() {
-        return (HheaTable) getEntryByTag(Table.hhea).getTable();
+    void cacheTable(int tag, Table table) {
+        switch (tag) {
+        case Table.head:
+            _head = (HeadTable) table;
+            break;
+        case Table.maxp:
+            _maxp = (MaxpTable) table;
+            break;
+        case Table.loca:
+            _loca = (LocaTable) table;
+            break;
+        case Table.glyf:
+            _glyf = (GlyfTable) table;
+            break;
+        case Table.name:
+            _name = (NameTable) table;
+            break;
+        case Table.hmtx:
+            _hmtx = (HmtxTable) table;
+            break;
+        case Table.GSUB:
+            _gsub = (GsubTable) table;
+            break;
+        case Table.cmap:
+            _cmap = (CmapTable) table;
+            break;
+        case Table.post:
+            _post = (PostTable) table;
+            break;
+        case Table.OS_2:
+            _os2 = (Os2Table) table;
+            break;
+        case Table.hhea:
+            _hhea = (HheaTable) table;
+            break;
+        case Table.vhea:
+            _vhea = (VheaTable) table;
+            break;
+        case Table.svg:
+            _svg = (SVGTable) table;
+            break;
+        case Table.hdmx:
+            _hdmx = (HdmxTable) table;
+            break;
+        case Table.VDMX:
+            _vdmx = (VdmxTable) table;
+            break;
+        case Table.kern:
+            _kern = (KernTable) table;
+            break;
+        case Table.gasp:
+            _gasp = (GaspTable) table;
+            break;
+        }
     }
 
-    HeadTable head() {
-        return (HeadTable) getEntryByTag(Table.head).getTable();
+    /**
+     * @see HeadTable
+     */
+    public HeadTable head() {
+        return _head;
+    }
+    
+    /**
+     * @see MaxpTable
+     */
+    public MaxpTable maxp() {
+        return _maxp;
+    }
+    
+    /**
+     * @see LocaTable
+     */
+    public LocaTable loca() {
+        return _loca;
     }
 
-    VheaTable vhea() {
-        return (VheaTable) getEntryByTag(Table.vhea).getTable();
+    /**
+     * @see GlyfTable
+     */
+    public GlyfTable glyf() {
+        return _glyf;
+    }
+    
+    /**
+     * @see NameTable
+     */
+    public NameTable name() {
+        return _name;
+    }
+    
+    /**
+     * @see HmtxTable
+     */
+    public HmtxTable hmtx() {
+        return _hmtx;
+    }
+    
+    /**
+     * @see GsubTable
+     */
+    public GsubTable gsub() {
+        return _gsub;
+    }
+    
+    /**
+     * @see CmapTable
+     */
+    public CmapTable cmap() {
+        return _cmap;
+    }
+    
+    /**
+     * @see PostTable
+     */
+    public PostTable post() {
+        return _post;
+    }
+    
+    /**
+     * @see Os2Table
+     */
+    public Os2Table os2() {
+        return _os2;
+    }
+    
+    /**
+     * @see HheaTable
+     */
+    public HheaTable hhea() {
+        return _hhea;
     }
 
-    MaxpTable maxp() {
-        return (MaxpTable) getEntryByTag(Table.maxp).getTable();
+    /**
+     * @see VheaTable
+     */
+    public VheaTable vhea() {
+        return _vhea;
     }
-
+    
+    /**
+     * @see SVGTable
+     */
+    public SVGTable svg() {
+        return _svg;
+    }
+    
+    /**
+     * @see HdmxTable
+     */
+    public HdmxTable hdmx() {
+        return _hdmx;
+    }
+    
+    /**
+     * @see VdmxTable
+     */
+    public VdmxTable vdmx() {
+        return _vdmx;
+    }
+    
+    /**
+     * @see KernTable
+     */
+    public KernTable kern() {
+        return _kern;
+    }
+    
+    /**
+     * @see GaspTable
+     */
+    public GaspTable gasp() {
+        return _gasp;
+    }
+    
+    /**
+     * Writes this {@link TableDirectory} and all of its {@link Entry entries}
+     * to the given output.
+     */
     public void write(BinaryIO io) throws IOException {
         long start = io.getPosition();
         
         // Table Record:
         // Entries in the Table Record must be sorted in ascending order by tag.
-        List<Entry> entries = Arrays.asList(_entries).stream()
+        List<Entry> entries = _entries.stream()
                 .filter(e -> e.getTable() instanceof Writable)
                 .sorted((e1, e2) -> Long.compare(0xFFFFFFFF & e1.getTag(), 0xFFFFFFFF & e2.getTag()))
                 .collect(Collectors.toList());
@@ -410,21 +688,39 @@ public class TableDirectory {
         return sum;
     }
 
+    /**
+     * The {@link Table} entry with the given index.
+     * 
+     * @see #getNumTables()
+     */
     public Entry getEntry(int index) {
-        return _entries[index];
+        return _entries.get(index);
     }
 
+    /**
+     * The entry for the {@link Table} with the given {@link Table#getType()}.
+     *
+     * @param tag
+     *        The {@link Table#getType() table type}.
+     * @return The {@link Entry} for the given table type.
+     */
     public Entry getEntryByTag(int tag) {
         for (int i = 0; i < getNumTables(); i++) {
-            if (_entries[i].getTag() == tag) {
-                return _entries[i];
+            Entry entry = getEntry(i);
+            if (entry.getTag() == tag) {
+                return entry;
             }
         }
         return null;
     }
 
+    /**
+     * Number of {@link Table} entries in this font.
+     * 
+     * @see #getEntry(int)
+     */
     public int getNumTables() {
-        return _entries.length;
+        return _entries.size();
     }
 
     /**
@@ -516,6 +812,7 @@ public class TableDirectory {
         return _sfntVersion;
     }
     
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder()
             .append("Offset Table\n------ -----")
@@ -525,17 +822,11 @@ public class TableDirectory {
             .append("\n    entrySelector: ").append(_entrySelector)
             .append("\n    rangeShift:    ").append(_rangeShift)
             .append("\n\n");
-        for (int i = 0; i < getNumTables(); i++) {
-            sb.append(_entries[i].toString());
+        for (Entry entry : _entries) {
+            sb.append(entry.toString());
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-    private Entry seekTable(DataInputStream dis, int tablesOrigin, Entry entry) throws IOException {
-        dis.reset();
-        dis.skip(tablesOrigin + entry.getOffset());
-        return entry;
     }
 
     /**

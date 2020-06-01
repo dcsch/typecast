@@ -19,7 +19,7 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fmt;
 
 /**
- * Index to Location table
+ * loca — Index to Location Table
  * 
  * <p>
  * The indexToLoc table stores the offsets to the locations of the glyphs in the
@@ -51,29 +51,33 @@ import net.java.dev.typecast.ot.Fmt;
  * </p>
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/loca">Spec: Index to Location</a>
  */
-public class LocaTable implements Table, Writable {
+public class LocaTable extends AbstractTable implements Writable {
 
     private int[] _offsets;
-    private int _length;
 
     private static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
-    private HeadTable _head;
 
-    public LocaTable(
-            DataInput di,
-            int length,
-            HeadTable head,
-            MaxpTable maxp) throws IOException {
-        _head = head;
-        _offsets = new int[maxp.getNumGlyphs() + 1];
-        boolean shortEntries = head.useShortEntries();
+    /**
+     * Creates a {@link LocaTable}.
+     */
+    public LocaTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numGlyphs = maxp().getNumGlyphs();
+        _offsets = new int[numGlyphs + 1];
+        boolean shortEntries = head().useShortEntries();
         if (shortEntries) {
-            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
+            for (int i = 0; i <= numGlyphs; i++) {
                 _offsets[i] = 2 * di.readUnsignedShort();
             }
         } else {
-            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
+            for (int i = 0; i <= numGlyphs; i++) {
                 _offsets[i] = di.readInt();
             }
         }
@@ -88,22 +92,22 @@ public class LocaTable implements Table, Writable {
             lastOffset = offset;
             ++index;
         }
-        _length = length;
     }
     
     void updateFormat() {
+        HeadTable headTable = head();
         for (int offset : _offsets) {
             if (offset > 2 * 0xFFFF || offset % 2 != 0) {
-                _head.setShortEntries(false);
+                headTable.setShortEntries(false);
                 return;
             }
         }
-        _head.setShortEntries(true);
+        headTable.setShortEntries(true);
     }
     
     @Override
     public void write(BinaryOutput out) throws IOException {
-        boolean shortEntries = _head.useShortEntries();
+        boolean shortEntries = head().useShortEntries();
         if (shortEntries) {
             for (int offset : _offsets) {
                 out.writeShort(offset / 2);

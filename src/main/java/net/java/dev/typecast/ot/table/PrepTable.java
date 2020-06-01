@@ -16,15 +16,16 @@ import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
- * Control Value Program Table
- * 
- * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/prep">Spec: Control Value Program Table</a>
+ * prep — Control Value Program
  * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/prep">Spec: Control Value Program Table</a>
  */
-class PrepTable extends Program implements Table, Writable {
+public class PrepTable extends Program implements Table, Writable {
 
-    public PrepTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         readInstructions(di, length);
     }
     

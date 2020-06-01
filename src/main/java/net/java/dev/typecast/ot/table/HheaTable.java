@@ -24,60 +24,58 @@ import net.java.dev.typecast.ot.Fixed;
  */
 public class HheaTable implements Table, Writable {
 
-    private int version;
-    private short ascender;
-    private short descender;
-    private short lineGap;
-    private short advanceWidthMax;
-    private short minLeftSideBearing;
-    private short minRightSideBearing;
-    private short xMaxExtent;
-    private short caretSlopeRise;
-    private short caretSlopeRun;
-    private short caretOffset;
-    private short metricDataFormat;
-    private int numberOfHMetrics;
-
     /**
-     * Creates a {@link HheaTable} from the given input.
-     *
-     * @param di
-     *        The input to read from.
-     * @param length
-     *        The total number of bytes.
+     * Version 1.0 of {@link HheaTable}.
      */
-    public HheaTable(DataInput di, int length) throws IOException {
-        version = di.readInt();
-        ascender = di.readShort();
-        descender = di.readShort();
-        lineGap = di.readShort();
-        advanceWidthMax = di.readShort();
-        minLeftSideBearing = di.readShort();
-        minRightSideBearing = di.readShort();
-        xMaxExtent = di.readShort();
-        caretSlopeRise = di.readShort();
-        caretSlopeRun = di.readShort();
-        caretOffset = di.readShort();
+    private static final int VERSION_1_0 = 0x00010000;
+    
+    private int _version = VERSION_1_0;
+    private short _ascender;
+    private short _descender;
+    private short _lineGap;
+    private short _advanceWidthMax;
+    private short _minLeftSideBearing;
+    private short _minRightSideBearing;
+    private short _xMaxExtent;
+    private short _caretSlopeRise;
+    private short _caretSlopeRun;
+    private short _caretOffset;
+    private short _metricDataFormat;
+    private int _numberOfHMetrics;
+
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        _ascender = di.readShort();
+        _descender = di.readShort();
+        _lineGap = di.readShort();
+        _advanceWidthMax = di.readShort();
+        _minLeftSideBearing = di.readShort();
+        _minRightSideBearing = di.readShort();
+        _xMaxExtent = di.readShort();
+        _caretSlopeRise = di.readShort();
+        _caretSlopeRun = di.readShort();
+        _caretOffset = di.readShort();
         for (int i = 0; i < 4; i++) {
             di.readShort();
         }
-        metricDataFormat = di.readShort();
-        numberOfHMetrics = di.readUnsignedShort();
+        _metricDataFormat = di.readShort();
+        _numberOfHMetrics = di.readUnsignedShort();
     }
     
     @Override
     public void write(BinaryOutput out) throws IOException {
-        out.writeInt(version);
-        out.writeShort(ascender);
-        out.writeShort(descender);
-        out.writeShort(lineGap);
-        out.writeShort(advanceWidthMax);
-        out.writeShort(minLeftSideBearing);
-        out.writeShort(minRightSideBearing);
-        out.writeShort(xMaxExtent);
-        out.writeShort(caretSlopeRise);
-        out.writeShort(caretSlopeRun);
-        out.writeShort(caretOffset);
+        out.writeInt(_version);
+        out.writeShort(_ascender);
+        out.writeShort(_descender);
+        out.writeShort(_lineGap);
+        out.writeShort(_advanceWidthMax);
+        out.writeShort(_minLeftSideBearing);
+        out.writeShort(_minRightSideBearing);
+        out.writeShort(_xMaxExtent);
+        out.writeShort(_caretSlopeRise);
+        out.writeShort(_caretSlopeRun);
+        out.writeShort(_caretOffset);
         
         // Reserved.
         out.writeShort(0);
@@ -85,8 +83,8 @@ public class HheaTable implements Table, Writable {
         out.writeShort(0);
         out.writeShort(0);
 
-        out.writeShort(metricDataFormat);
-        out.writeShort(numberOfHMetrics);
+        out.writeShort(_metricDataFormat);
+        out.writeShort(_numberOfHMetrics);
     }
 
     @Override
@@ -98,14 +96,14 @@ public class HheaTable implements Table, Writable {
      * Typographic ascent (Distance from baseline of highest ascender).
      */
     public short getAscender() {
-        return ascender;
+        return _ascender;
     }
     
     /**
      * Typographic descent (Distance from baseline of lowest descender).
      */
     public short getDescender() {
-        return descender;
+        return _descender;
     }
 
     /**
@@ -113,21 +111,21 @@ public class HheaTable implements Table, Writable {
      * legacy platform implementations.
      */
     public short getLineGap() {
-        return lineGap;
+        return _lineGap;
     }
 
     /**
      * Maximum advance width value in 'hmtx' table.
      */
     public short getAdvanceWidthMax() {
-        return advanceWidthMax;
+        return _advanceWidthMax;
     }
 
     /**
      * Minimum left sidebearing value in 'hmtx' table.
      */
     public short getMinLeftSideBearing() {
-        return minLeftSideBearing;
+        return _minLeftSideBearing;
     }
 
     /**
@@ -135,28 +133,28 @@ public class HheaTable implements Table, Writable {
      * xMin)).
      */
     public short getMinRightSideBearing() {
-        return minRightSideBearing;
+        return _minRightSideBearing;
     }
 
     /**
      * Max(lsb + (xMax - xMin)).
      */
     public short getXMaxExtent() {
-        return xMaxExtent;
+        return _xMaxExtent;
     }
 
     /**
      * Used to calculate the slope of the cursor (rise/run); 1 for vertical.
      */
     public short getCaretSlopeRise() {
-        return caretSlopeRise;
+        return _caretSlopeRise;
     }
 
     /**
      * 0 for vertical.
      */
     public short getCaretSlopeRun() {
-        return caretSlopeRun;
+        return _caretSlopeRun;
     }
     
     /**
@@ -164,39 +162,39 @@ public class HheaTable implements Table, Writable {
      * produce the best appearance. Set to 0 for non-slanted fonts.
      */
     public short getCaretOffset() {
-        return caretOffset;
+        return _caretOffset;
     }
 
     /**
      * 0 for current format.
      */
     public short getMetricDataFormat() {
-        return metricDataFormat;
+        return _metricDataFormat;
     }
 
     /**
      * Number of hMetric entries in 'hmtx' table.
      */
     public int getNumberOfHMetrics() {
-        return numberOfHMetrics;
+        return _numberOfHMetrics;
     }
 
     @Override
     public String toString() {
         return "'hhea' Table - Horizontal Header\n--------------------------------" +
-                "\n        'hhea' version:       " + Fixed.floatValue(version) +
-                "\n        yAscender:            " + ascender +
-                "\n        yDescender:           " + descender +
-                "\n        yLineGap:             " + lineGap +
-                "\n        advanceWidthMax:      " + advanceWidthMax +
-                "\n        minLeftSideBearing:   " + minLeftSideBearing +
-                "\n        minRightSideBearing:  " + minRightSideBearing +
-                "\n        xMaxExtent:           " + xMaxExtent +
-                "\n        caretSlopeRise:       " + caretSlopeRise +
-                "\n        caretSlopeRun:        " + caretSlopeRun +
-                "\n        caretOffset:          " + caretOffset +
-                "\n        metricDataFormat:     " + metricDataFormat +
-                "\n        numberOfHMetrics:     " + numberOfHMetrics;
+                "\n        'hhea' version:       " + Fixed.floatValue(_version) +
+                "\n        yAscender:            " + _ascender +
+                "\n        yDescender:           " + _descender +
+                "\n        yLineGap:             " + _lineGap +
+                "\n        advanceWidthMax:      " + _advanceWidthMax +
+                "\n        minLeftSideBearing:   " + _minLeftSideBearing +
+                "\n        minRightSideBearing:  " + _minRightSideBearing +
+                "\n        xMaxExtent:           " + _xMaxExtent +
+                "\n        caretSlopeRise:       " + _caretSlopeRise +
+                "\n        caretSlopeRun:        " + _caretSlopeRun +
+                "\n        caretOffset:          " + _caretOffset +
+                "\n        metricDataFormat:     " + _metricDataFormat +
+                "\n        numberOfHMetrics:     " + _numberOfHMetrics;
     }
 
 }
