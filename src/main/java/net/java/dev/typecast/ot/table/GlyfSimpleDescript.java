@@ -96,11 +96,6 @@ public class GlyfSimpleDescript extends GlyfDescript {
     private short[] _yCoordinates;
     
     /**
-     * @see #getPointCount()
-     */
-    private int _count;
-
-    /**
      * Creates a {@link GlyfSimpleDescript}.
      *
      * @param parentTable
@@ -117,7 +112,7 @@ public class GlyfSimpleDescript extends GlyfDescript {
             int glyphIndex,
             short numberOfContours,
             DataInput di) throws IOException {
-        super(parentTable, glyphIndex, numberOfContours, di);
+        super(parentTable, glyphIndex, di);
         
         // Simple glyph description
         _endPtsOfContours = new int[numberOfContours];
@@ -126,15 +121,16 @@ public class GlyfSimpleDescript extends GlyfDescript {
         }
 
         // The last end point index reveals the total number of points
-        _count = _endPtsOfContours[numberOfContours-1] + 1;
-        _flags = new byte[_count];
-        _xCoordinates = new short[_count];
-        _yCoordinates = new short[_count];
+        int count = _endPtsOfContours[numberOfContours-1] + 1;
+        
+        _flags = new byte[count];
+        _xCoordinates = new short[count];
+        _yCoordinates = new short[count];
 
         int instructionCount = di.readUnsignedShort();
         readInstructions(di, instructionCount);
-        readFlags(_count, di);
-        readCoords(_count, di);
+        readFlags(count, di);
+        readCoords(count, di);
     }
     
     @Override
@@ -165,6 +161,29 @@ public class GlyfSimpleDescript extends GlyfDescript {
     public byte getFlags(int i) {
         return _flags[i];
     }
+    
+    /**
+     * Whether the point with the given index is an on-curve point.
+     * 
+     * <p>
+     * A value of <code>false</code> designates a control point of an underlying
+     * quadratic bezier segment. Two on-curve points in sequence designate a
+     * straight line segment. If there are two consecutive off-curve points, the
+     * intermediate on-curve point is elided and must be reconstructed from the
+     * midpoint of the two control points.
+     * </p>
+     * 
+     * @param i
+     *        The point index.
+     * @return Whether the point with the given index is a control point.
+     * 
+     * @see <a href="http://chanae.walon.org/pub/ttf/ttf_glyphs.htm">Glyph Hell:
+     *      An introduction to glyphs, as used and defined in the FreeType
+     *      engine</a>
+     */
+    public boolean isOnCurve(int i) {
+        return (getFlags(i) & ON_CURVE_POINT) > 0;
+    }
 
     @Override
     public short getXCoordinate(int i) {
@@ -183,7 +202,7 @@ public class GlyfSimpleDescript extends GlyfDescript {
 
     @Override
     public int getPointCount() {
-        return _count;
+        return _flags.length;
     }
 
     @Override
