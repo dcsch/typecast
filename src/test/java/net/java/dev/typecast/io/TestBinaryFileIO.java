@@ -17,19 +17,19 @@ import java.io.RandomAccessFile;
 import junit.framework.TestCase;
 
 /**
- * Test case for {@link BinaryFileIO}.
+ * Test case for {@link BinaryFileOutput}.
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
 public class TestBinaryFileIO extends TestCase {
 
     /** 
-     * Tests writing to {@link BinaryFileIO}.
+     * Tests writing to {@link BinaryFileOutput}.
      */
     public void testWrite() throws IOException {
         BinaryOutput inner;
         File testFile = new File("target/tmp/output.bin");
-        try (BinaryFileIO out = new BinaryFileIO(new RandomAccessFile(testFile, "rw"))) {
+        try (BinaryFileOutput out = new BinaryFileOutput(new RandomAccessFile(testFile, "rw"))) {
             out.write(42);
             inner = out.reserve(5);
             out.write(13);
@@ -38,19 +38,23 @@ public class TestBinaryFileIO extends TestCase {
         BinaryOutput inner2;
         try {
             inner.write(99);
-            
+            long position = inner.getPosition();
             try {
                 inner.writeLong(0L);
                 fail("Must fail.");
             } catch (IOException ex) {
                 // Expected.
             }
+            
+            inner.setPosition(position);
             try {
                 inner.writeUTF("öäü");
                 fail("Must fail.");
             } catch (IOException ex) {
                 // Expected.
             }
+
+            inner.setPosition(position);
             try {
                 inner.reserve(5);
                 fail("Must fail.");
@@ -58,6 +62,7 @@ public class TestBinaryFileIO extends TestCase {
                 // Expected.
             }
             
+            inner.setPosition(position);
             inner2 = inner.reserve(2);
             inner.writeChar(0xEE00);
         } finally {
@@ -65,6 +70,7 @@ public class TestBinaryFileIO extends TestCase {
         }
         
         try {
+            long pos = inner2.getPosition();
             try {
                 inner2.writeInt(0);
                 fail("Must fail.");
@@ -72,6 +78,7 @@ public class TestBinaryFileIO extends TestCase {
                 // Expected.
             }
             
+            inner2.setPosition(pos);
             inner2.writeShort(0xCAFF);
         } finally {
             inner2.close();
@@ -82,6 +89,23 @@ public class TestBinaryFileIO extends TestCase {
             assertEquals(99, in.read());
             assertEquals(0xCAFFEE00, in.readInt());
             assertEquals(13, in.read());
+        }
+    }
+    
+    /**
+     * Tests {@link BinaryFileInput}.
+     */
+    public void testRead() throws IOException {
+        File testFile = new File("target/tmp/input.bin");
+        RandomAccessFile f = new RandomAccessFile(testFile, "rw");
+        for (int n = 0, cnt = 40; n < cnt; n++) {
+            f.write(n);
+        }
+        
+        try (BinaryFileInput in = new BinaryFileInput(f)) {
+            for (int n = 0, cnt = 10; n < cnt; n++) {
+                in.readInt();
+            }
         }
     }
     

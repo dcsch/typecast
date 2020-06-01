@@ -32,7 +32,9 @@ import java.nio.file.Files;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.java.dev.typecast.io.BinaryFileIO;
+import net.java.dev.typecast.io.BinaryFileInput;
+import net.java.dev.typecast.io.BinaryFileOutput;
+import net.java.dev.typecast.io.BinaryIO;
 import net.java.dev.typecast.ot.table.HeadTable;
 
 /**
@@ -90,13 +92,15 @@ public class TTFontTest extends TestCase {
         try (RandomAccessFile outFile = new RandomAccessFile(fontFile, "rw")) {
             outFile.setLength(0);
             
-            try (BinaryFileIO out = new BinaryFileIO(outFile)) {
-                long elapsed = System.currentTimeMillis();
-                font.write(out);
-                
-                elapsed = System.currentTimeMillis() - elapsed;
-                
-                System.out.println("writing " + name + " took " + elapsed + "ms");
+            try (BinaryFileOutput out = new BinaryFileOutput(outFile)) {
+                try (BinaryFileInput in = new BinaryFileInput(outFile)) {
+                    long elapsed = System.currentTimeMillis();
+                    font.write(new BinaryIO(in, out));
+                    
+                    elapsed = System.currentTimeMillis() - elapsed;
+                    
+                    System.out.println("Writing " + name + " took " + elapsed + "ms");
+                }
             }
         }
         

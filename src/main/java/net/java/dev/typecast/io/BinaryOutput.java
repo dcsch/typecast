@@ -30,6 +30,11 @@ public interface BinaryOutput extends DataOutput, RandomAccessBinary, AutoClosea
      */
     BinaryOutput reserve(int length) throws IOException;
     
+    /**
+     * Writes bufferd data to the underlying storage.
+     */
+    void flush() throws IOException;
+    
     @Override 
     void close() throws IOException;
     

@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 
 import net.java.dev.typecast.io.BinUtils;
 import net.java.dev.typecast.io.BinaryIO;
+import net.java.dev.typecast.io.BinaryInput;
 import net.java.dev.typecast.io.BinaryOutput;
 import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Fixed;
@@ -122,7 +123,8 @@ public class TableDirectory {
             _length = length;
         }
 
-        Writable write(BinaryIO out) throws IOException {
+        Writable write(BinaryIO io) throws IOException {
+            BinaryOutput out = io.getOut();
             out.writeInt(_tag);
             
             // Checksum computed later on.
@@ -152,10 +154,11 @@ public class TableDirectory {
         }
 
         void updateChecksum(BinaryIO io) throws IOException {
-            _checksum = computeChecksum(io, getOffset(), getLength());
+            _checksum = computeChecksum(io.getIn(), getOffset(), getLength());
             
-            io.setPosition(_checkSumPos);
-            io.writeInt(_checksum);
+            BinaryOutput out = io.getOut();
+            out.setPosition(_checkSumPos);
+            out.writeInt(_checksum);
         }
 
         /**
@@ -641,7 +644,8 @@ public class TableDirectory {
      * to the given output.
      */
     public void write(BinaryIO io) throws IOException {
-        long start = io.getPosition();
+        BinaryOutput out = io.getOut();
+        long start = out.getPosition();
         
         // Table Record:
         // Entries in the Table Record must be sorted in ascending order by tag.
@@ -653,11 +657,11 @@ public class TableDirectory {
         int numTables = entries.size();
         
         // Offset Table:
-        io.writeInt(_sfntVersion);
-        io.writeShort(numTables);
-        io.writeShort(getSearchRange(numTables));
-        io.writeShort(getEntrySelector(numTables));
-        io.writeShort(getRangeShift(numTables));
+        out.writeInt(_sfntVersion);
+        out.writeShort(numTables);
+        out.writeShort(getSearchRange(numTables));
+        out.writeShort(getEntrySelector(numTables));
+        out.writeShort(getRangeShift(numTables));
         
         List<Writable> tableOuts = new ArrayList<>(numTables);
         for (Entry entry : entries) {
@@ -665,20 +669,26 @@ public class TableDirectory {
         }
         
         for (Writable tableOut : tableOuts) {
-            tableOut.write(io);
+            tableOut.write(out);
         }
         
-        long length = io.getPosition() - start;
+        // Make sure that the data can be read back during checksum computation.
+        out.flush();
+        
+        long length = out.getPosition() - start;
 
         for (Entry entry : entries) {
             entry.updateChecksum(io);
         }
         
-        int checksumAdjustment = 0xB1B0AFBA - computeChecksum(io, start, length);
-        head().updateChecksumAdjustment(io, checksumAdjustment);
+        // Again make sure that all table checksums are flushed to disk before computing the font checksum.
+        out.flush();
+        
+        int checksumAdjustment = 0xB1B0AFBA - computeChecksum(io.getIn(), start, length);
+        head().updateChecksumAdjustment(out, checksumAdjustment);
     }
     
-    static int computeChecksum(BinaryIO io, long start, long length) throws IOException {
+    static int computeChecksum(BinaryInput io, long start, long length) throws IOException {
         io.setPosition(start);
         
         int sum = 0;

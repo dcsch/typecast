@@ -9,12 +9,38 @@
 package net.java.dev.typecast.io;
 
 /**
- * TODO
+ * Combination of {@link BinaryInput} and {@link BinaryOutput}.
  *
  * @author <a href="mailto:haui@haumacher.de">Bernhard Haumacher</a>
  */
-public interface BinaryIO extends BinaryOutput, BinaryInput {
+public class BinaryIO {
 
-    // Pure sum interface. 
+    private BinaryInput _in;
+    private BinaryOutput _out;
+
+    /** 
+     * Creates a {@link BinaryIO}.
+     *
+     * @param in See {@link #getIn()}.
+     * @param out See {@link #getOut()}.
+     */
+    public BinaryIO(BinaryInput in, BinaryOutput out) {
+        _in = in;
+        _out = out;
+    }
+
+    /**
+     * The underlying {@link BinaryInput}.
+     */
+    public BinaryInput getIn() {
+        return _in;
+    }
+    
+    /**
+     * The underlying {@link BinaryOutput}.
+     */
+    public BinaryOutput getOut() {
+        return _out;
+    }
     
 }
