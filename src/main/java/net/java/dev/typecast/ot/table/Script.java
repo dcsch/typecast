@@ -113,5 +113,30 @@ public class Script {
     public LangSys getLangSys(int i) {
         return _langSys[i];
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("             defaultLangSysOffset = " + _defaultLangSysOffset + "\n");
+        sb.append("             langSysCount         = " + _langSysCount + "\n");
+        sb.append("\n");
+        
+        sb.append("            defaultLangSys\n");
+        sb.append("            --------------\n");
+        sb.append(_defaultLangSys.toString());
+        sb.append("\n");
+        
+        if (_langSys != null) {
+            int num = 1;
+            for (LangSys record : _langSys) {
+                sb.append("            langSys " + (num++) + "\n");
+                sb.append("            ----------\n");
+                sb.append(record.toString());
+                sb.append("\n");
+            }
+        }
+        
+        return sb.toString();
+    }
 }
 

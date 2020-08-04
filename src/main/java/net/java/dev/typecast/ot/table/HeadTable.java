@@ -53,33 +53,171 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.Bits;
 import net.java.dev.typecast.ot.Fixed;
+import net.java.dev.typecast.ot.LongDateTime;
 
 /**
+ * head — Font Header Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/head">Spec: Font Header Table</a>
  */
-public class HeadTable implements Table {
+public class HeadTable implements Table, Writable {
+    
+    private static final short FORMAT_LONG_OFFSETS = 1;
 
-    private int _versionNumber;
+    private static final short FORMAT_SHORT_OFFSETS = 0;
+
+    /**
+     * @see #getMagicNumber()
+     */
+    public static final int MAGIC = 0x5F0F3CF5;
+    
+    /**
+     * @see #getMajorVersion()
+     */
+    public static final int MAJOR_VERSION = 1;
+
+    /**
+     * @see #getMinorVersion()
+     */
+    public static final int MINOR_VERSION = 0;
+    
+    /**
+     * @see #getGlyphDataFormat()
+     */
+    public static final short GLYPH_DATA_FORMAT = 0;
+
+    /**
+     * 0: Fully mixed directional glyphs;
+     * @see #getFontDirectionHint()
+     */
+    public static final short FONT_DIRECTION_MIXED = 0;
+    
+    /**
+     * 1: Only strongly left to right;
+     * @see #getFontDirectionHint()
+     */
+    public static final short FONT_DIRECTION_LEFT_TO_RIGHT = 1;
+
+    /**
+     * 2: Like 1 but also contains neutrals;
+     * @see #getFontDirectionHint()
+     */
+    public static final short FONT_DIRECTION_LEFT_TO_RIGHT_AND_NEUTRAL = 2;
+
+    /**
+     * -1: Only strongly right to left;
+     * @see #getFontDirectionHint()
+     */
+    public static final short FONT_DIRECTION_RIGHT_TO_LEFT = -1;
+    
+    /**
+     * -2: Like -1 but also contains neutrals.
+     * @see #getFontDirectionHint()
+     */
+    public static final short FONT_DIRECTION_RIGHT_TO_LEFT_AND_NEUTRAL = -2;
+    
+    /**
+     * @see #getMajorVersion()
+     */
+    private int _majorVersion = MAJOR_VERSION;
+    
+    /**
+     * @see #getMinorVersion()
+     */
+    private int _minorVersion = MINOR_VERSION;
+    
+    /**
+     * @see #getFontRevision()
+     */
     private int _fontRevision;
+    
+    /**
+     * @see #getCheckSumAdjustment()
+     */
     private int _checkSumAdjustment;
-    private int _magicNumber;
+    
+    /**
+     * @see #getMagicNumber()
+     */
+    private int _magicNumber = MAGIC;
+    
+    /**
+     * @see #getFlags()
+     */
     private short _flags;
+    
+    /**
+     * @see #getUnitsPerEm()
+     */
     private short _unitsPerEm;
+    
+    /**
+     * @see #getCreated()
+     */
     private long _created;
+    
+    /**
+     * @see #getModified()
+     */
     private long _modified;
+    
+    /**
+     * @see #getXMin()
+     */
     private short _xMin;
+    
+    /**
+     * @see #getYMin()
+     */
     private short _yMin;
+    
+    /**
+     * @see #getXMax()
+     */
     private short _xMax;
+    
+    /**
+     * @see #getYMax()
+     */
     private short _yMax;
+    
+    /**
+     * @see #getMacStyle()
+     */
     private short _macStyle;
+    
+    /**
+     * @see #getLowestRecPPEM()
+     */
     private short _lowestRecPPEM;
-    private short _fontDirectionHint;
+    
+    /**
+     * @see #getFontDirectionHint()
+     */
+    private short _fontDirectionHint = FONT_DIRECTION_LEFT_TO_RIGHT_AND_NEUTRAL;
+    
+    /**
+     * @see #getIndexToLocFormat()
+     */
     private short _indexToLocFormat;
-    private short _glyphDataFormat;
+    
+    /**
+     * @see #getGlyphDataFormat()
+     */
+    private short _glyphDataFormat = GLYPH_DATA_FORMAT;
 
-    public HeadTable(DataInput di) throws IOException {
-        _versionNumber = di.readInt();
+    private long _checkSumAdjustmentPos;
+
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _majorVersion = di.readUnsignedShort();
+        _minorVersion = di.readUnsignedShort();
         _fontRevision = di.readInt();
         _checkSumAdjustment = di.readInt();
         _magicNumber = di.readInt();
@@ -97,85 +235,318 @@ public class HeadTable implements Table {
         _indexToLocFormat = di.readShort();
         _glyphDataFormat = di.readShort();
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        
+        out.writeShort(_majorVersion);
+        out.writeShort(_minorVersion);
+        out.writeInt(_fontRevision);
 
-    public int getCheckSumAdjustment() {
-        return _checkSumAdjustment;
+        // Updated later on.
+        _checkSumAdjustmentPos = out.getPosition();
+        _checkSumAdjustment = 0;
+        out.writeInt(_checkSumAdjustment);
+        
+        out.writeInt(_magicNumber);
+        out.writeShort(_flags);
+        out.writeShort(_unitsPerEm);
+        out.writeLong(_created);
+        out.writeLong(_modified);
+        out.writeShort(_xMin);
+        out.writeShort(_yMin);
+        out.writeShort(_xMax);
+        out.writeShort(_yMax);
+        out.writeShort(_macStyle);
+        out.writeShort(_lowestRecPPEM);
+        out.writeShort(_fontDirectionHint);
+        out.writeShort(_indexToLocFormat);
+        out.writeShort(_glyphDataFormat);
+    }
+    
+    @Override
+    public int getType() {
+        return head;
+    }
+    
+    /**
+     * uint16     majorVersion     Major version number of the font header table — set to {@link #MAJOR_VERSION}.
+     */
+    public int getMajorVersion() {
+        return _majorVersion;
+    }
+    
+    /**
+     * uint16     minorVersion     Minor version number of the font header table — set to {@link #MINOR_VERSION}.
+     */
+    public int getMinorVersion() {
+        return _minorVersion;
     }
 
-    public long getCreated() {
-        return _created;
+    /**
+     * Composed version number from {@link #getMajorVersion()} and {@link #getMinorVersion()}.
+     */
+    public int getVersionNumber() {
+        return _majorVersion << 16 | _minorVersion;
+    }
+    
+    /**
+     * Printable version number.
+     * 
+     * @see #getMajorVersion()
+     * @see #getMinorVersion()
+     */
+    public String getVersion() {
+        return _majorVersion + "." + _minorVersion;
     }
 
-    public short getFlags() {
-        return _flags;
-    }
-
-    public short getFontDirectionHint() {
-        return _fontDirectionHint;
-    }
-
+    /**
+     * Fixed Set by font manufacturer.
+     */
     public int getFontRevision(){
         return _fontRevision;
     }
 
-    public short getGlyphDataFormat() {
-        return _glyphDataFormat;
+    /**
+     * uint32
+     * 
+     * To compute: set it to 0, sum the entire font as uint32, then store
+     * 0xB1B0AFBA - sum.
+     */
+    public int getCheckSumAdjustment() {
+        return _checkSumAdjustment;
+    }
+    
+    void updateChecksumAdjustment(BinaryOutput out, int value) throws IOException {
+        _checkSumAdjustment = value;
+        out.setPosition(_checkSumAdjustmentPos);
+        out.writeInt(_checkSumAdjustment);
+    }
+    
+    /**
+     * uint32     Set to {@link #MAGIC}.
+     */
+    public int getMagicNumber() {
+        return _magicNumber;
     }
 
-    public short getIndexToLocFormat() {
-        return _indexToLocFormat;
+    /**
+     * uint16
+     */
+    public short getFlags() {
+        return _flags;
+    }
+    
+    /**
+     * The Left sidebearing point is at x=0 for all glyphs (relevant only for
+     * TrueType rasterizers)
+     */
+    public boolean isLeftSidebearingNormalized() {
+        return Bits.bit(_flags, 1);
     }
 
-    public short getLowestRecPPEM() {
-        return _lowestRecPPEM;
-    }
-
-    public short getMacStyle() {
-        return _macStyle;
-    }
-
-    public long getModified() {
-        return _modified;
-    }
-
-    public int getType() {
-        return head;
-    }
-
+    /**
+     * uint16
+     * 
+     * Set to a value from 16 to 16384. Any value in this range is valid. In
+     * fonts that have TrueType outlines, a power of 2 is recommended as this
+     * allows performance optimizations in some rasterizers.
+     */
     public short getUnitsPerEm() {
         return _unitsPerEm;
     }
 
-    public int getVersionNumber() {
-        return _versionNumber;
+    /**
+     * LONGDATETIME
+     * 
+     * Number of seconds since 12:00 midnight that started January 1st 1904 in
+     * GMT/UTC time zone. 64-bit integer
+     */
+    public long getCreated() {
+        return _created;
     }
 
-    public short getXMax() {
-        return _xMax;
+    /**
+     * LONGDATETIME
+     * 
+     * Number of seconds since 12:00 midnight that started January 1st 1904 in
+     * GMT/UTC time zone. 64-bit integer
+     */
+    public long getModified() {
+        return _modified;
     }
 
+    /**
+     * int16     
+     * 
+     * For all glyph bounding boxes.
+     */
     public short getXMin() {
         return _xMin;
     }
 
-    public short getYMax() {
-        return _yMax;
-    }
-
+    /**
+     * int16     
+     * 
+     * For all glyph bounding boxes.
+     */
     public short getYMin() {
         return _yMin;
     }
 
+    /**
+     * int16     
+     * 
+     * For all glyph bounding boxes.
+     */
+    public short getXMax() {
+        return _xMax;
+    }
+
+    /**
+     * int16     
+     * 
+     * For all glyph bounding boxes.
+     */
+    public short getYMax() {
+        return _yMax;
+    }
+
+    /**
+     * uint16
+     * 
+     * Contains information concerning the nature of the font patterns.
+     */
+    public short getMacStyle() {
+        return _macStyle;
+    }
+    
+    /**
+     * Whether the glyphs are emboldened.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacBold() {
+        return Bits.bit(_macStyle, 0);
+    }
+
+    /**
+     * Font contains italic or oblique glyphs, otherwise they are upright.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacItalic() {
+        return Bits.bit(_macStyle, 1);
+    }
+    
+    /**
+     * Glyphs are underscored.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacUnderline() {
+        return Bits.bit(_macStyle, 2);
+    }
+    
+    /**
+     * Outline (hollow) glyphs, otherwise they are solid.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacOutline() {
+        return Bits.bit(_macStyle, 3);
+    }
+    
+    /**
+     * Whether the font has shadow.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacShadow() {
+        return Bits.bit(_macStyle, 4);
+    }
+    
+    /**
+     * Whether the font is condensed.
+     * 
+     * @see #getMacStyle()
+     */
+    public boolean isMacCondensed() {
+        return Bits.bit(_macStyle, 5);
+    }
+    
+    /**
+     * @see #getMacStyle()
+     */
+    public boolean isMacExtended() {
+        return Bits.bit(_macStyle, 6);
+    }
+    
+    /**
+     * uint16     
+     * 
+     * Smallest readable size in pixels.
+     */
+    public short getLowestRecPPEM() {
+        return _lowestRecPPEM;
+    }
+
+    /**
+     * int16
+     * 
+     * Deprecated (Set to {@link #FONT_DIRECTION_LEFT_TO_RIGHT_AND_NEUTRAL}).
+     * 
+     * @see #FONT_DIRECTION_MIXED
+     * @see #FONT_DIRECTION_LEFT_TO_RIGHT
+     * @see #FONT_DIRECTION_LEFT_TO_RIGHT_AND_NEUTRAL
+     * @see #FONT_DIRECTION_RIGHT_TO_LEFT
+     * @see #FONT_DIRECTION_RIGHT_TO_LEFT_AND_NEUTRAL
+     */
+    public short getFontDirectionHint() {
+        return _fontDirectionHint;
+    }
+
+    /**
+     * int16
+     * 
+     * {@link #FORMAT_SHORT_OFFSETS} for short offsets (Offset16),
+     * {@link #FORMAT_LONG_OFFSETS} for long (Offset32).
+     */
+    public short getIndexToLocFormat() {
+        return _indexToLocFormat;
+    }
+
+    /**
+     * Whether short offsets (Offset16) are used.
+     */
+    public boolean useShortEntries() {
+        return getIndexToLocFormat() == FORMAT_SHORT_OFFSETS;
+    }
+    
+    void setShortEntries(boolean value) {
+        _indexToLocFormat = value ? FORMAT_SHORT_OFFSETS : FORMAT_LONG_OFFSETS;
+    }
+
+    /**
+     * int16
+     * 
+     * {@link #GLYPH_DATA_FORMAT} for current format.
+     */
+    public short getGlyphDataFormat() {
+        return _glyphDataFormat;
+    }
+
+    @Override
     public String toString() {
         return "'head' Table - Font Header\n--------------------------" +
-                "\n  'head' version:      " + Fixed.floatValue(_versionNumber) +
+                "\n  'head' version:      " + getVersion() +
                 "\n  fontRevision:        " + Fixed.roundedFloatValue(_fontRevision, 8) +
                 "\n  checkSumAdjustment:  0x" + Integer.toHexString(_checkSumAdjustment).toUpperCase() +
                 "\n  magicNumber:         0x" + Integer.toHexString(_magicNumber).toUpperCase() +
                 "\n  flags:               0x" + Integer.toHexString(_flags).toUpperCase() +
                 "\n  unitsPerEm:          " + _unitsPerEm +
-                "\n  created:             " + _created +
-                "\n  modified:            " + _modified +
+                "\n  created:             " + LongDateTime.toDate(_created) +
+                "\n  modified:            " + LongDateTime.toDate(_modified) +
                 "\n  xMin:                " + _xMin +
                 "\n  yMin:                " + _yMin +
                 "\n  xMax:                " + _xMax +
@@ -183,8 +554,9 @@ public class HeadTable implements Table {
                 "\n  macStyle bits:       " + Integer.toHexString(_macStyle).toUpperCase() +
                 "\n  lowestRecPPEM:       " + _lowestRecPPEM +
                 "\n  fontDirectionHint:   " + _fontDirectionHint +
-                "\n  indexToLocFormat:    " + _indexToLocFormat +
-                "\n  glyphDataFormat:     " + _glyphDataFormat;
+                "\n  shortOffsets:        " + (_indexToLocFormat == FORMAT_SHORT_OFFSETS) + " (format: " + _indexToLocFormat + ")"+
+                "\n  glyphDataFormat:     " + _glyphDataFormat +
+                "\n";
     }
 
 }

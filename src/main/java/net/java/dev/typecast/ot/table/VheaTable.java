@@ -20,15 +20,24 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import net.java.dev.typecast.ot.Fixed;
 
 /**
- * Vertical Header Table
+ * vhea — Vertical Header Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/vhea">Spec: Vertical Header Table</a>
  */
 public class VheaTable implements Table {
 
-    private int _version;
+    /**
+     * Version 1.0 of {@link VheaTable}.
+     */
+    public static final int VERSION_1_0 = 0x00010000;
+    
+    private int _version = VERSION_1_0;
     private short _ascent;
     private short _descent;
     private short _lineGap;
@@ -41,7 +50,8 @@ public class VheaTable implements Table {
     private short _metricDataFormat;
     private int _numberOfLongVerMetrics;
 
-    public VheaTable(DataInput di) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readInt();
         _ascent = di.readShort();
         _descent = di.readShort();
@@ -57,6 +67,11 @@ public class VheaTable implements Table {
         }
         _metricDataFormat = di.readShort();
         _numberOfLongVerMetrics = di.readUnsignedShort();
+    }
+
+    @Override
+    public int getType() {
+        return vhea;
     }
 
     public short getAdvanceHeightMax() {

@@ -54,6 +54,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
+ * Lookup list in the {@link GsubTable}.
+ * 
+ * @see GsubTable#getLookupList()
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -101,6 +104,24 @@ public class LookupList {
             return _lookups[i];
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("    lookupList\n");
+        sb.append("    -----------\n");
+        sb.append("        lookupCount     = " + _lookupCount + "\n");
+        sb.append("        \n");
+        
+        int num = 1;
+        for (Lookup lookup : _lookups) {
+            sb.append("        lookup " + (num++) + "\n");
+            sb.append("        ----------\n");
+            sb.append(lookup.toString());
+            sb.append("        \n");
+        }
+        return sb.toString();
     }
 
 }

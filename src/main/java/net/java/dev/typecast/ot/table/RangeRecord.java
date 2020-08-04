@@ -93,5 +93,14 @@ class RangeRecord {
         }
         return -1;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                    start              = " + _start + "\n");
+        sb.append("                    end                = " + _end + "\n");
+        sb.append("                    startCoverageIndex = " + _startCoverageIndex + "\n");
+        return sb.toString();
+    }
 }
 

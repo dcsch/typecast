@@ -53,73 +53,129 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
-/**
- * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
- */
-public class HmtxTable implements Table {
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.Fmt;
 
-    private int[] _hMetrics;
+/**
+ * hmtx — Horizontal Metrics Table
+ * 
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/hmtx">Spec: Horizontal Metrics Table</a>
+ */
+public class HmtxTable extends AbstractTable implements Writable {
+
+    private int[] _advanceWidth;
     private short[] _leftSideBearing;
     private int _length;
 
-    public HmtxTable(
-            DataInput di,
-            int length,
-            HheaTable hhea,
-            MaxpTable maxp) throws IOException {
-        _hMetrics = new int[hhea.getNumberOfHMetrics()];
-        for (int i = 0; i < hhea.getNumberOfHMetrics(); ++i) {
-            _hMetrics[i] =
-                    di.readUnsignedByte()<<24
-                    | di.readUnsignedByte()<<16
-                    | di.readUnsignedByte()<<8
-                    | di.readUnsignedByte();
+    /**
+     * Creates a {@link HmtxTable}.
+     */
+    public HmtxTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numberOfHMetrics = hhea().getNumberOfHMetrics();
+        _advanceWidth = new int[numberOfHMetrics];
+        
+        // Left side bearings for glyph IDs greater than or equal to
+        // numberOfHMetrics.
+        int numGlyphs = maxp().getNumGlyphs();
+        _leftSideBearing = new short[numGlyphs];
+
+        // Paired advance width and left side bearing values for each glyph.
+        // Records are indexed by glyph ID.
+        for (int glyphId = 0; glyphId < numberOfHMetrics; ++glyphId) {
+            _advanceWidth[glyphId] = di.readUnsignedShort();
+            _leftSideBearing[glyphId] = di.readShort();
         }
-        int lsbCount = maxp.getNumGlyphs() - hhea.getNumberOfHMetrics();
-        _leftSideBearing = new short[lsbCount];
-        for (int i = 0; i < lsbCount; ++i) {
-            _leftSideBearing[i] = di.readShort();
+        
+        for (int glyphId = numberOfHMetrics; glyphId < numGlyphs; ++glyphId) {
+            _leftSideBearing[glyphId] = di.readShort();
         }
+        
         _length = length;
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        for (int n = 0, cnt = _advanceWidth.length; n < cnt; n++) {
+            out.writeShort(_advanceWidth[n]);
+            out.writeShort(_leftSideBearing[n]);
+        }
+        for (int n = _advanceWidth.length, cnt = _leftSideBearing.length; n < cnt; n++) {
+            out.writeShort(_leftSideBearing[n]);
+        }
+    }
 
+    @Override
+    public int getType() {
+        return hmtx;
+    }
+
+    /**
+     * uint16
+     * 
+     * Advance width, in font design units.
+     * 
+     * <p>
+     * The baseline is an imaginary line that is used to ‘guide’ glyphs when
+     * rendering text. It can be horizontal (e.g., Latin, Cyrillic, Arabic) or
+     * vertical (e.g., Chinese, Japanese, Mongolian). Moreover, to render text,
+     * a virtual point, located on the baseline, called the pen position or
+     * origin, is used to locate glyphs.
+     * </p>
+     * 
+     * <p>
+     * The distance between two successive pen positions is glyph-specific and
+     * is called the advance width. Note that its value is always positive, even
+     * for right-to-left oriented scripts like Arabic. This introduces some
+     * differences in the way text is rendered.
+     * </p>
+     * 
+     * @param i
+     *        The glyph index, see {@link GlyfTable#getNumGlyphs()}.
+     * 
+     * @see "https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html"
+     */
     public int getAdvanceWidth(int i) {
-        if (_hMetrics == null) {
-            return 0;
-        }
-        if (i < _hMetrics.length) {
-            return _hMetrics[i] >> 16;
+        if (i < _advanceWidth.length) {
+            return _advanceWidth[i];
         } else {
-            return _hMetrics[_hMetrics.length - 1] >> 16;
+            return _advanceWidth[_advanceWidth.length - 1];
         }
     }
 
+    /**
+     * int16
+     * 
+     * Glyph left side bearing, in font design units.
+     * 
+     * @param i
+     *        The glyph index, see {@link GlyfTable#getNumGlyphs()}.
+     * 
+     * @see "https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html"
+     */
     public short getLeftSideBearing(int i) {
-        if (_hMetrics == null) {
-            return 0;
-        }
-        if (i < _hMetrics.length) {
-            return (short)(_hMetrics[i] & 0xffff);
-        } else {
-            return _leftSideBearing[i - _hMetrics.length];
-        }
+        return _leftSideBearing[i];
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("'hmtx' Table - Horizontal Metrics\n---------------------------------\n");
-        sb.append("Size = ").append(_length).append(" bytes, ")
-            .append(_hMetrics.length).append(" entries\n");
-        for (int i = 0; i < _hMetrics.length; i++) {
-            sb.append("        ").append(i)
-                .append(". advWid: ").append(getAdvanceWidth(i))
-                .append(", LSdBear: ").append(getLeftSideBearing(i))
-                .append("\n");
-        }
+        sb.append("'hmtx' Table - Horizontal Metrics\n");
+        sb.append("---------------------------------\n");
+        sb.append("        Size:   ").append(_length).append(" bytes\n");
+        sb.append("        Length: ").append(_leftSideBearing.length).append(" entries\n");
         for (int i = 0; i < _leftSideBearing.length; i++) {
-            sb.append("        LSdBear ").append(i + _hMetrics.length)
-                .append(": ").append(_leftSideBearing[i])
-                .append("\n");
+            sb.append("        ").append(Fmt.pad(6, i)).append(": ");
+            sb.append("adv=").append(getAdvanceWidth(i));
+            sb.append(", lsb=").append(getLeftSideBearing(i));
+            sb.append("\n");
         }
         return sb.toString();
     }

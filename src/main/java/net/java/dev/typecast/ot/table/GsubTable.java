@@ -56,24 +56,32 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
+ * Glyph Substitution Table
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class GsubTable implements Table, LookupSubtableFactory {
 
+    /**
+     * Version 1.0 of {@link GsubTable}.
+     */
+    public static final int VERSION_1_0 = 0x00010000;
+
+    private int _version = VERSION_1_0;
+    
     private ScriptList _scriptList;
     private FeatureList _featureList;
     private LookupList _lookupList;
     
-    protected GsubTable(DataInput di, int length) throws IOException {
-
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         // Load into a temporary buffer, and create another input stream
         byte[] buf = new byte[length];
         di.readFully(buf);
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(buf));
 
         // GSUB Header
-        int version = dis.readInt();
+        _version = dis.readInt();
         int scriptListOffset = dis.readUnsignedShort();
         int featureListOffset = dis.readUnsignedShort();
         int lookupListOffset = dis.readUnsignedShort();
@@ -124,6 +132,18 @@ public class GsubTable implements Table, LookupSubtableFactory {
         return s;
     }
 
+    @Override
+    public int getType() {
+        return GSUB;
+    }
+    
+    /**
+     * Major, minor version as high and low word.
+     */
+    public int getVersion() {
+        return _version;
+    }
+
     public ScriptList getScriptList() {
         return _scriptList;
     }
@@ -134,10 +154,6 @@ public class GsubTable implements Table, LookupSubtableFactory {
 
     public LookupList getLookupList() {
         return _lookupList;
-    }
-
-    public String toString() {
-        return "GSUB";
     }
 
     public static String lookupTypeAsString(int type) {
@@ -156,6 +172,18 @@ public class GsubTable implements Table, LookupSubtableFactory {
             return "Chaining";
         }
         return "Unknown";
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("'GSUB' Table - Glyph Substitution Table\n");
+        sb.append("---------------------------------------\n");
+        sb.append("    Content not shown.\n");
+//        sb.append(_scriptList.toString());
+//        sb.append(_featureList.toString());
+//        sb.append(_lookupList.toString());
+        return sb.toString();
     }
 
 }

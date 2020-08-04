@@ -54,6 +54,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
+ * Entry of the {@link LookupList}.
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
@@ -103,6 +104,28 @@ public class Lookup {
 
     public LookupSubtable getSubtable(int i) {
         return _subTables[i];
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("            type = " + _type + "\n");
+        sb.append("            flag = " + _flag + "\n");
+        sb.append("            subTableCount = " + _subTableCount + "\n");
+        sb.append("            \n");
+        
+        int num = 1;
+        for (LookupSubtable table : _subTables) {
+            sb.append("            subTable " + (num++) + "\n");
+            sb.append("            ------------\n");
+            if (table == null) {
+                sb.append("                TODO: Not supported.\n");
+            } else {
+                sb.append(table.toString());
+            }
+            sb.append("            \n");
+        }
+        return sb.toString();
     }
 
 }
