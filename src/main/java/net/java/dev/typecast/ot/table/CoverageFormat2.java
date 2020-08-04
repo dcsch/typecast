@@ -99,4 +99,22 @@ public class CoverageFormat2 extends Coverage {
         }
         return ids.stream().mapToInt(i->i).toArray();
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                coverageFormat  = " + getFormat() + "\n");
+        sb.append("                rangeCount      = " + _rangeCount + "\n");
+        sb.append("                \n");
+        
+        int num = 1;
+        for (RangeRecord record : _rangeRecords) {
+            sb.append("                rangeRecord " + (num++) + "\n");
+            sb.append("                ---------------\n");
+            sb.append(record.toString());
+            sb.append("                \n");
+        }
+        return sb.toString();
+    }
+    
 }

@@ -21,26 +21,48 @@ package net.java.dev.typecast.ot;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.Writer;
 
-import net.java.dev.typecast.ot.table.*;
+import net.java.dev.typecast.io.BinaryIO;
+import net.java.dev.typecast.ot.table.CmapTable;
+import net.java.dev.typecast.ot.table.GsubTable;
+import net.java.dev.typecast.ot.table.HeadTable;
+import net.java.dev.typecast.ot.table.HheaTable;
+import net.java.dev.typecast.ot.table.HmtxTable;
+import net.java.dev.typecast.ot.table.MaxpTable;
+import net.java.dev.typecast.ot.table.NameTable;
+import net.java.dev.typecast.ot.table.Os2Table;
+import net.java.dev.typecast.ot.table.PostTable;
+import net.java.dev.typecast.ot.table.Table;
+import net.java.dev.typecast.ot.table.TableDirectory;
+import net.java.dev.typecast.ot.table.VheaTable;
 
 /**
- * The TrueType font.
+ * OpenType font.
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public abstract class OTFont {
 
-    private Os2Table _os2;
-    private CmapTable _cmap;
-    private HeadTable _head;
-    private HheaTable _hhea;
-    private HmtxTable _hmtx;
-    private MaxpTable _maxp;
-    private NameTable _name;
-    private PostTable _post;
-    private VheaTable _vhea;
-    private GsubTable _gsub;
-
+    private final TableDirectory _tableDirectory;
+    
+    /** 
+     * Creates a {@link OTFont}.
+     */
+    public OTFont() {
+        _tableDirectory = new TableDirectory(this);
+    }
+    
+    /**
+     * Creates a {@link OTFont} from the given binary font file data.
+     * 
+     * @see #read(byte[], int)
+     */
+    public OTFont(byte[] fontData, int tablesOrigin) throws IOException {
+        this();
+        read(fontData, tablesOrigin);
+    }
+    
     /**
      * @param fontData OpenType/TrueType font file data.
      * @param directoryOffset The Table Directory offset within the file.  For a
@@ -53,11 +75,8 @@ public abstract class OTFont {
      * individual font resource data.
      * @throws java.io.IOException
      */
-    OTFont(byte[] fontData, int tablesOrigin) throws IOException {
-
-        // Load the table directory
-//        dis.skip(directoryOffset);
-        TableDirectory tableDirectory = new TableDirectory(fontData);
+    public void read(byte[] fontData, int tablesOrigin) throws IOException {
+        _tableDirectory.read(fontData);
 
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         dis.mark(fontData.length);
@@ -66,107 +85,141 @@ public abstract class OTFont {
         // Load some prerequisite tables
         // (These are tables that are referenced by other tables, so we need to load
         // them first)
-        seekTable(tableDirectory, dis, tablesOrigin, Table.head);
-        _head = new HeadTable(dis);
+        initTable(dis, tablesOrigin, Table.head);
 
         // 'hhea' is required by 'hmtx'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.hhea);
-        _hhea = new HheaTable(dis);
+        initTable(dis, tablesOrigin, Table.hhea);
 
         // 'maxp' is required by 'glyf', 'hmtx', 'loca', and 'vmtx'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.maxp);
-        _maxp = new MaxpTable(dis);
-
+        initTable(dis, tablesOrigin, Table.maxp);
+        
         // 'vhea' is required by 'vmtx'
-        int length = seekTable(tableDirectory, dis, tablesOrigin, Table.vhea);
-        if (length > 0) {
-            _vhea = new VheaTable(dis);
-        }
+        initTable(dis, tablesOrigin, Table.vhea);
 
         // 'post' is required by 'glyf'
-        seekTable(tableDirectory, dis, tablesOrigin, Table.post);
-        _post = new PostTable(dis);
+        initTable(dis, tablesOrigin, Table.post);
 
         // Load all the other required tables
-        seekTable(tableDirectory, dis, tablesOrigin, Table.cmap);
-        _cmap = new CmapTable(dis);
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.hmtx);
-        _hmtx = new HmtxTable(dis, length, _hhea, _maxp);
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.name);
-        _name = new NameTable(dis, length);
-        seekTable(tableDirectory, dis, tablesOrigin, Table.OS_2);
-        _os2 = new Os2Table(dis);
+        initTable(dis, tablesOrigin, Table.cmap);
+        initTable(dis, tablesOrigin, Table.hmtx);
+        initTable(dis, tablesOrigin, Table.name);
+        initTable(dis, tablesOrigin, Table.OS_2);
+    }
+    
+    public void write(BinaryIO out) throws IOException {
+        _tableDirectory.write(out);
+    }
+    
+    /**
+     * {@link TableDirectory} with all font tables.
+     */
+    public TableDirectory getTableDirectory() {
+        return _tableDirectory;
+    }
+    
+    /**
+     * Adds the given {@link Table} to this font.
+     * 
+     * <p>
+     * If a {@link Table} with the same {@link Table#getType()} is already
+     * present in this font, it is removed and returned.
+     * </p>
+     *
+     * @param table
+     * @return The {@link Table} with the same {@link Table#getType()} that was
+     *         part of this font before.
+     */
+    public Table addTable(Table table) {
+        return getTableDirectory().addTable(table);
+    }
+    
+    public Table removeTable(int tag) {
+        return getTableDirectory().removeTable(tag);
     }
 
     public Os2Table getOS2Table() {
-        return _os2;
+        return getTableDirectory().os2();
     }
     
     public CmapTable getCmapTable() {
-        return _cmap;
+        return getTableDirectory().cmap();
     }
     
     public HeadTable getHeadTable() {
-        return _head;
+        return getTableDirectory().head();
     }
     
     public HheaTable getHheaTable() {
-        return _hhea;
+        return getTableDirectory().hhea();
     }
     
     public HmtxTable getHmtxTable() {
-        return _hmtx;
+        return getTableDirectory().hmtx();
     }
     
     MaxpTable getMaxpTable() {
-        return _maxp;
+        return getTableDirectory().maxp();
     }
 
     public NameTable getNameTable() {
-        return _name;
+        return getTableDirectory().name();
     }
 
     public PostTable getPostTable() {
-        return _post;
+        return getTableDirectory().post();
     }
 
     public VheaTable getVheaTable() {
-        return _vhea;
+        return getTableDirectory().vhea();
     }
 
     public GsubTable getGsubTable() {
-        return _gsub;
+        return getTableDirectory().gsub();
     }
 
     public int getAscent() {
-        return _hhea.getAscender();
+        return getHheaTable().getAscender();
     }
 
     public int getDescent() {
-        return _hhea.getDescender();
+        return getHheaTable().getDescender();
     }
 
     public int getNumGlyphs() {
-        return _maxp.getNumGlyphs();
+        return getMaxpTable().getNumGlyphs();
     }
 
     public abstract Glyph getGlyph(int i);
 
-    int seekTable(
-            TableDirectory tableDirectory,
-            DataInputStream dis,
-            int tablesOrigin,
-            int tag) throws IOException {
-        dis.reset();
-        TableDirectory.Entry entry = tableDirectory.getEntryByTag(tag);
+    protected Table initTable(DataInputStream dis, int tablesOrigin, int tag) throws IOException {
+        TableDirectory directory = getTableDirectory();
+        TableDirectory.Entry entry = directory.getEntryByTag(tag);
         if (entry == null) {
-            return 0;
+            return null;
         }
-        dis.skip(tablesOrigin + entry.getOffset());
-        return entry.getLength();
+        return entry.initTable(dis, tablesOrigin);
     }
 
+    @Override
     public String toString() {
-        return _head.toString();
+        return getHeadTable().toString();
+    }
+    
+    /**
+     * Dumps information of all tables to the given {@link Writer}.
+     */
+    public void dumpTo(Writer out) throws IOException {
+        getTableDirectory().dumpTo(out);
+    }
+
+    /** 
+     * Writes the toString() representation of the given table to the given {@link Writer}.
+     */
+    protected static void dump(Writer out, Table table) throws IOException {
+        if (table != null) {
+            table.dump(out);
+            out.write("\n");
+            out.write("\n");
+        }
     }
 }

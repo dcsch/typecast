@@ -10,35 +10,45 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.Fmt;
+
 /**
+ * loca — Index to Location Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/loca">Spec: Index to Location</a>
  */
-public class LocaTable implements Table {
+public class LocaTable extends AbstractTable implements Writable {
 
     private int[] _offsets;
-    private short _factor;
-    private int _length;
 
     private static final Logger logger = LoggerFactory.getLogger(LocaTable.class);
 
-    public LocaTable(
-            DataInput di,
-            int length,
-            HeadTable head,
-            MaxpTable maxp) throws IOException {
-        _offsets = new int[maxp.getNumGlyphs() + 1];
-        boolean shortEntries = head.getIndexToLocFormat() == 0;
+    /**
+     * Creates a {@link LocaTable}.
+     */
+    public LocaTable(TableDirectory directory) {
+        super(directory);
+    }
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        int numGlyphs = maxp().getNumGlyphs();
+        _offsets = new int[numGlyphs + 1];
+        boolean shortEntries = head().useShortEntries();
         if (shortEntries) {
-            _factor = 2;
-            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
-                _offsets[i] = di.readUnsignedShort();
+            for (int i = 0; i <= numGlyphs; i++) {
+                _offsets[i] = 2 * di.readUnsignedShort();
             }
         } else {
-            _factor = 1;
-            for (int i = 0; i <= maxp.getNumGlyphs(); i++) {
+            for (int i = 0; i <= numGlyphs; i++) {
                 _offsets[i] = di.readInt();
             }
         }
@@ -53,25 +63,54 @@ public class LocaTable implements Table {
             lastOffset = offset;
             ++index;
         }
-        _length = length;
+    }
+    
+    void updateFormat() {
+        HeadTable headTable = head();
+        for (int offset : _offsets) {
+            if (offset > 2 * 0xFFFF || offset % 2 != 0) {
+                headTable.setShortEntries(false);
+                return;
+            }
+        }
+        headTable.setShortEntries(true);
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        boolean shortEntries = head().useShortEntries();
+        if (shortEntries) {
+            for (int offset : _offsets) {
+                out.writeShort(offset / 2);
+            }
+        } else {
+            for (int offset : _offsets) {
+                out.writeInt(offset);
+            }
+        }
+    }
+    
+    @Override
+    public int getType() {
+        return loca;
     }
 
-    public int getOffset(int i) {
-        if (_offsets == null) {
-            return 0;
-        }
-        return _offsets[i] * _factor;
+    public int getOffset(int glyphId) {
+        return _offsets[glyphId];
+    }
+    
+    public void setOffset(int glyphId, int offset) {
+        _offsets[glyphId] = offset;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("'loca' Table - Index To Location Table\n--------------------------------------\n")
-            .append("Size = ").append(_length).append(" bytes, ")
-            .append(_offsets.length).append(" entries\n");
+        sb.append("'loca' Table - Index To Location Table\n");
+        sb.append("--------------------------------------\n");
+        sb.append("    entries = " + _offsets.length + "\n");
         for (int i = 0; i < _offsets.length; i++) {
-            sb.append("        Idx ").append(i)
-                .append(" -> glyfOff 0x").append(getOffset(i)).append("\n");
+            sb.append("    Index " + Fmt.pad(5, i) + " -> Offset " + Fmt.pad(7, getOffset(i)) + "\n");
         }
         return sb.toString();
     }

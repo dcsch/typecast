@@ -23,22 +23,75 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Arrays;
 
+import net.java.dev.typecast.io.BinaryOutput;
+
 /**
+ * Format 4: Segment mapping to delta values
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-4-segment-mapping-to-delta-values"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat4 extends CmapFormat {
 
+    /**
+     * uint16   length  This is the length in bytes of the subtable.
+     */
     private final int _length;
+    
+    /**
+     * uint16   language
+     */
     private final int _language;
+    
+    /**
+     * uint16   segCountX2  2 × segCount.
+     */
     private final int _segCountX2;
+    
+    /**
+     * uint16   searchRange     2 × (2**floor(log2(segCount)))
+     */
     private final int _searchRange;
+    
+    /**
+     * uint16   entrySelector   log2(searchRange/2)
+     */
     private final int _entrySelector;
+    
+    /**
+     * uint16   rangeShift  2 × segCount - searchRange
+     */
     private final int _rangeShift;
+    
+    /**
+     * uint16   endCode[segCount]   End characterCode for each segment, last=0xFFFF.
+     */
     private final int[] _endCode;
+    
+    /**
+     * uint16   startCode[segCount]     Start character code for each segment.
+     */
     private final int[] _startCode;
+    
+    /**
+     * int16    idDelta[segCount]   Delta for all character codes in segment.
+     */
     private final int[] _idDelta;
+    
+    /**
+     * uint16   idRangeOffset[segCount]     Offsets into glyphIdArray or 0
+     */
     private final int[] _idRangeOffset;
+    
+    /**
+     * uint16   glyphIdArray[ ]     Glyph index array (arbitrary length)
+     */
     private final int[] _glyphIdArray;
+    
+    /**
+     * @see #_segCountX2
+     */
     private final int _segCount;
 
     CmapFormat4(DataInput di) throws IOException {
@@ -79,6 +132,38 @@ public class CmapFormat4 extends CmapFormat {
 //        if (leftover > 0) {
 //            di.skipBytes(leftover);
 //        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        out.writeShort(getFormat());
+        try (BinaryOutput lengthOut = out.reserve(2)) {
+            out.writeShort(getLanguage());
+            out.writeShort(_segCountX2);
+            out.writeShort(_searchRange);
+            out.writeShort(_entrySelector);
+            out.writeShort(_rangeShift);
+            for (int endCode : _endCode) {
+                out.writeShort(endCode);
+            }
+            // Padding
+            out.writeShort(0);
+            for (int startCode : _startCode) {
+                out.writeShort(startCode);
+            }
+            for (int idDelta : _idDelta) {
+                out.writeShort(idDelta);
+            }
+            for (int idRangeOffset : _idRangeOffset) {
+                out.writeShort(idRangeOffset);
+            }
+            for (int glyphId : _glyphIdArray) {
+                out.writeShort(glyphId);
+            }
+            
+            lengthOut.writeShort((int) (out.getPosition() - start));
+        }
     }
 
     @Override
@@ -134,21 +219,14 @@ public class CmapFormat4 extends CmapFormat {
     @Override
     public String toString() {
         return super.toString() +
-                ", segCountX2: " +
-                _segCountX2 +
-                ", searchRange: " +
-                _searchRange +
-                ", entrySelector: " +
-                _entrySelector +
-                ", rangeShift: " +
-                _rangeShift +
-                ", endCode: " +
-                Arrays.toString(_endCode) +
-                ", startCode: " +
-                Arrays.toString(_endCode) +
-                ", idDelta: " +
-                Arrays.toString(_idDelta) +
-                ", idRangeOffset: " +
-                Arrays.toString(_idRangeOffset);
+            "    format:         " + getFormat() + "\n" +
+            "    segCountX2:     " + _segCountX2 + "\n" +
+            "    searchRange:    " + _searchRange + "\n" +
+            "    entrySelector:  " + _entrySelector + "\n" +
+            "    rangeShift:     " + _rangeShift + "\n" +
+            "    endCode:        " + Arrays.toString(_endCode) + "\n" +
+            "    startCode:      " + Arrays.toString(_startCode) + "\n" +
+            "    idDelta:        " + Arrays.toString(_idDelta) + "\n" +
+            "    idRangeOffset:  " + Arrays.toString(_idRangeOffset) + "\n";
     }
 }

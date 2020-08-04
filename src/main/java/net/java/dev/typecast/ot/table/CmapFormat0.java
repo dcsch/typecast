@@ -21,24 +21,64 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.Arrays;
+
+import net.java.dev.typecast.io.BinaryOutput;
 
 /**
+ * Format 0: Byte encoding table
+ * 
+ * <p>
  * Simple Macintosh cmap table, mapping only the ASCII character set to glyphs.
+ * </p>
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-0-byte-encoding-table"
  *
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat0 extends CmapFormat {
 
+    /**
+     * uint16   
+     * 
+     * @see #getLength()
+     */
     private final int _length;
+    
+    /**
+     * uint16 
+     * 
+     * @see #getLanguage()
+     */
     private final int _language;
-    private final int[] _glyphIdArray = new int[256];
+    
+    private final int[] _glyphIdArray;
 
     CmapFormat0(DataInput di) throws IOException {
         _length = di.readUnsignedShort();
         _language = di.readUnsignedShort();
-        for (int i = 0; i < 256; i++) {
+        
+        // Available mapping data is total length minus  format, length, and language field.
+        int mappings = _length - 6;
+        _glyphIdArray = new int[mappings];
+        for (int i = 0; i < mappings; i++) {
             _glyphIdArray[i] = di.readUnsignedByte();
         }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        out.writeShort(getFormat());
+        BinaryOutput lengthOut = out.reserve(2);
+        out.writeShort(getLanguage());
+        for (int n = 0, cnt = _glyphIdArray.length; n < cnt; n++) {
+            out.writeByte(_glyphIdArray[n]);
+        }
+        long length = out.getPosition() - start;
+        
+        lengthOut.writeShort((int) length);
+        lengthOut.close();
     }
 
     @Override
@@ -76,5 +116,13 @@ public class CmapFormat0 extends CmapFormat {
         } else {
             return 0;
         }
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() +
+            "    format:         " + getFormat() + "\n" +
+            "    language:       " + getLanguage() + "\n" +
+            "    glyphIdArray:   " + Arrays.toString(_glyphIdArray) + "\n";
     }
 }

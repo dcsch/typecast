@@ -20,21 +20,25 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
- * The Vertical Device Metrics table for TrueType outlines.
+ * VDMX - Vertical Device Metrics Table for TrueType outlines.
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/vdmx">Spec: Vertical Device Metrics</a>
  */
 public class VdmxTable implements Table {
 
-    private static class Ratio {
+    private static class RatioRange {
         
         private byte _bCharSet;
         private byte _xRatio;
         private byte _yStartRatio;
         private byte _yEndRatio;
         
-        Ratio(DataInput di) throws IOException {
+        RatioRange(DataInput di) throws IOException {
             _bCharSet = di.readByte();
             _xRatio = di.readByte();
             _yStartRatio = di.readByte();
@@ -83,14 +87,14 @@ public class VdmxTable implements Table {
         }
     }
     
-    private static class Group {
+    private static class VDMXGroup {
         
         private int _recs;
         private int _startsz;
         private int _endsz;
         private VTableRecord[] _entry;
         
-        Group(DataInput di) throws IOException {
+        VDMXGroup(DataInput di) throws IOException {
             _recs = di.readUnsignedShort();
             _startsz = di.readUnsignedByte();
             _endsz = di.readUnsignedByte();
@@ -116,52 +120,112 @@ public class VdmxTable implements Table {
             return _entry;
         }
     }
+
+    /**
+     * Version 0 of {@link VdmxTable}, 
+     */
+    public static final int VERSION_0 = 0;
     
-    private int _version;
-    private int _numRecs;
-    private int _numRatios;
-    private Ratio[] _ratRange;
-    private int[] _offset;
-    private Group[] _groups;
+    /**
+     * Version 1 of {@link VdmxTable}, 
+     */
+    public static final int VERSION_1 = 1;
     
-    /** Creates a new instance of VdmxTable */
-    public VdmxTable(DataInput di) throws IOException {
+    private int _version = VERSION_1;
+    private final ArrayList<RatioRange> _ratRange = new ArrayList<>();
+    private final ArrayList<VDMXGroup>  _groups = new ArrayList<>();
+    
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
-        _numRecs = di.readUnsignedShort();
-        _numRatios = di.readUnsignedShort();
-        _ratRange = new Ratio[_numRatios];
-        for (int i = 0; i < _numRatios; ++i) {
-            _ratRange[i] = new Ratio(di);
+        int numRecs = di.readUnsignedShort();
+        int numRatios = di.readUnsignedShort();
+        _ratRange.ensureCapacity(numRatios);
+        for (int i = 0; i < numRatios; ++i) {
+            _ratRange.add(new RatioRange(di));
         }
-        _offset = new int[_numRatios];
-        for (int i = 0; i < _numRatios; ++i) {
-            _offset[i] = di.readUnsignedShort();
+        
+        // TODO: Offsets are not used, why?
+        int[] offset = new int[numRatios];
+        for (int i = 0; i < numRatios; ++i) {
+            offset[i] = di.readUnsignedShort();
         }
-        _groups = new Group[_numRecs];
-        for (int i = 0; i < _numRecs; ++i) {
-            _groups[i] = new Group(di);
+
+        _groups.ensureCapacity(numRecs);
+        for (int i = 0; i < numRecs; ++i) {
+            _groups.add(new VDMXGroup(di));
         }
     }
     
+    @Override
+    public int getType() {
+        return VDMX;
+    }
+    
+    /**
+     * Version number.
+     * 
+     * @see #VERSION_0
+     * @see #VERSION_1
+     */
+    public int getVersion() {
+        return _version;
+    }
+
+    /** 
+     * Number of ratio ranges and offsets.
+     */
+    public int getNumRatios() {
+        return _ratRange.size();
+    }
+
+    /** 
+     * Number of {@link VDMXGroup}s.
+     * 
+     * @see #getGroup(int)
+     */
+    public int getNumRecs() {
+        return _groups.size();
+    }
+
+    /**
+     * {@link VDMXGroup} with given index.
+     * 
+     * @see #getNumRecs()
+     */
+    public VDMXGroup getGroup(int index) {
+        return _groups.get(index);
+    }
+
+    /**
+     * {@link RatioRange} with the given index.
+     * 
+     * @see #getNumRatios()
+     */
+    public RatioRange getRatio(int index) {
+        return _ratRange.get(index);
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("'VDMX' Table - Precomputed Vertical Device Metrics\n")
             .append("--------------------------------------------------\n")
             .append("  Version:                 ").append(_version).append("\n")
-            .append("  Number of Hgt Records:   ").append(_numRecs).append("\n")
-            .append("  Number of Ratio Records: ").append(_numRatios).append("\n");
-        for (int i = 0; i < _numRatios; ++i) {
+            .append("  Number of Hgt Records:   ").append(getNumRecs()).append("\n")
+            .append("  Number of Ratio Records: ").append(getNumRatios()).append("\n");
+        for (int i = 0; i < getNumRatios(); ++i) {
+            RatioRange ratio = getRatio(i);
             sb.append("\n    Ratio Record #").append(i + 1).append("\n")
-                .append("\tCharSetId     ").append(_ratRange[i].getBCharSet()).append("\n")
-                .append("\txRatio        ").append(_ratRange[i].getXRatio()).append("\n")
-                .append("\tyStartRatio   ").append(_ratRange[i].getYStartRatio()).append("\n")
-                .append("\tyEndRatio     ").append(_ratRange[i].getYEndRatio()).append("\n")
-                .append("\tRecord Offset ").append(_offset[i]).append("\n");
+                .append("\tCharSetId     ").append(ratio.getBCharSet()).append("\n")
+                .append("\txRatio        ").append(ratio.getXRatio()).append("\n")
+                .append("\tyStartRatio   ").append(ratio.getYStartRatio()).append("\n")
+                .append("\tyEndRatio     ").append(ratio.getYEndRatio()).append("\n");
         }
         sb.append("\n   VDMX Height Record Groups\n")
             .append("   -------------------------\n");
-        for (int i = 0; i < _numRecs; ++i) {
-            Group group = _groups[i];
+        for (int i = 0; i < getNumRecs(); ++i) {
+            VDMXGroup group = getGroup(i);
             sb.append("   ").append(i + 1)
                 .append(".   Number of Hgt Records  ").append(group.getRecs()).append("\n")
                 .append("        Starting Y Pel Height  ").append(group.getStartSZ()).append("\n")
@@ -175,5 +239,5 @@ public class VdmxTable implements Table {
         }
         return sb.toString();
     }
-
+    
 }

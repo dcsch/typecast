@@ -81,4 +81,13 @@ public class Feature {
         return _lookupListIndex[i];
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("            featureParams     = " + _featureParams + "\n");
+        sb.append("            lookupCount       = " + _lookupCount + "\n");
+        sb.append("            lookupListIndex   = " + LangSys.toString(_lookupListIndex) + "\n");
+        return sb.toString();
+    }
+
 }

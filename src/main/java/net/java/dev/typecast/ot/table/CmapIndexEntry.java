@@ -53,14 +53,39 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
 /**
+ * Encoding record.
+ * 
+ * <p>
+ * The array of encoding records specifies particular encodings and the offset
+ * to the subtable for each encoding.
+ * </p>
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
 
+    /**
+     * @see #getPlatformId()
+     */
     private int _platformId;
+
+    /**
+     * @see #getEncodingId()
+     */
     private int _encodingId;
+
+    /**
+     * @see #getOffset()
+     */
     private int _offset;
+    
+    /**
+     * @see #getFormat()
+     */
     private CmapFormat _format;
 
     CmapIndexEntry(DataInput di) throws IOException {
@@ -69,14 +94,55 @@ public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
         _offset = di.readInt();
     }
 
+    /**
+     * Writes the EncodingRecord with offset data.
+     *
+     * @param out
+     *        The {@link BinaryOutput} to write to.
+     * @param start
+     *        The start position of the surrounding table.
+     * @return A {@link Writable} writing the actual format subtable.
+     */
+    public Writable writeEncodingRecord(BinaryOutput out, long start) throws IOException {
+        out.writeShort(getPlatformId());
+        out.writeShort(getEncodingId());
+        BinaryOutput offsetOut = out.reserve(4);
+        
+        return new Writable() {
+            @Override
+            public void write(BinaryOutput out) throws IOException {
+                long offset = out.getPosition() - start;
+                getFormat().write(out);
+                
+                offsetOut.writeInt((int) offset);
+                offsetOut.close();
+            }
+        };
+    }
+
+    /**
+     * uint16
+     * 
+     * Platform ID.
+     */
     public int getPlatformId() {
         return _platformId;
     }
 
+    /**
+     * uint16
+     * 
+     * Platform-specific encoding ID.
+     */
     public int getEncodingId() {
         return _encodingId;
     }
 
+    /**
+     * Offset32
+     * 
+     * Byte offset from beginning of table to the subtable for this encoding.
+     */
     public int getOffset() {
         return _offset;
     }
@@ -91,16 +157,13 @@ public class CmapIndexEntry implements Comparable<CmapIndexEntry> {
 
     @Override
     public String toString() {
-        return "platform id: " +
-                _platformId +
-                " (" +
-                ID.getPlatformName((short) _platformId) +
-                "), encoding id: " +
-                _encodingId +
-                " (" +
-                ID.getEncodingName((short) _platformId, (short) _encodingId) +
-                "), offset: " +
-                _offset;
+        return 
+            "    Index entry\n"+
+            "    -----------\n"+
+            "    platformId:     " + _platformId + " (" + ID.getPlatformName((short) _platformId) + ")\n" + 
+            "    encodingId:     " + _encodingId + " (" + ID.getEncodingName((short) _platformId, (short) _encodingId) + ")\n" + 
+            "    offset:         " + _offset + "\n" +
+            _format;
     }
 
     @Override

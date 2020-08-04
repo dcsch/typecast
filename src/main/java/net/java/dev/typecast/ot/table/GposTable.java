@@ -22,22 +22,46 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
+ * GPOS — Glyph Positioning Table
+ * 
  * TODO: To be implemented
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/gpos">Spec: Glyph Positioning Table</a>
  */
-class GposTable implements Table {
+public class GposTable implements Table {
 
-    protected GposTable(DataInput di) throws IOException {
+    private int _version;
+    private int _scriptList;
+    private int _featureList;
+    private int _lookupList;
 
-        // GPOS Header
-        int version = di.readInt();
-        int scriptList = di.readInt();
-        int featureList = di.readInt();
-        int lookupList = di.readInt();
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readInt();
+        _scriptList = di.readInt();
+        _featureList = di.readInt();
+        _lookupList = di.readInt();
+        
+        // TODO: Implement.
     }
 
+    @Override
+    public int getType() {
+        return GPOS;
+    }
+
+    @Override
     public String toString() {
-        return "GPOS";
+        StringBuilder sb = new StringBuilder();
+        sb.append("'GPOS' Table - Glyph Positioning Table\n");
+        sb.append("--------------------------------------\n");
+        sb.append("    version      = ").append(_version).append("\n");
+        sb.append("    scriptList   = ").append(_scriptList).append("\n");
+        sb.append("    featureList  = ").append(_featureList).append("\n");
+        sb.append("    lookupList   = ").append(_lookupList).append("\n");
+        return sb.toString();
     }
 
 }

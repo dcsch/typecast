@@ -8,8 +8,8 @@
 
 package net.java.dev.typecast.ot.table;
 
-import java.io.IOException;
 import java.io.DataInput;
+import java.io.IOException;
 
 /**
  *
@@ -20,6 +20,7 @@ class DsigEntry {
     private int format;
     private int length;
     private int offset;
+    private SignatureBlock _signature;
     
     /** Creates new DsigEntry */
     DsigEntry(DataInput di) throws IOException {
@@ -38,5 +39,19 @@ class DsigEntry {
     
     public int getOffset() {
         return offset;
+    }
+
+    /**
+     * The {@link SignatureBlock} of this entry.
+     */
+    public SignatureBlock getSignature() {
+        return _signature;
+    }
+    
+    /** 
+     * @see #getSignature()
+     */
+    public void setSignature(SignatureBlock signatureBlock) {
+        _signature = signatureBlock;
     }
 }

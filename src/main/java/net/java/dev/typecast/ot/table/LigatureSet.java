@@ -80,5 +80,21 @@ class LigatureSet {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                ligatureCount   = " + _ligatureCount + "\n");
+        sb.append("                \n");
+        
+        int num = 1;
+        for (Ligature lignature : _ligatures) {
+            sb.append("                lignature " + (num++) + "\n");
+            sb.append("                -------------\n");
+            sb.append(lignature.toString());
+            sb.append("                \n");
+        }
+        return sb.toString();
+    }
+
 }
 

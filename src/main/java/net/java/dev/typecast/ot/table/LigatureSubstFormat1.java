@@ -88,7 +88,27 @@ public class LigatureSubstFormat1 extends LigatureSubst {
         return 1;
     }
 
+    @Override
     public String getTypeAsString() {
         return "LigatureSubstFormat1";
-    }    
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                format             = " + getFormat() + "\n");
+        sb.append("                type               = " + getTypeAsString() + "\n");
+        sb.append("                coverageOffset     = " + _coverageOffset + "\n");
+        sb.append("                ligSetCount        = " + _ligSetCount + "\n");
+        sb.append(_coverage.toString());
+        
+        int num = 1;
+        for (LigatureSet ligSet : _ligatureSets) {
+            sb.append("                lignatureSet " + (num++) + "\n");
+            sb.append("                ----------------\n");
+            sb.append(ligSet.toString());
+            sb.append("                \n");
+        }
+        return sb.toString();
+    }
 }

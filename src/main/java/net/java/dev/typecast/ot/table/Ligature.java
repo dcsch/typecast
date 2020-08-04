@@ -81,4 +81,12 @@ class Ligature {
         return (i == 0) ? _ligGlyph : _components[i-1];
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                    ligGlyph   = " + _ligGlyph + "\n");
+        sb.append("                    components = " + LangSys.toString(_components) + "\n");
+        return sb.toString();
+    }
+
 }

@@ -10,19 +10,42 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 import net.java.dev.typecast.ot.Disassembler;
 
 /**
+ * prep — Control Value Program
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/prep">Spec: Control Value Program Table</a>
  */
-class PrepTable extends Program implements Table {
+public class PrepTable extends Program implements Table, Writable {
 
-    public PrepTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         readInstructions(di, length);
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        writeInstructionsContent(out);
+    }
 
+    @Override
+    public int getType() {
+        return prep;
+    }
+
+    @Override
     public String toString() {
-        return Disassembler.disassemble(getInstructions(), 0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("prep - Control Value Program Table\n");
+        sb.append("----------------------------------\n");
+        sb.append(Disassembler.disassemble(getInstructions(), 4));
+        return sb.toString();
     }
 
 }

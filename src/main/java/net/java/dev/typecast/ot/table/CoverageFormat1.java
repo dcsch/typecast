@@ -90,4 +90,13 @@ public class CoverageFormat1 extends Coverage {
     public int[] getGlyphIds() {
         return _glyphIds;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                coverageFormat  = " + getFormat() + "\n");
+        sb.append("                glyphCount      = " + _glyphCount + "\n");
+        sb.append("                glyphIds        = " + LangSys.toString(_glyphIds) + "\n");
+        return sb.toString();
+    }
 }

@@ -11,32 +11,58 @@ package net.java.dev.typecast.ot.table;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+import net.java.dev.typecast.ot.Fmt;
+
 /**
+ * Control Value Table
+ * 
+ * @see <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/cvt">Spec: Control Value Table</a>
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-class CvtTable implements Table {
+public class CvtTable implements Table, Writable {
 
-    private final short[] values;
+    private short[] values;
 
-    protected CvtTable(DataInput di, int length) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         int len = length / 2;
         values = new short[len];
         for (int i = 0; i < len; i++) {
             values[i] = di.readShort();
         }
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        for (short value : values) {
+            out.writeShort(value);
+        }
+    }
+
+    @Override
+    public int getType() {
+        return cvt;
+    }
 
     public short[] getValues() {
         return values;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("'cvt ' Table - Control Value Table\n----------------------------------\n");
-        sb.append("Size = ").append(0).append(" bytes, ").append(values.length).append(" entries\n");
-        sb.append("        Values\n        ------\n");
+        sb.append("'cvt ' Table - Control Value Table\n");
+        sb.append("----------------------------------\n");
+        sb.append("    valueCnt = " + values.length + "\n");
+        sb.append("    \n");
+        
+        sb.append("    Values\n");
+        sb.append("    ------\n");
         for (int i = 0; i < values.length; i++) {
-            sb.append("        ").append(i).append(": ").append(values[i]).append("\n");
+            sb.append("        " + Fmt.pad(3, i) + ": " + values[i] + "\n");
         }
         return sb.toString();
     }

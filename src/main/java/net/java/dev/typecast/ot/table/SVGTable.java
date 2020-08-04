@@ -1,0 +1,340 @@
+/*
+ * Copyright (c)ff 2020 Business Operation Systems GmbH. All Rights Reserved.
+ */
+package net.java.dev.typecast.ot.table;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
+
+/**
+ * The SVG (Scalable Vector Graphics) table
+ * 
+ * <p>
+ * This table contains SVG descriptions for some or all of the glyphs in the font.
+ * </p>
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/svg"
+ * 
+ * @author <a href="mailto:bhu@top-logic.com">Bernhard Haumacher</a>
+ */
+public class SVGTable implements Table, Writable {
+
+    /**
+     * @see #getVersion()
+     */
+    public static final int VERSION = 0;
+    
+    /**
+     * @see #getVersion()
+     */
+    private int _version = VERSION;
+
+    /**
+     * @see #getDocumentRecords()
+     */
+    private final ArrayList<SVGDocumentRecord> _documentRecords = new ArrayList<>();
+
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        _version = di.readUnsignedShort();
+        
+        // Offset to the SVG Document List, from the start of the SVG table.
+        // Must be non-zero. 
+        int offsetToSVGDocumentList = di.readInt();
+        di.skipBytes(offsetToSVGDocumentList - 6);
+
+        // SVG Document List starts here.
+        int offset = 0;
+
+        // uint16 Number of SVG document records. Must be non-zero.
+        int numEntries = di.readUnsignedShort();
+        offset += 2;
+        
+        _documentRecords.ensureCapacity(numEntries);
+        for (int n = 0; n < numEntries; n++) {
+            _documentRecords.add(SVGDocumentRecord.readFrom(di));
+        }
+        offset += numEntries * 12;
+        
+        ArrayList<SVGDocumentRecord> recordsInOffsetOrder = new ArrayList<>(_documentRecords);
+        Collections.sort(recordsInOffsetOrder, (a, b) -> Integer.compare(a.getSvgDocOffset(), b.getSvgDocOffset()));
+        
+        int lastOffset = 0;
+        for (int n = 0; n < numEntries; n++) {
+            SVGDocumentRecord record = recordsInOffsetOrder.get(n);
+            
+            int docOffset = record.getSvgDocOffset();
+            if (docOffset == lastOffset) {
+                // Pointing to the same document.
+                record.setDocument(recordsInOffsetOrder.get(n - 1).getDocument());
+            } else {
+                int skip = docOffset - offset;
+                assert skip >= 0;
+                di.skipBytes(skip);
+                offset = docOffset;
+            }
+            lastOffset = offset;
+            record.readDoc(di);
+            offset += record.getSvgDocLength();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(_version);
+        
+        // Offset to the SVG Document List, from the start of the SVG table.
+        // Must be non-zero. 
+        try (BinaryOutput offsetOut = out.reserve(4)) {
+            // Reserved.
+            out.writeInt(0);
+
+            // SVG Document List starts here.
+            long docListStart = out.getPosition();
+            long docListOffset = docListStart - start;
+            offsetOut.writeInt((int) docListOffset);
+
+            int numEntries = _documentRecords.size();
+            out.writeShort(numEntries);
+            
+            List<Writable> docOuts = new ArrayList<>(numEntries);
+            for (SVGDocumentRecord record : _documentRecords) {
+                docOuts.add(record.write(out, docListStart));
+            }
+            
+            for (Writable docOut : docOuts) {
+                docOut.write(out);
+            }
+        }
+    }
+    
+    /**
+     * Records must be sorted in order of increasing startGlyphID. For any given
+     * record, the startGlyphID must be less than or equal to the endGlyphID of
+     * that record, and also must be greater than the endGlyphID of any previous
+     * record.
+     * 
+     * <p>
+     * Note: Two or more records can point to the same SVG document. In this
+     * way, a single SVG document can provide glyph descriptions for
+     * discontinuous glyph ID ranges.
+     * </p>
+     */
+    public List<SVGDocumentRecord> getDocumentRecords() {
+        return _documentRecords;
+    }
+    
+    /**
+     * uint16   version     Table version (starting at 0). Set to {@link #VERSION}.
+     */
+    public int getVersion() {
+        return _version;
+    }
+
+    @Override
+    public int getType() {
+        return 0;
+    }
+    
+    @Override
+    public String toString() {
+        return "SVG Table\n" +
+               "---------\n" + 
+               "  Version: " + getVersion() + "\n" +
+               "  Number of records: " + getDocumentRecords().size();
+    }
+    
+    @Override
+    public void dump(Writer out) throws IOException {
+        Table.super.dump(out);
+        
+        for (SVGDocumentRecord record : getDocumentRecords()) {
+            out.write("\n\n");
+            out.write(record.toString());
+        }
+    }
+
+    /**
+     * Each SVG document record specifies a range of glyph IDs (from
+     * startGlyphID to endGlyphID, inclusive), and the location of its
+     * associated SVG document in the SVG table.
+     */
+    public static class SVGDocumentRecord {
+
+        /**
+         * @see #getStartGlyphID()
+         */
+        private int _startGlyphID;
+
+        /**
+         * @see #getEndGlyphID()
+         */
+        private int _endGlyphID;
+        
+        /**
+         * @see #getSvgDocOffset()
+         */
+        private int _svgDocOffset;
+        
+        /**
+         * @see #getSvgDocLength()
+         */
+        private int _svgDocLength;
+
+        private String _document;
+
+        /** 
+         * Creates a {@link SVGDocumentRecord}.
+         */
+        public void read(DataInput di) throws IOException {
+            _startGlyphID = di.readUnsignedShort();
+            _endGlyphID = di.readUnsignedShort();
+            _svgDocOffset = di.readInt();
+            _svgDocLength = di.readInt();
+        }
+        
+        /** 
+         * Reads a {@link SVGDocumentRecord} from the given input.
+         */
+        public static SVGDocumentRecord readFrom(DataInput di) throws IOException {
+            SVGDocumentRecord result = new SVGDocumentRecord();
+            result.read(di);
+            return result;
+        }
+
+        public Writable write(BinaryOutput out, long docListStart) throws IOException {
+            out.writeShort(_startGlyphID);
+            out.writeShort(_endGlyphID);
+            BinaryOutput offsetOut = out.reserve(8);
+            
+            return new Writable() {
+                @Override
+                public void write(BinaryOutput out) throws IOException {
+                    long docStart = out.getPosition();
+                    long docOffset = docStart - docListStart;
+                    
+                    writeDoc(out);
+                    
+                    long docLength = out.getPosition() - docStart;
+                    
+                    offsetOut.writeInt((int) docOffset);
+                    offsetOut.writeInt((int) docLength);
+                    offsetOut.close();
+                }
+            };
+        }
+        
+        /** 
+         * Reads the SVG document from the given reader.
+         */
+        public void readDoc(DataInput di) throws IOException {
+            byte[] docData = new byte[getSvgDocLength()];
+            di.readFully(docData);
+            
+            if (docData[0] == 0x1F && docData[1] == 0x8B && docData[2] == 0x08) {
+                // Gzip encoded document.
+                try (GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(docData))) {
+                    readDoc(in);
+                }
+            } else {
+                try (InputStream in = new ByteArrayInputStream(docData)) {
+                    readDoc(in);
+                }
+            }
+        }
+
+        private void readDoc(InputStream in) throws IOException {
+            StringBuilder doc = new StringBuilder();
+            char[] buffer = new char[4096];
+            try (InputStreamReader r = new InputStreamReader(in, Charset.forName("utf-8"))) {
+                while (true) {
+                    int direct = r.read(buffer);
+                    if (direct < 0) {
+                        break;
+                    }
+                    doc.append(buffer, 0, direct);
+                }
+            }
+            
+            _document = doc.toString();
+        }
+
+        void writeDoc(BinaryOutput out) throws IOException {
+            out.write(_document.getBytes("utf-8"));
+        }
+
+        /**
+         * uint16
+         * 
+         * The first glyph ID for the range covered by this record.
+         */
+        public int getStartGlyphID() {
+            return _startGlyphID;
+        }
+        
+        /**
+         * uint16
+         * 
+         * The last glyph ID for the range covered by this record.
+         */
+        public int getEndGlyphID() {
+            return _endGlyphID;
+        }
+        
+        /**
+         * Offset32 
+         * 
+         * Offset from the beginning of the SVGDocumentList to an SVG document. Must be non-zero.
+         */
+        public int getSvgDocOffset() {
+            return _svgDocOffset;
+        }
+        
+        /**
+         * uint32
+         * 
+         * Length of the SVG document data. Must be non-zero.
+         */
+        public int getSvgDocLength() {
+            return _svgDocLength;
+        }
+        
+        /**
+         * The SVG document as XML string.
+         */
+        public String getDocument() {
+            return _document;
+        }
+
+        /** 
+         * @see #getDocument()
+         */
+        public void setDocument(String document) {
+            _document = document;
+        }
+        
+        @Override
+        public String toString() {
+            return 
+                "    SVG document record\n" + 
+                "    -------------------\n" + 
+                "      startGlyphID: " + getStartGlyphID() + "\n" +
+                "      endGlyphID:   " + getEndGlyphID() + "\n" + 
+                "      svg:          " + getDocument();
+        }
+    }
+}

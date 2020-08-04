@@ -110,5 +110,24 @@ public class ScriptList {
         return null;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("    scriptList\n");
+        sb.append("    ----------\n");
+        sb.append("        scriptCount = " + _scriptCount + "\n");
+        sb.append("\n");
+
+        int num = 1;
+        for (Script script : _scripts) {
+            sb.append("        script " + (num ++) + "\n");
+            sb.append("        ----------\n");
+            
+            sb.append(script.toString());
+        }
+        
+        return sb.toString();
+    }
+
 }
 

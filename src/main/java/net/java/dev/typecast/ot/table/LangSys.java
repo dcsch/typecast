@@ -100,5 +100,26 @@ public class LangSys {
         return false;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("                lookupOrder     = " + _lookupOrder + "\n");
+        sb.append("                reqFeatureIndex = " + _reqFeatureIndex + "\n");
+        sb.append("                featureCount    = " + _featureCount + "\n");
+        sb.append("                featureIndex    = " + toString(_featureIndex) + "\n");
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    static String toString(int[] featureIndex) {
+        StringBuffer sb = new StringBuffer();
+        for (int n = 0, cnt = featureIndex.length; n < cnt; n++) {
+            if (n > 0) {
+                sb.append(", ");
+            }
+            sb.append(featureIndex[n]);
+        }
+        return sb.toString();
+    }
 }
 

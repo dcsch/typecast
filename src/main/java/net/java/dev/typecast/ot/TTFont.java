@@ -18,92 +18,99 @@
 
 package net.java.dev.typecast.ot;
 
-import net.java.dev.typecast.ot.table.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class TTFont extends OTFont {
+import net.java.dev.typecast.ot.table.GaspTable;
+import net.java.dev.typecast.ot.table.GlyfTable;
+import net.java.dev.typecast.ot.table.HdmxTable;
+import net.java.dev.typecast.ot.table.HmtxTable;
+import net.java.dev.typecast.ot.table.KernTable;
+import net.java.dev.typecast.ot.table.LocaTable;
+import net.java.dev.typecast.ot.table.SVGTable;
+import net.java.dev.typecast.ot.table.Table;
+import net.java.dev.typecast.ot.table.VdmxTable;
 
-    private GlyfTable _glyf;
-    private GaspTable _gasp;
-    private KernTable _kern;
-    private HdmxTable _hdmx;
-    private VdmxTable _vdmx;
+/**
+ * TrueType Font.
+ *
+ * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ */
+public class TTFont extends OTFont {
+   
+    /** 
+     * Creates a {@link TTFont}.
+     */
+    public TTFont() {
+        super();
+    }
 
     /**
-     * Constructor
-     *
-     * @param fontData
-     * @param tablesOrigin
+     * Creates a {@link TTFont} from the given binary font file data.
+     * 
+     * @see #read(byte[], int)
      */
     public TTFont(byte[] fontData, int tablesOrigin) throws IOException {
         super(fontData, tablesOrigin);
+    }
 
-        // Load the table directory
-//        dis.skip(directoryOffset);
-        TableDirectory tableDirectory = new TableDirectory(fontData);
+    @Override
+    public void read(byte[] fontData, int tablesOrigin) throws IOException {
+        super.read(fontData, tablesOrigin);
 
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(fontData));
         dis.mark(fontData.length);
         dis.reset();
 
         // 'loca' is required by 'glyf'
-        int length = seekTable(tableDirectory, dis, tablesOrigin, Table.loca);
-        LocaTable loca = new LocaTable(dis, length, this.getHeadTable(), this.getMaxpTable());
-
-        // If this is a TrueType outline, then we'll have at least the
-        // 'glyf' table (along with the 'loca' table)
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.glyf);
-        _glyf = new GlyfTable(dis, length, this.getMaxpTable(), loca);
-
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.gasp);
-        if (length > 0) {
-            _gasp = new GaspTable(dis);
+        LocaTable loca = (LocaTable) initTable(dis, tablesOrigin, Table.loca);
+        if (loca != null) {
+            // If this is a TrueType outline, then we'll have at least the
+            // 'glyf' table (along with the 'loca' table)
+            initTable(dis, tablesOrigin, Table.glyf);
         }
-
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.kern);
-        if (length > 0) {
-            _kern = new KernTable(dis);
-        }
-
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.hdmx);
-        if (length > 0) {
-            _hdmx = new HdmxTable(dis, length, this.getMaxpTable());
-        }
-
-        length = seekTable(tableDirectory, dis, tablesOrigin, Table.VDMX);
-        if (length > 0) {
-            _vdmx = new VdmxTable(dis);
-        }
+        
+        initTable(dis, tablesOrigin, Table.svg);
+        initTable(dis, tablesOrigin, Table.gasp);
+        initTable(dis, tablesOrigin, Table.kern);
+        initTable(dis, tablesOrigin, Table.hdmx);
+        initTable(dis, tablesOrigin, Table.VDMX);
+        
+        getTableDirectory().initTables(dis, tablesOrigin);
     }
 
     public GlyfTable getGlyfTable() {
-        return _glyf;
+        return getTableDirectory().glyf();
+    }
+    
+    /**
+     * Optional {@link SVGTable}.
+     */
+    public SVGTable getSvgTable() {
+        return getTableDirectory().svg();
     }
 
     public GaspTable getGaspTable() {
-        return _gasp;
+        return getTableDirectory().gasp();
     }
 
     public KernTable getKernTable() {
-        return _kern;
+        return getTableDirectory().kern();
     }
 
     public HdmxTable getHdmxTable() {
-        return _hdmx;
+        return getTableDirectory().hdmx();
     }
 
     public VdmxTable getVdmxTable() {
-        return _vdmx;
+        return getTableDirectory().vdmx();
     }
 
     public Glyph getGlyph(int i) {
-        return new TTGlyph(
-                _glyf.getDescription(i),
-                getHmtxTable().getLeftSideBearing(i),
-                getHmtxTable().getAdvanceWidth(i));
+        HmtxTable hmtxTable = getHmtxTable();
+        return new TTGlyph(getGlyfTable().getDescription(i), 
+            hmtxTable.getLeftSideBearing(i), hmtxTable.getAdvanceWidth(i));
     }
 
 }

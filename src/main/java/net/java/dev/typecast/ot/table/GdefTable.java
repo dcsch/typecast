@@ -5,11 +5,22 @@ import java.io.DataInput;
 import java.io.IOException;
 
 /**
+ * GDEF — Glyph Definition Table
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
+ * 
+ * <a href="https://docs.microsoft.com/en-us/typography/opentype/spec/gdef">Spec: Glyph Definition Table</a>
  */
-class GdefTable implements Table {
+public class GdefTable implements Table {
 
-    protected GdefTable(DataInput di) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
+        // TODO: Implement.
+    }
+
+    @Override
+    public int getType() {
+        return GDEF;
     }
 
 }

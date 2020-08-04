@@ -21,25 +21,129 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.Arrays;
+
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 
 /**
- * High-byte mapping through table cmap format.
+ * Format 2: High-byte mapping through table.
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-2-high-byte-mapping-through-table"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
 public class CmapFormat2 extends CmapFormat {
 
-    private static class SubHeader {
+    static class SubHeader implements Writable {
+        /**
+         * uint16
+         * 
+         * First valid low byte for this SubHeader.
+         * 
+         * @see #_entryCount
+         */
         int _firstCode;
+        
+        /**
+         * uint16
+         * 
+         * Number of valid low bytes for this SubHeader.
+         */
         int _entryCount;
+        
+        /**
+         * @see #_entryCount
+         */
         short _idDelta;
+
+        /**
+         * @see #_entryCount
+         */
         int _idRangeOffset;
-        int _arrayIndex;
+
+        int _glyphIndexArray;
+        
+        /**
+         * First valid low byte for this {@link SubHeader}.
+         */
+        public int getFirstCode() {
+            return _firstCode;
+        }
+        
+        /**
+         * Number of valid low bytes for this {@link SubHeader}.
+         */
+        public int getEntryCount() {
+            return _entryCount;
+        }
+        
+        /**
+         * Offset to add to the value obtained from the subarray (if not 0,
+         * which indicates the missing glyph), to get the glyph index.
+         */
+        public short getIdDelta() {
+            return _idDelta;
+        }
+        
+        /**
+         * The number of bytes past the actual location of the
+         * {@link #getIdRangeOffset()} word where the
+         * {@link #getGlyphIndexArray()} element corresponding to
+         * {@link #getFirstCode()} appears.
+         */
+        public int getIdRangeOffset() {
+            return _idRangeOffset;
+        }
+        
+        /**
+         * @see #getIdRangeOffset()
+         */
+        public int getGlyphIndexArray() {
+            return _glyphIndexArray;
+        }
+
+        @Override
+        public void write(BinaryOutput out) throws IOException {
+            out.writeShort(getFirstCode());
+            out.writeShort(getEntryCount());
+            out.writeShort(getIdDelta());
+            out.writeShort(getIdRangeOffset());
+        }
     }
     
+    /**
+     * uint16
+     * 
+     * @see #getLength()
+     */
     private final int _length;
+
+    /**
+     * uint16
+     * 
+     * @see #getLanguage()
+     */
     private final int _language;
+    
+    /**
+     * uint16[256]
+     * 
+     * Array that maps high bytes to subHeaders: value is subHeader index × 8.
+     */
     private final int[] _subHeaderKeys = new int[256];
+    
+    /**
+     * Variable-length array of SubHeader records.
+     */
     private final SubHeader[] _subHeaders;
+    
+    /**
+     * uint16
+     * 
+     * Variable-length array containing subarrays used for mapping the low byte
+     * of 2-byte characters.
+     */
     private final int[] _glyphIndexArray;
 
     CmapFormat2(DataInput di) throws IOException {
@@ -72,11 +176,11 @@ public class CmapFormat2 extends CmapFormat {
             
             // Calculate the offset into the _glyphIndexArray
             pos += 8;
-            sh._arrayIndex =
+            sh._glyphIndexArray =
                     (pos - 2 + sh._idRangeOffset - indexArrayOffset) / 2;
             
             // What is the highest range within the glyphIndexArray?
-            highest = Math.max(highest, sh._arrayIndex + sh._entryCount);
+            highest = Math.max(highest, sh._glyphIndexArray + sh._entryCount);
             
             _subHeaders[i] = sh;
         }
@@ -85,6 +189,27 @@ public class CmapFormat2 extends CmapFormat {
         _glyphIndexArray = new int[highest];
         for (int i = 0; i < _glyphIndexArray.length; ++i) {
             _glyphIndexArray[i] = di.readUnsignedShort();
+        }
+    }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        out.writeShort(getFormat());
+        try (BinaryOutput lenghtOut = out.reserve(2)) {
+            out.writeShort(getLanguage());
+            for (int n = 0, cnt = _subHeaderKeys.length; n < cnt; n++) {
+                out.writeShort(_subHeaderKeys[n]);
+            }
+            for (int n = 0, cnt = _subHeaders.length; n < cnt; n++) {
+                _subHeaders[n].write(out);
+            }
+            for (int n = 0, cnt = _glyphIndexArray.length; n < cnt; n++) {
+                out.writeShort(_glyphIndexArray[n]);
+            }
+            long length = out.getPosition() - start;
+            
+            lenghtOut.writeShort((int) length);
         }
     }
 
@@ -151,11 +276,20 @@ public class CmapFormat2 extends CmapFormat {
         
         // Now calculate the glyph index
         int glyphIndex =
-                _glyphIndexArray[sh._arrayIndex + (lowByte - sh._firstCode)];
+                _glyphIndexArray[sh._glyphIndexArray + (lowByte - sh._firstCode)];
         if (glyphIndex != 0) {
             glyphIndex += sh._idDelta;
             glyphIndex %= 65536;
         }
         return glyphIndex;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+            "    format:         " + getFormat() + "\n" +
+            "    language:       " + getLanguage() + "\n" +
+            "    subHeaderKeys:  " + Arrays.toString(_subHeaderKeys) + "\n" +
+            "    glyphIndexArray:" + Arrays.toString(_glyphIndexArray) + "\n";
     }
 }

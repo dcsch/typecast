@@ -52,76 +52,143 @@ package net.java.dev.typecast.ot.table;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.Arrays;
+import net.java.dev.typecast.io.BinaryOutput;
+import net.java.dev.typecast.io.Writable;
 
 /**
+ * Character to Glyph Index Mapping Table
+ * 
+ * @see "https://docs.microsoft.com/en-us/typography/opentype/spec/cmap"
+ * 
  * @author <a href="mailto:david.schweinsberg@gmail.com">David Schweinsberg</a>
  */
-public class CmapTable implements Table {
+public class CmapTable implements Table, Writable {
 
-    private int _version;
-    private int _numTables;
-    private CmapIndexEntry[] _entries;
+    /**
+     * @see #getVersion()
+     */
+    public static final int VERSION = 0x0000;
+    
+    private int _version = VERSION;
+    
+    private ArrayList<CmapIndexEntry> _entries = new ArrayList<>();
 
-    public CmapTable(DataInput di) throws IOException {
+    @Override
+    public void read(DataInput di, int length) throws IOException {
         _version = di.readUnsignedShort();
-        _numTables = di.readUnsignedShort();
+        int numTables = di.readUnsignedShort();
         long bytesRead = 4;
-        _entries = new CmapIndexEntry[_numTables];
-
+        
         // Get each of the index entries
-        for (int i = 0; i < _numTables; i++) {
-            _entries[i] = new CmapIndexEntry(di);
+        
+        // Note: The encoding record entries in the 'cmap' header must be sorted
+        // first by platform ID, then by platform-specific encoding ID, and then
+        // by the language field in the corresponding subtable. Each platform
+        // ID, platform-specific encoding ID, and subtable language combination
+        // may appear only once in the 'cmap' table.
+        _entries.ensureCapacity(numTables);
+        for (int i = 0; i < numTables; i++) {
+            _entries.add(new CmapIndexEntry(di));
             bytesRead += 8;
         }
 
-        // Sort into their order of offset
-        Arrays.sort(_entries);
+        // For reading, sort into their order of offset.
+        List<CmapIndexEntry> entries = new ArrayList<CmapIndexEntry>(_entries);
+        Collections.sort(entries);
 
         // Get each of the tables
-        int lastOffset = 0;
+        int lastOffset = -1;
         CmapFormat lastFormat = null;
-        for (int i = 0; i < _numTables; i++) {
-            if (_entries[i].getOffset() == lastOffset) {
+        for (CmapIndexEntry entry : entries) {
+            if (entry.getOffset() == lastOffset) {
 
                 // This is a multiple entry
-                _entries[i].setFormat(lastFormat);
+                entry.setFormat(lastFormat);
                 continue;
-            } else if (_entries[i].getOffset() > bytesRead) {
-                di.skipBytes(_entries[i].getOffset() - (int) bytesRead);
-            } else if (_entries[i].getOffset() != bytesRead) {
+            } else if (entry.getOffset() > bytesRead) {
+                di.skipBytes(entry.getOffset() - (int) bytesRead);
+            } else if (entry.getOffset() != bytesRead) {
                 
                 // Something is amiss
                 throw new IOException();
             }
             int formatType = di.readUnsignedShort();
             lastFormat = CmapFormat.create(formatType, di);
-            lastOffset = _entries[i].getOffset();
-            _entries[i].setFormat(lastFormat);
+            lastOffset = entry.getOffset();
+            entry.setFormat(lastFormat);
             bytesRead += lastFormat.getLength();
         }
     }
+    
+    @Override
+    public void write(BinaryOutput out) throws IOException {
+        long start = out.getPosition();
+        
+        out.writeShort(getVersion());
+        out.writeShort(getNumTables());
+        
+        // The encoding record entries in the 'cmap' header must be sorted first
+        // by platform ID, then by platform-specific encoding ID, and then by
+        // the language field in the corresponding subtable.
+        Collections.sort(_entries, (e1, e2) -> {
+            int platformCmp = Integer.compare(e1.getPlatformId(), e2.getPlatformId());
+            if (platformCmp != 0) {
+                return platformCmp;
+            }
+            
+            int encodingCmp = Integer.compare(e1.getEncodingId(), e2.getEncodingId());
+            if (encodingCmp != 0) {
+                return encodingCmp;
+            }
+            
+            int langCmp = Integer.compare(e1.getFormat().getLanguage(), e2.getFormat().getLanguage());
+            return langCmp;
+        });
+        
+        List<Writable> formatWriters = new ArrayList<>(_entries.size());
+        for (CmapIndexEntry entry : _entries) {
+            formatWriters.add(entry.writeEncodingRecord(out, start));
+        }
+        
+        for (Writable formatWriter : formatWriters) {
+            formatWriter.write(out);
+        }
+    }
 
+    @Override
+    public int getType() {
+        return cmap;
+    }
+
+    /**
+     * uint16 Table version number ({@link #VERSION}}).
+     */
     public int getVersion() {
         return _version;
     }
     
+    /**
+     * uint16
+     * 
+     * Number of encoding tables that follow.
+     */
     public int getNumTables() {
-        return _numTables;
+        return _entries.size();
     }
     
     public CmapIndexEntry getCmapIndexEntry(int i) {
-        return _entries[i];
+        return _entries.get(i);
     }
     
     public CmapFormat getCmapFormat(short platformId, short encodingId) {
-
         // Find the requested format
-        for (int i = 0; i < _numTables; i++) {
-            if (_entries[i].getPlatformId() == platformId
-                    && _entries[i].getEncodingId() == encodingId) {
-                return _entries[i].getFormat();
+        for (CmapIndexEntry entry : _entries) {
+            if (entry.getPlatformId() == platformId && entry.getEncodingId() == encodingId) {
+                return entry.getFormat();
             }
         }
         return null;
@@ -129,17 +196,23 @@ public class CmapTable implements Table {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("cmap\n");
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("cmap Table\n");
+        sb.append("----------\n");
+        sb.append("  numTables: " + getNumTables() + "\n");
 
         // Get each of the index entries
-        for (int i = 0; i < _numTables; i++) {
-            sb.append("\t").append(_entries[i].toString()).append("\n");
+        for (CmapIndexEntry entry : _entries) {
+            sb.append("\n").append(entry.toString());
         }
 
         // Get each of the tables
 //        for (int i = 0; i < numTables; i++) {
 //            sb.append("\t").append(formats[i].toString()).append("\n");
 //        }
+        
+        sb.append("\n");
         return sb.toString();
     }
 
